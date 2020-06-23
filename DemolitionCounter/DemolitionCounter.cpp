@@ -8,6 +8,7 @@ BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", plugin
 
 bool enabledCounter;
 int demos = 0;
+int exterms = 0;
 
 void DemolitionCounter::onLoad()
 {
@@ -50,9 +51,20 @@ void DemolitionCounter::StatEvent(ServerWrapper caller, void* args) {
 	cvarManager->log(label.ToString());
 
 	// if the event is a demo
-	if (label.ToString().compare("Demolition") != 0) {
+	if (label.ToString().compare("Demolition") == 0) {
+		DemolitionCounter::demolition(receiver);
 		return;
 	}
+
+	// if event is an exterm
+	if (label.ToString().compare("Extermination") == 0) {
+		DemolitionCounter::extermination(receiver);
+		return;
+	}
+	
+}
+
+void DemolitionCounter::demolition(PriWrapper receiver) {
 	ServerWrapper sw = gameWrapper->GetOnlineGame();
 
 	if (sw.IsNull()) {
@@ -81,6 +93,48 @@ void DemolitionCounter::StatEvent(ServerWrapper caller, void* args) {
 		cvarManager->log("main player demo");
 		demos++;
 		cvarManager->log(std::to_string(demos));
+
+		std::ofstream demoFile;
+		demoFile.open("./DemolitionCounter/demolitions.txt");
+		demoFile << std::to_string(demos);
+		demoFile.close();
+	}
+}
+
+void DemolitionCounter::extermination(PriWrapper receiver) {
+	ServerWrapper sw = gameWrapper->GetOnlineGame();
+
+	if (sw.IsNull()) {
+		cvarManager->log("null server");
+		return;
+	}
+
+	auto primary = sw.GetLocalPrimaryPlayer();
+
+	if (primary.IsNull()) {
+		cvarManager->log("null primary player");
+		return;
+	}
+
+	auto primaryPri = primary.GetPRI();
+
+	if (primaryPri.IsNull()) {
+		cvarManager->log("null primary pri");
+		return;
+	}
+
+	auto receiverID = receiver.GetUniqueId();
+	auto primaryID = primaryPri.GetUniqueId();
+
+	if (receiverID.ID == primaryID.ID) {
+		cvarManager->log("main player exterm");
+		exterms++;
+		cvarManager->log(std::to_string(exterms));
+
+		std::ofstream demoFile;
+		demoFile.open("./DemolitionCounter/exterminations.txt");
+		demoFile << std::to_string(exterms);
+		demoFile.close();
 	}
 }
 
