@@ -267,7 +267,7 @@ void DemolitionCounter::demolition() {
 	//cvarManager->log("main player demo");
 	demos++;
 	gameDemos++;
-	cvarManager->log(std::to_string(demos));
+	//cvarManager->log(std::to_string(demos));
 
 	DemolitionCounter::writeDemos();
 }
@@ -275,7 +275,7 @@ void DemolitionCounter::extermination() {
 	//cvarManager->log("main player exterm");
 	exterms++;
 	gameExterms++;
-	cvarManager->log(std::to_string(exterms));
+	//cvarManager->log(std::to_string(exterms));
 
 	DemolitionCounter::writeExterms();
 }
