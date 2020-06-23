@@ -33,7 +33,7 @@ void DemolitionCounter::updateEnabled(bool enabled) {
 		gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
 			std::bind(&DemolitionCounter::statEvent, this, std::placeholders::_1, std::placeholders::_2));
 
-		gameWrapper->HookEvent("Function Engine.PlayerController.ClientStartOnlineGame", std::bind(&DemolitionCounter::startGame, this));
+		gameWrapper->HookEventPost("Function Engine.PlayerInput.InitInputSystem", std::bind(&DemolitionCounter::startGame, this));
 	}
 	else {
 		gameWrapper->UnhookEvent("Function TAGame.GFxHUD_TA.HandleStatTickerMessage");
@@ -99,12 +99,10 @@ void DemolitionCounter::demolition(PriWrapper receiver) {
 	if (receiverID.ID == primaryID.ID) {
 		cvarManager->log("main player demo");
 		demos++;
+		gameDemos++;
 		cvarManager->log(std::to_string(demos));
 
-		std::ofstream demoFile;
-		demoFile.open("./DemolitionCounter/demolitions.txt");
-		demoFile << std::to_string(demos);
-		demoFile.close();
+		DemolitionCounter::writeDemos();
 	}
 }
 
@@ -136,12 +134,10 @@ void DemolitionCounter::extermination(PriWrapper receiver) {
 	if (receiverID.ID == primaryID.ID) {
 		cvarManager->log("main player exterm");
 		exterms++;
+		gameExterms++;
 		cvarManager->log(std::to_string(exterms));
 
-		std::ofstream demoFile;
-		demoFile.open("./DemolitionCounter/exterminations.txt");
-		demoFile << std::to_string(exterms);
-		demoFile.close();
+		DemolitionCounter::writeExterms();
 	}
 }
 
@@ -151,9 +147,10 @@ void DemolitionCounter::writeDemos() {
 	demoFile << std::to_string(demos);
 	demoFile.close();
 
-	demoFile.open("./DemolitionCounter/gameDemolitions.txt");
-	demoFile << std::to_string(gameDemos);
-	demoFile.close();
+	std::ofstream gameDemoFile;
+	gameDemoFile.open("./DemolitionCounter/gameDemolitions.txt");
+	gameDemoFile << std::to_string(gameDemos);
+	gameDemoFile.close();
 }
 
 void DemolitionCounter::writeExterms() {
@@ -162,9 +159,10 @@ void DemolitionCounter::writeExterms() {
 	extermFile << std::to_string(exterms);
 	extermFile.close();
 
-	extermFile.open("./DemolitionCounter/gameExterminations.txt");
-	extermFile << std::to_string(gameExterms);
-	extermFile.close();
+	std::ofstream gameExtermFile;
+	gameExtermFile.open("./DemolitionCounter/gameExterminations.txt");
+	gameExtermFile << std::to_string(gameExterms);
+	gameExtermFile.close();
 }
 
 void DemolitionCounter::writeGames() {
@@ -175,6 +173,7 @@ void DemolitionCounter::writeGames() {
 }
 
 void DemolitionCounter::startGame() {
+	cvarManager->log("started game");
 	gameExterms = 0;
 	gameDemos = 0;
 	games++;
