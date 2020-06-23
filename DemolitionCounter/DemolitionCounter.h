@@ -17,11 +17,19 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	void updateEnabled(bool enabled);
 
 	// fires when a stat happens and this is enabled
-	void StatEvent(ServerWrapper caller, void* args);
+	void statEvent(ServerWrapper caller, void* args);
 
 	void demolition(PriWrapper receiver);
 
 	void extermination(PriWrapper receiver);
+
+	void startGame();
+
+	void writeDemos();
+
+	void writeExterms();
+
+	void writeGames();
 	// Inherited via PluginWindow
 	/*
 
