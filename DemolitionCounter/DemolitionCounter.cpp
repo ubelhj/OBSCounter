@@ -21,9 +21,17 @@ void DemolitionCounter::onLoad()
 	updateEnabled(enabledVar.getBoolValue());
 	enabledVar.addOnValueChanged([this](std::string, CVarWrapper cvar) { updateEnabled(cvar.getBoolValue()); });
 
-	DemolitionCounter::writeDemos();
-	DemolitionCounter::writeExterms();
-	DemolitionCounter::writeGames();
+	auto startDemos = cvarManager->registerCvar("counter_set_demos", "0", "sets demolition value");
+
+	demos = startDemos.getIntValue();
+	startDemos.addOnValueChanged([this](std::string, CVarWrapper cvar) { demos = cvar.getIntValue(); writeDemos(); });
+
+	auto startExterms = cvarManager->registerCvar("counter_set_exterms", "0", "sets extermination value");
+
+	exterms = startExterms.getIntValue();
+	startExterms.addOnValueChanged([this](std::string, CVarWrapper cvar) { exterms = cvar.getIntValue(); writeExterms(); });
+
+	writeAll();
 }
 
 void DemolitionCounter::updateEnabled(bool enabled) {
@@ -37,6 +45,7 @@ void DemolitionCounter::updateEnabled(bool enabled) {
 	}
 	else {
 		gameWrapper->UnhookEvent("Function TAGame.GFxHUD_TA.HandleStatTickerMessage");
+		gameWrapper->UnhookEvent("Function Engine.PlayerInput.InitInputSystem");
 	}
 }
 
@@ -57,88 +66,67 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
 	auto label = statEvent.GetLabel();
 	cvarManager->log(label.ToString());
 
+	if (!DemolitionCounter::isPrimaryPlayer(receiver)) {
+		return;
+	}
+
 	// if the event is a demo
 	if (label.ToString().compare("Demolition") == 0) {
-		DemolitionCounter::demolition(receiver);
+		DemolitionCounter::demolition();
 		return;
 	}
 
 	// if event is an exterm
 	if (label.ToString().compare("Extermination") == 0) {
-		DemolitionCounter::extermination(receiver);
+		DemolitionCounter::extermination();
 		return;
 	}
-	
 }
 
-void DemolitionCounter::demolition(PriWrapper receiver) {
+bool DemolitionCounter::isPrimaryPlayer(PriWrapper receiver) {
 	ServerWrapper sw = gameWrapper->GetOnlineGame();
 
 	if (sw.IsNull()) {
 		cvarManager->log("null server");
-		return;
+		return false;
 	}
 
 	auto primary = sw.GetLocalPrimaryPlayer();
 
 	if (primary.IsNull()) {
 		cvarManager->log("null primary player");
-		return;
+		return false;
 	}
 
 	auto primaryPri = primary.GetPRI();
 
 	if (primaryPri.IsNull()) {
 		cvarManager->log("null primary pri");
-		return;
+		return false;
 	}
 
 	auto receiverID = receiver.GetUniqueId();
 	auto primaryID = primaryPri.GetUniqueId();
 
-	if (receiverID.ID == primaryID.ID) {
-		cvarManager->log("main player demo");
-		demos++;
-		gameDemos++;
-		cvarManager->log(std::to_string(demos));
-
-		DemolitionCounter::writeDemos();
-	}
+	return receiverID.ID == primaryID.ID;
 }
 
-void DemolitionCounter::extermination(PriWrapper receiver) {
-	ServerWrapper sw = gameWrapper->GetOnlineGame();
+void DemolitionCounter::demolition() {
+	cvarManager->log("main player demo");
+	demos++;
+	gameDemos++;
+	cvarManager->log(std::to_string(demos));
 
-	if (sw.IsNull()) {
-		cvarManager->log("null server");
-		return;
-	}
+	DemolitionCounter::writeDemos();
+}
 
-	auto primary = sw.GetLocalPrimaryPlayer();
+void DemolitionCounter::extermination() {
+	cvarManager->log("main player exterm");
+	exterms++;
+	gameExterms++;
+	cvarManager->log(std::to_string(exterms));
 
-	if (primary.IsNull()) {
-		cvarManager->log("null primary player");
-		return;
-	}
-
-	auto primaryPri = primary.GetPRI();
-
-	if (primaryPri.IsNull()) {
-		cvarManager->log("null primary pri");
-		return;
-	}
-
-	auto receiverID = receiver.GetUniqueId();
-	auto primaryID = primaryPri.GetUniqueId();
-
-	if (receiverID.ID == primaryID.ID) {
-		cvarManager->log("main player exterm");
-		exterms++;
-		gameExterms++;
-		cvarManager->log(std::to_string(exterms));
-
-		DemolitionCounter::writeExterms();
-	}
+	DemolitionCounter::writeExterms();
 }
 
 void DemolitionCounter::writeDemos() {
@@ -163,6 +151,12 @@ void DemolitionCounter::writeExterms() {
 	gameExtermFile.open("./DemolitionCounter/gameExterminations.txt");
 	gameExtermFile << std::to_string(gameExterms);
 	gameExtermFile.close();
+}
+
+void DemolitionCounter::writeAll() {
+	writeDemos();
+	writeExterms();
+	writeGames();
 }
 
 void DemolitionCounter::writeGames() {
