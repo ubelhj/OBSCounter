@@ -35,4 +35,9 @@
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DemolitionCounter.set">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

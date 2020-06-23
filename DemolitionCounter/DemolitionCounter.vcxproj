@@ -103,6 +103,9 @@
   <ItemGroup>
     <Text Include="demolitions.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DemolitionCounter.set" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

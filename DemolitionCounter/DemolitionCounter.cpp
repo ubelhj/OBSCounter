@@ -18,7 +18,15 @@ void DemolitionCounter::onLoad()
 	updateEnabled(enabledVar.getBoolValue());
 	enabledVar.addOnValueChanged([this](std::string, CVarWrapper cvar) { updateEnabled(cvar.getBoolValue()); });
 
+	std::ofstream demoFile;
+	demoFile.open("./DemolitionCounter/demolitions.txt");
+	demoFile << std::to_string(demos);
+	demoFile.close();
 
+	std::ofstream extermFile;
+	extermFile.open("./DemolitionCounter/exterminations.txt");
+	extermFile << std::to_string(exterms);
+	extermFile.close();
 }
 
 void DemolitionCounter::updateEnabled(bool enabled) {
