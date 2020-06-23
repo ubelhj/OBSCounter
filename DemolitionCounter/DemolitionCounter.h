@@ -1,4 +1,5 @@
 #pragma once
+#pragma comment(lib, "bakkesmod.lib")
 
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/pluginwindow.h"
@@ -15,8 +16,8 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// enables or disables plugin
 	void updateEnabled(bool enabled);
 
-	// fires when a demo happens and this is enabled
-	void demolishEvent();
+	// fires when a stat happens and this is enabled
+	void StatEvent(ServerWrapper caller, void* args);
 	// Inherited via PluginWindow
 	/*
 

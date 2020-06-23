@@ -4,7 +4,7 @@
 #include <fstream>
 #include "bakkesmod/wrappers/GameObject/Stats/StatEventWrapper.h"
 
-BAKKESMOD_PLUGIN(DemolitionCounter, "write a plugin description here", plugin_version, PLUGINTYPE_THREADED)
+BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", plugin_version, PLUGINTYPE_THREADED)
 
 bool enabledCounter;
 int demos = 0;
@@ -24,44 +24,64 @@ void DemolitionCounter::updateEnabled(bool enabled) {
 	enabledCounter = enabled;
 
 	if (enabled) {
-		gameWrapper->HookEvent("Function TAGame.Car_TA.OnDemolished", std::bind(&DemolitionCounter::demolishEvent, this));
+		gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
+			std::bind(&DemolitionCounter::StatEvent, this, std::placeholders::_1, std::placeholders::_2));
+	}
+	else {
+		gameWrapper->UnhookEvent("Function TAGame.GFxHUD_TA.HandleStatTickerMessage");
 	}
 }
 
-void DemolitionCounter::demolishEvent() {
-	cvarManager->log("demolition happened");
-	if (!gameWrapper->IsInOnlineGame()) {
-		cvarManager->log("not in game");
+struct TheArgStruct
+{
+	uintptr_t Receiver;
+	uintptr_t Victim;
+	uintptr_t StatEvent;
+};
+
+void DemolitionCounter::StatEvent(ServerWrapper caller, void* args) {
+	auto tArgs = (TheArgStruct*)args;
+	cvarManager->log("stat event!");
+
+	auto victim = PriWrapper(tArgs->Victim);
+	auto receiver = PriWrapper(tArgs->Receiver);
+	auto statEvent = StatEventWrapper(tArgs->StatEvent);
+	auto label = statEvent.GetLabel();
+	cvarManager->log(label.ToString());
+
+	// if the event is a demo
+	if (label.ToString().compare("Demolition") != 0) {
 		return;
 	}
-
 	ServerWrapper sw = gameWrapper->GetOnlineGame();
 
 	if (sw.IsNull()) {
-		cvarManager->log("game not server");
+		cvarManager->log("null server");
 		return;
 	}
 
-	PlayerControllerWrapper player = sw.GetLocalPrimaryPlayer();
+	auto primary = sw.GetLocalPrimaryPlayer();
 
-	if (player.IsNull()) {
-		cvarManager->log("no primary player");
+	if (primary.IsNull()) {
+		cvarManager->log("null primary player");
 		return;
 	}
 
-	PriWrapper playerPri = player.GetPRI();
+	auto primaryPri = primary.GetPRI();
 
-	if (playerPri.IsNull()) {
-		cvarManager->log("null player pri");
+	if (primaryPri.IsNull()) {
+		cvarManager->log("null primary pri");
 		return;
 	}
 
-	int demos = playerPri.GetMatchDemolishes();
+	auto receiverID = receiver.GetUniqueId();
+	auto primaryID = primaryPri.GetUniqueId();
 
-	std::string targetStr = std::to_string(demos);
-
-	cvarManager->log(targetStr);
-	cvarManager->log("end demoed");
+	if (receiverID.ID == primaryID.ID) {
+		cvarManager->log("main player demo");
+		demos++;
+		cvarManager->log(std::to_string(demos));
+	}
 }
 
 void DemolitionCounter::onUnload()
