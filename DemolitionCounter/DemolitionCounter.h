@@ -16,6 +16,9 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// enables or disables plugin
 	void updateEnabled(bool enabled);
 
+	// sets cvars to modify counters 
+	void setCvars();
+
 	// fires when a stat happens and this is enabled
 	void statEvent(ServerWrapper caller, void* args);
 
@@ -24,6 +27,9 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 
 	// called when a new game starts, resets game stats
 	void startGame();
+
+	// called when a game ends, allows next game to be started
+	void endGame();
 
 	// functions done as each of these stats happen for the primary player
 	void demolition();
