@@ -19,21 +19,72 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// fires when a stat happens and this is enabled
 	void statEvent(ServerWrapper caller, void* args);
 
+	// checks if the plyer that received a stat is the main player
 	bool isPrimaryPlayer(PriWrapper receiver);
 
-	void demolition();
-
-	void extermination();
-
+	// called when a new game starts, resets game stats
 	void startGame();
 
-	void writeDemos();
+	// functions done as each of these stats happen for the primary player
+	void demolition();
+	void extermination();
+	void win();
+	void mvp();
+	void goal();
+	void aerialGoal();
+	void backwardsGoal();
+	void bicycleGoal();
+	void longGoal();
+	void turtleGoal();
+	void poolShot();
+	void overtimeGoal();
+	void hatTrick();
+	void assist();
+	void playmaker();
+	void save();
+	void epicSave();
+	void savior();
+	void shot();
+	void center();
+	void clear();
+	void firstTouch();
+	void damage();
+	void ultraDamage();
+	void lowFive();
+	void highFive();
+	void swish();
 
-	void writeExterms();
-
-	void writeGames();
-
+	// writes the .txt files
 	void writeAll();
+	void writeDemos();
+	void writeExterms();
+	void writeGames();
+	void writeWins();
+	void writeMvps();
+	void writeGoals();
+	void writeAerialGoals();
+	void writeBackwardsGoals();
+	void writeBicycleGoals();
+	void writeLongGoals();
+	void writeTurtleGoals();
+	void writePoolShots();
+	void writeOvertimeGoals();
+	void writeHatTricks();
+	void writeAssists();
+	void writePlaymakers();
+	void writeSaves();
+	void writeEpicSaves();
+	void writeSaviors();
+	void writeShots();
+	void writeCenters();
+	void writeClears();
+	void writeFirstTouchs();
+	void writeDamages();
+	void writeUltraDamages();
+	void writeLowFives();
+	void writeHighFives();
+	void writeSwishs();
+	
 	// Inherited via PluginWindow
 	/*
 
