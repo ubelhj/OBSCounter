@@ -1,4 +1,4 @@
-# DemolitionCounter
+# OBSCounter
 Counts demolitions in rocket league and outputs to files
 [https://bakkesplugins.com/plugins/view/123](https://bakkesplugins.com/plugins/view/123)
 
