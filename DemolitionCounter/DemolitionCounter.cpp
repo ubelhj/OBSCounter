@@ -74,6 +74,15 @@ void DemolitionCounter::onLoad()
     updateEnabled(enabledVar.getBoolValue());
     enabledVar.addOnValueChanged([this](std::string, CVarWrapper cvar) { updateEnabled(cvar.getBoolValue()); });
 
+    auto decimalsVar = cvarManager->registerCvar("counter_decimals", "2", "set decimal places in averages (1 - 10)");
+    decimalsVar.addOnValueChanged([this](std::string, CVarWrapper cvar) { 
+            int newValue = cvar.getIntValue();
+            if (newValue >= 1 && newValue <= 10) {
+                decimalPlaces = newValue;
+                writeAll();
+            }
+        });
+
     // setters for totals
     setCvars();
     
