@@ -16,6 +16,7 @@ int wins = 0;
 int mvps = 0;
 int games = 0;
 int demos = 0;
+int deaths = 0;
 int exterms = 0;
 int goals = 0;
 int aerialGoals = 0;
@@ -42,6 +43,7 @@ int highFives = 0;
 int swishs = 0;
 int gameGoals = 0;
 int gameDemos = 0;
+int gameDeaths = 0;
 int gameExterms = 0;
 int gameAerialGoals = 0;
 int gameBackwardsGoals = 0;
@@ -95,6 +97,8 @@ void DemolitionCounter::setCvars() {
     startgames.addOnValueChanged([this](std::string, CVarWrapper cvar) { games = cvar.getIntValue() - 1; endedGame = true; startGame(); endedGame = true; });
     auto startDemos = cvarManager->registerCvar("counter_set_demos", "0", "sets demolition value");
     startDemos.addOnValueChanged([this](std::string, CVarWrapper cvar) { demos = cvar.getIntValue(); writeDemos(); });
+    auto startDeaths = cvarManager->registerCvar("counter_set_deaths", "0", "sets deaths value");
+    startDeaths.addOnValueChanged([this](std::string, CVarWrapper cvar) { deaths = cvar.getIntValue(); writeDeaths(); });
     auto startExterms = cvarManager->registerCvar("counter_set_exterms", "0", "sets extermination value");
     startExterms.addOnValueChanged([this](std::string, CVarWrapper cvar) { exterms = cvar.getIntValue(); writeExterms(); });
     auto startwins = cvarManager->registerCvar("counter_set_wins", "0", "sets wins value");
@@ -187,6 +191,18 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     auto statEvent = StatEventWrapper(tArgs->StatEvent);
     auto label = statEvent.GetLabel();
     //cvarManager->log(label.ToString());
+
+    // special case for demolitions to check for the player's death
+    if (label.ToString().compare("Demolition") == 0) {
+        if (DemolitionCounter::isPrimaryPlayer(receiver)) {
+            DemolitionCounter::demolition();
+            return;
+        }
+        else if (DemolitionCounter::isPrimaryPlayer(victim)) {
+            DemolitionCounter::death();
+            return;
+        }
+    }
 
     if (!DemolitionCounter::isPrimaryPlayer(receiver)) {
         return;
@@ -332,6 +348,11 @@ bool DemolitionCounter::isPrimaryPlayer(PriWrapper receiver) {
         return false;
     }
 
+    if (receiver.IsNull()) {
+        cvarManager->log("null receiver");
+        return false;
+    }
+
     auto receiverID = receiver.GetUniqueId();
     auto primaryID = primaryPri.GetUniqueId();
 
@@ -390,6 +411,11 @@ void DemolitionCounter::demolition() {
     //cvarManager->log(std::to_string(demos));
 
     DemolitionCounter::writeDemos();
+}
+void DemolitionCounter::death() {
+    deaths++;
+    gameDeaths++;
+    DemolitionCounter::writeDeaths();
 }
 void DemolitionCounter::extermination() {
     //cvarManager->log("main player exterm");
@@ -545,6 +571,30 @@ void DemolitionCounter::writeDemos() {
     std::ofstream gameFile;
     gameFile.open("./OBSCounter/gameDemolitions.txt");
     gameFile << std::to_string(gameDemos);
+    gameFile.close();
+}
+void DemolitionCounter::writeDeaths() {
+    std::ofstream averageFile;
+    averageFile.open("./OBSCounter/averageDeaths.txt");
+    float averageDeaths;
+    if (games == 0) {
+        averageDeaths = 0.00;
+    }
+    else {
+        averageDeaths = (float)deaths / (float)games;
+    }
+    averageFile << std::fixed << std::setprecision(decimalPlaces);
+    averageFile << averageDeaths;
+    averageFile.close();
+
+    std::ofstream file;
+    file.open("./OBSCounter/deaths.txt");
+    file << std::to_string(deaths);
+    file.close();
+
+    std::ofstream gameFile;
+    gameFile.open("./OBSCounter/gameDeaths.txt");
+    gameFile << std::to_string(gameDeaths);
     gameFile.close();
 }
 void DemolitionCounter::writeGoals() {
@@ -1133,6 +1183,7 @@ void DemolitionCounter::writeGames() {
 // calls all write functions at once
 void DemolitionCounter::writeAll() {
     writeDemos();
+    writeDeaths();
     writeExterms();
     writeGames();
     writeWins();

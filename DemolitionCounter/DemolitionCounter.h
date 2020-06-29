@@ -33,6 +33,7 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 
 	// functions done as each of these stats happen for the primary player
 	void demolition();
+	void death();
 	void extermination();
 	void win();
 	void mvp();
@@ -63,6 +64,7 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// writes the .txt files
 	void writeAll();
 	void writeDemos();
+	void writeDeaths();
 	void writeExterms();
 	void writeGames();
 	void writeWins();
