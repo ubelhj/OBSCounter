@@ -210,10 +210,10 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
 
     // Checks for each possible event name
     // no switches in c++ for strings
-    if (label.ToString().compare("Demolition") == 0) {
+   /* if (label.ToString().compare("Demolition") == 0) {
         DemolitionCounter::demolition();
         return;
-    }
+    }*/
     if (label.ToString().compare("Extermination") == 0) {
         DemolitionCounter::extermination();
         return;
@@ -239,8 +239,8 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
         return;
     }
     if (label.ToString().compare("Bicycle Goal") == 0) {
-    DemolitionCounter::bicycleGoal();
-    return;
+        DemolitionCounter::bicycleGoal();
+        return;
     }
     if (label.ToString().compare("Long Goal") == 0) {
         DemolitionCounter::longGoal();
