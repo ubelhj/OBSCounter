@@ -212,7 +212,7 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     // no switches in c++ for strings
    /* if (label.ToString().compare("Demolition") == 0) {
         DemolitionCounter::demolition();
-        return;
+        return; 
     }*/
     if (label.ToString().compare("Extermination") == 0) {
         DemolitionCounter::extermination();
