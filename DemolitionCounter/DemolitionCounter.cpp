@@ -372,6 +372,7 @@ void DemolitionCounter::startGame() {
     games++;
     gameExterms = 0;
     gameDemos = 0;
+    gameDeaths = 0;
     gameGoals = 0;
     gameAerialGoals = 0;
     gameBackwardsGoals = 0;
