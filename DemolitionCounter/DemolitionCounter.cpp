@@ -282,15 +282,15 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
         DemolitionCounter::savior();
         return;
     }
-    if (label.ToString().compare("Shot") == 0) {
+    if (label.ToString().compare("Shot on Goal") == 0) {
         DemolitionCounter::shot();
         return;
     }
-    if (label.ToString().compare("Center") == 0) {
+    if (label.ToString().compare("Center Ball") == 0) {
         DemolitionCounter::center();
         return;
     }
-    if (label.ToString().compare("Clear") == 0) {
+    if (label.ToString().compare("Clear Ball") == 0) {
         DemolitionCounter::clear();
         return;
     }
@@ -314,7 +314,7 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
         DemolitionCounter::highFive();
         return;
     }
-    if (label.ToString().compare("Swish") == 0) {
+    if (label.ToString().compare("Swish Goal") == 0) {
         DemolitionCounter::swish();
         return;
     }
