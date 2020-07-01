@@ -158,7 +158,7 @@ void DemolitionCounter::hookEvents() {
     // works on a joined game in progress
     gameWrapper->HookEventPost("Function Engine.PlayerInput.InitInputSystem", std::bind(&DemolitionCounter::startGame, this));
     // works on ended game
-    gameWrapper->HookEventPost("Function TAGame.GFxHUD_Soccar_TA.HandleMatchWinnerSet", std::bind(&DemolitionCounter::endGame, this));
+    gameWrapper->HookEventPost("Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", std::bind(&DemolitionCounter::endGame, this));
 }
 
 struct TheArgStruct
