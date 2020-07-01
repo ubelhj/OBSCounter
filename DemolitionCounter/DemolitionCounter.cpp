@@ -7,7 +7,6 @@
 
 BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", plugin_version, PLUGINTYPE_THREADED)
 
-bool enabledCounter;
 bool endedGame = true;
 int decimalPlaces = 2;
 
@@ -71,11 +70,6 @@ int gameSwishs = 0;
 void DemolitionCounter::onLoad()
 {
     cvarManager->log("Plugin loaded!");
-    auto enabledVar = cvarManager->registerCvar("counter_enabled", "0", "activate/deactivate demolition counter");
-
-    updateEnabled(enabledVar.getBoolValue());
-    enabledVar.addOnValueChanged([this](std::string, CVarWrapper cvar) { updateEnabled(cvar.getBoolValue()); });
-
     auto decimalsVar = cvarManager->registerCvar("counter_decimals", "2", "set decimal places in averages (1 - 10)");
     decimalsVar.addOnValueChanged([this](std::string, CVarWrapper cvar) { 
             int newValue = cvar.getIntValue();
@@ -87,6 +81,8 @@ void DemolitionCounter::onLoad()
 
     // setters for totals
     setCvars();
+
+    hookEvents();
     
     writeAll();
 }
@@ -153,25 +149,16 @@ void DemolitionCounter::setCvars() {
     startswishs.addOnValueChanged([this](std::string, CVarWrapper cvar) { swishs = cvar.getIntValue(); writeSwishs(); });
 }
 
-void DemolitionCounter::updateEnabled(bool enabled) {
-    enabledCounter = enabled;
+void DemolitionCounter::hookEvents() {
+    gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
+        std::bind(&DemolitionCounter::statEvent, this, std::placeholders::_1, std::placeholders::_2));
 
-    if (enabled) {
-        gameWrapper->HookEventWithCaller<ServerWrapper>("Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
-            std::bind(&DemolitionCounter::statEvent, this, std::placeholders::_1, std::placeholders::_2));
-
-        // works on a starting game 
-        gameWrapper->HookEventPost("Function GameEvent_Soccar_TA.WaitingForPlayers.BeginState", std::bind(&DemolitionCounter::startGame, this));
-        // works on a joined game in progress
-        gameWrapper->HookEventPost("Function Engine.PlayerInput.InitInputSystem", std::bind(&DemolitionCounter::startGame, this));
-        // works on ended game
-        gameWrapper->HookEventPost("Function TAGame.GFxHUD_Soccar_TA.HandleMatchWinnerSet", std::bind(&DemolitionCounter::endGame, this));
-    }      
-    else {
-        gameWrapper->UnhookEvent("Function TAGame.GFxHUD_TA.HandleStatTickerMessage");
-        gameWrapper->UnhookEvent("Function GameEvent_Soccar_TA.WaitingForPlayers.BeginState");
-        gameWrapper->UnhookEvent("Function Engine.PlayerInput.InitInputSystem");
-    }
+    // works on a starting game 
+    gameWrapper->HookEventPost("Function GameEvent_Soccar_TA.WaitingForPlayers.BeginState", std::bind(&DemolitionCounter::startGame, this));
+    // works on a joined game in progress
+    gameWrapper->HookEventPost("Function Engine.PlayerInput.InitInputSystem", std::bind(&DemolitionCounter::startGame, this));
+    // works on ended game
+    gameWrapper->HookEventPost("Function TAGame.GFxHUD_Soccar_TA.HandleMatchWinnerSet", std::bind(&DemolitionCounter::endGame, this));
 }
 
 struct TheArgStruct

@@ -12,12 +12,12 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	//Boilerplate
 	virtual void onLoad();
 	virtual void onUnload();
-	
-	// enables or disables plugin
-	void updateEnabled(bool enabled);
 
 	// sets cvars to modify counters 
 	void setCvars();
+
+	// hooks events for stats
+	void hookEvents();
 
 	// fires when a stat happens and this is enabled
 	void statEvent(ServerWrapper caller, void* args);
