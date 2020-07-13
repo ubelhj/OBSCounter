@@ -189,6 +189,7 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
             DemolitionCounter::death();
             return;
         }
+        return;
     }
 
     if (!DemolitionCounter::isPrimaryPlayer(receiver)) {
@@ -425,6 +426,7 @@ void DemolitionCounter::goal() {
     goals++;
     gameGoals++;
     DemolitionCounter::writeGoals();
+    DemolitionCounter::writeShootingPercentage();
 }
 void DemolitionCounter::aerialGoal() {
     aerialGoals++;
@@ -495,6 +497,7 @@ void DemolitionCounter::shot() {
     shots++;
     gameShots++;
     DemolitionCounter::writeShots();
+    DemolitionCounter::writeShootingPercentage();
 }
 void DemolitionCounter::center() {
     centers++;
@@ -1167,6 +1170,19 @@ void DemolitionCounter::writeGames() {
     gameFile << std::to_string(games);
     gameFile.close();
 }
+void DemolitionCounter::writeShootingPercentage() {
+    std::ofstream gameFile;
+    gameFile.open("./OBSCounter/gameShootingPercentage.txt");
+    gameFile << std::fixed << std::setprecision(decimalPlaces);
+    gameFile << ((float)gameGoals / (float)gameShots);
+    gameFile.close();
+
+    std::ofstream file;
+    file.open("./OBSCounter/shootingPercentage.txt");
+    file << std::fixed << std::setprecision(decimalPlaces);
+    file << ((float)goals / (float)shots);
+    file.close();
+}
 
 // calls all write functions at once
 void DemolitionCounter::writeAll() {
@@ -1199,6 +1215,7 @@ void DemolitionCounter::writeAll() {
     writeLowFives();
     writeHighFives();
     writeSwishs();
+    writeShootingPercentage();
 }
 
 void DemolitionCounter::onUnload()

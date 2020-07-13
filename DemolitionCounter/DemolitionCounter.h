@@ -92,6 +92,7 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	void writeLowFives();
 	void writeHighFives();
 	void writeSwishs();
+	void writeShootingPercentage();
 	
 	// Inherited via PluginWindow
 	/*
