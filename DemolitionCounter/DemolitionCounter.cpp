@@ -1172,15 +1172,29 @@ void DemolitionCounter::writeGames() {
 }
 void DemolitionCounter::writeShootingPercentage() {
     std::ofstream gameFile;
+    float gameShooting;
+    if (gameShots == 0) {
+        gameShooting = 0;
+    }
+    else {
+        gameShooting = (float)gameGoals / (float)gameShots;
+    }
     gameFile.open("./OBSCounter/gameShootingPercentage.txt");
     gameFile << std::fixed << std::setprecision(decimalPlaces);
-    gameFile << ((float)gameGoals / (float)gameShots);
+    gameFile << gameShooting;
     gameFile.close();
 
+    float totalShooting;
+    if (shots == 0) {
+        totalShooting = 0;
+    }
+    else {
+        totalShooting = (float)goals / (float)shots;
+    }
     std::ofstream file;
     file.open("./OBSCounter/shootingPercentage.txt");
     file << std::fixed << std::setprecision(decimalPlaces);
-    file << ((float)goals / (float)shots);
+    file << totalShooting;
     file.close();
 }
 
