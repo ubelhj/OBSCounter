@@ -31,15 +31,18 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// called when a game ends, allows next game to be started
 	void endGame();
 
+
 	// writes the .txt files
 	// writes all at once
 	void writeAll();
 	// writes all game stats
 	void writeAllGameStats();
+
 	// writes a specific stat
 	void write(int statIndex);
 	// writes a game stat only
 	void writeGameStat(int statIndex);
+
 
 	// extra stats beyond basic ones
 	// writes shooting percentage on a shot or a goal

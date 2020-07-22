@@ -10,9 +10,9 @@ BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", plugin
 bool endedGame = true;
 int decimalPlaces = 2;
 
-// Macros for all stat indexes 
-// easier to refer back with macro
-// total stats are from 0 to 28
+// constexpr for all stat indexes 
+// easier to refer back to stat names
+// total stats are from 0 to 28, game stats from 29 to end
 // these stats have no game counterpart
 constexpr int wins = 0;
 constexpr int mvps = 1;
@@ -44,7 +44,7 @@ constexpr int ultraDamages = 25;
 constexpr int lowFives = 26;
 constexpr int highFives = 27;
 constexpr int swishs = 28;
-// game stats are from 29-end
+// game stats are from 29 -> end
 constexpr int gameGoals = 29;
 constexpr int gameDemos = 30;
 constexpr int gameDeaths = 31;
@@ -72,6 +72,7 @@ constexpr int gameLowFives = 52;
 constexpr int gameHighFives = 53;
 constexpr int gameSwishs = 54;
 constexpr int numStats = 55;
+
 // jump from a stat to its most recent game stat
 constexpr int totalToGame = 26;
 // number of stats without game counterpart
@@ -568,7 +569,7 @@ void DemolitionCounter::write(int statIndex) {
         std::string averageLocation = "./OBSCounter/average";
         // makes the first letter uppercase for nice looking files
         std::string statNameUpper = indexStringMap[statIndex];
-        std::toupper(statNameUpper[0]);
+        statNameUpper[0] = std::toupper(statNameUpper[0]);
         averageLocation += statNameUpper + ".txt";
         averageFile.open(averageLocation);
 
@@ -604,12 +605,8 @@ void DemolitionCounter::write(int statIndex) {
 
 // writes a game stat, must be a game stat index
 void DemolitionCounter::writeGameStat(int statIndex) {
-    // holds stat name with uppercase first letter
-    std::string statNameUpper = indexStringMap[statIndex];
-    std::toupper(statNameUpper[0]);
-
     std::ofstream gameStatFile;
-    gameStatFile.open("./OBSCounter/game" + statNameUpper + ".txt");
+    gameStatFile.open("./OBSCounter/" + indexStringMap[statIndex] + ".txt");
     // jumps from stat to its game counterpart
     gameStatFile << statArray[statIndex];
     gameStatFile.close();
