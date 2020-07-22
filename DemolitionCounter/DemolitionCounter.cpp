@@ -10,62 +10,67 @@ BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", plugin
 bool endedGame = true;
 int decimalPlaces = 2;
 
-// stores all stats
-int wins = 0;
-int mvps = 0;
-int games = 0;
-int demos = 0;
-int deaths = 0;
-int exterms = 0;
-int goals = 0;
-int aerialGoals = 0;
-int backwardsGoals = 0;
-int bicycleGoals = 0;
-int longGoals = 0;
-int turtleGoals = 0;
-int poolShots = 0;
-int overtimeGoals = 0;
-int hatTricks = 0;
-int assists = 0;
-int playmakers = 0;
-int saves = 0;
-int epicSaves = 0;
-int saviors = 0;
-int shots = 0;
-int centers = 0;
-int clears = 0;
-int firstTouchs = 0;
-int damages = 0;
-int ultraDamages = 0;
-int lowFives = 0;
-int highFives = 0;
-int swishs = 0;
-int gameGoals = 0;
-int gameDemos = 0;
-int gameDeaths = 0;
-int gameExterms = 0;
-int gameAerialGoals = 0;
-int gameBackwardsGoals = 0;
-int gameBicycleGoals = 0;
-int gameLongGoals = 0;
-int gameTurtleGoals = 0;
-int gamePoolShots = 0;
-int gameOvertimeGoals = 0;
-int gameHatTricks = 0;
-int gameAssists = 0;
-int gamePlaymakers = 0;
-int gameSaves = 0;
-int gameEpicSaves = 0;
-int gameSaviors = 0;
-int gameShots = 0;
-int gameCenters = 0;
-int gameClears = 0;
-int gameFirstTouchs = 0;
-int gameDamages = 0;
-int gameUltraDamages = 0;
-int gameLowFives = 0;
-int gameHighFives = 0;
-int gameSwishs = 0;
+// Macros for all stat indexes 
+// easier to refer back with macro
+constexpr int wins = 0;
+constexpr int mvps = 1;
+constexpr int games = 2;
+constexpr int demos = 3;
+constexpr int deaths = 4;
+constexpr int exterms = 5;
+constexpr int goals = 6;
+constexpr int aerialGoals = 7;
+constexpr int backwardsGoals = 8;
+constexpr int bicycleGoals = 9;
+constexpr int longGoals = 10;
+constexpr int turtleGoals = 11;
+constexpr int poolShots = 12;
+constexpr int overtimeGoals = 13;
+constexpr int hatTricks = 14;
+constexpr int assists = 15;
+constexpr int playmakers = 16;
+constexpr int saves = 17;
+constexpr int epicSaves = 18;
+constexpr int saviors = 19;
+constexpr int shots = 20;
+constexpr int centers = 21;
+constexpr int clears = 22;
+constexpr int firstTouchs = 23;
+constexpr int damages = 24;
+constexpr int ultraDamages = 25;
+constexpr int lowFives = 26;
+constexpr int highFives = 27;
+constexpr int swishs = 28;
+constexpr int gameGoals = 29;
+constexpr int gameDemos = 30;
+constexpr int gameDeaths = 31;
+constexpr int gameExterms = 32;
+constexpr int gameAerialGoals = 33;
+constexpr int gameBackwardsGoals = 34;
+constexpr int gameBicycleGoals = 35;
+constexpr int gameLongGoals = 36;
+constexpr int gameTurtleGoals = 37;
+constexpr int gamePoolShots = 38;
+constexpr int gameOvertimeGoals = 39;
+constexpr int gameHatTricks = 40;
+constexpr int gameAssists = 41;
+constexpr int gamePlaymakers = 42;
+constexpr int gameSaves = 43;
+constexpr int gameEpicSaves = 44;
+constexpr int gameSaviors = 45;
+constexpr int gameShots = 46;
+constexpr int gameCenters = 47;
+constexpr int gameClears = 48;
+constexpr int gameFirstTouchs = 49;
+constexpr int gameDamages = 50;
+constexpr int gameUltraDamages = 51;
+constexpr int gameLowFives = 52;
+constexpr int gameHighFives = 53;
+constexpr int gameSwishs = 54;
+constexpr int numStats = 55;
+
+// holds all stats
+int statArray[numStats];
 
 void DemolitionCounter::onLoad()
 {
@@ -90,63 +95,63 @@ void DemolitionCounter::onLoad()
 void DemolitionCounter::setCvars() {
     // special case to make sure games update properly
     auto startgames = cvarManager->registerCvar("counter_set_games", "0", "sets games value");
-    startgames.addOnValueChanged([this](std::string, CVarWrapper cvar) { games = cvar.getIntValue() - 1; endedGame = true; startGame(); endedGame = true; });
+    startgames.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[games] = cvar.getIntValue() - 1; endedGame = true; startGame(); endedGame = true; });
     auto startDemos = cvarManager->registerCvar("counter_set_demos", "0", "sets demolition value");
-    startDemos.addOnValueChanged([this](std::string, CVarWrapper cvar) { demos = cvar.getIntValue(); writeDemos(); });
+    startDemos.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[demos] = cvar.getIntValue(); write(demos); });
     auto startDeaths = cvarManager->registerCvar("counter_set_deaths", "0", "sets deaths value");
-    startDeaths.addOnValueChanged([this](std::string, CVarWrapper cvar) { deaths = cvar.getIntValue(); writeDeaths(); });
+    startDeaths.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[deaths] = cvar.getIntValue(); write(deaths); });
     auto startExterms = cvarManager->registerCvar("counter_set_exterms", "0", "sets extermination value");
-    startExterms.addOnValueChanged([this](std::string, CVarWrapper cvar) { exterms = cvar.getIntValue(); writeExterms(); });
+    startExterms.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[exterms] = cvar.getIntValue(); write(exterms); });
     auto startwins = cvarManager->registerCvar("counter_set_wins", "0", "sets wins value");
-    startwins.addOnValueChanged([this](std::string, CVarWrapper cvar) { wins = cvar.getIntValue(); writeWins(); });
+    startwins.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[wins] = cvar.getIntValue(); write(wins); });
     auto startmvps = cvarManager->registerCvar("counter_set_mvps", "0", "sets mvps value");
-    startmvps.addOnValueChanged([this](std::string, CVarWrapper cvar) { mvps = cvar.getIntValue(); writeMvps(); });
+    startmvps.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[mvps] = cvar.getIntValue(); write(mvps); });
     auto startgoals = cvarManager->registerCvar("counter_set_goals", "0", "sets goals value");
-    startgoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { goals = cvar.getIntValue(); writeGoals(); });
+    startgoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[goals] = cvar.getIntValue(); write(goals); });
     auto startaerialGoals = cvarManager->registerCvar("counter_set_aerialGoals", "0", "sets aerialGoals value");
-    startaerialGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { aerialGoals = cvar.getIntValue(); writeAerialGoals(); });
+    startaerialGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[aerialGoals] = cvar.getIntValue(); write(aerialGoals); });
     auto startbackwardsGoals = cvarManager->registerCvar("counter_set_backwardsGoals", "0", "sets backwardsGoals value");
-    startbackwardsGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { backwardsGoals = cvar.getIntValue(); writeBackwardsGoals(); });
+    startbackwardsGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[backwardsGoals] = cvar.getIntValue(); write(backwardsGoals); });
     auto startbicycleGoals = cvarManager->registerCvar("counter_set_bicycleGoals", "0", "sets bicycleGoals value");
-    startbicycleGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { bicycleGoals = cvar.getIntValue(); writeBicycleGoals(); });
+    startbicycleGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[bicycleGoals] = cvar.getIntValue(); write(bicycleGoals); });
     auto startlongGoals = cvarManager->registerCvar("counter_set_longGoals", "0", "sets longGoals value");
-    startlongGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { longGoals = cvar.getIntValue(); writeLongGoals(); });
+    startlongGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[longGoals] = cvar.getIntValue(); write(longGoals); });
     auto startturtleGoals = cvarManager->registerCvar("counter_set_turtleGoals", "0", "sets turtleGoals value");
-    startturtleGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { turtleGoals = cvar.getIntValue(); writeTurtleGoals(); });
+    startturtleGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[turtleGoals] = cvar.getIntValue(); write(turtleGoals); });
     auto startpoolShots = cvarManager->registerCvar("counter_set_poolShots", "0", "sets poolShots value");
-    startpoolShots.addOnValueChanged([this](std::string, CVarWrapper cvar) { poolShots = cvar.getIntValue(); writePoolShots(); });
+    startpoolShots.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[poolShots] = cvar.getIntValue(); write(poolShots); });
     auto startovertimeGoals = cvarManager->registerCvar("counter_set_overtimeGoals", "0", "sets overtimeGoals value");
-    startovertimeGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { overtimeGoals = cvar.getIntValue(); writeOvertimeGoals(); });
+    startovertimeGoals.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[overtimeGoals] = cvar.getIntValue(); write(overtimeGoals); });
     auto starthatTricks = cvarManager->registerCvar("counter_set_hatTricks", "0", "sets hatTricks value");
-    starthatTricks.addOnValueChanged([this](std::string, CVarWrapper cvar) { hatTricks = cvar.getIntValue(); writeHatTricks(); });
+    starthatTricks.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[hatTricks] = cvar.getIntValue(); write(hatTricks); });
     auto startassists = cvarManager->registerCvar("counter_set_assists", "0", "sets assists value");
-    startassists.addOnValueChanged([this](std::string, CVarWrapper cvar) { assists = cvar.getIntValue(); writeAssists(); });
+    startassists.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[assists] = cvar.getIntValue(); write(assists); });
     auto startplaymakers = cvarManager->registerCvar("counter_set_playmakers", "0", "sets playmakers value");
-    startplaymakers.addOnValueChanged([this](std::string, CVarWrapper cvar) { playmakers = cvar.getIntValue(); writePlaymakers(); });
+    startplaymakers.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[playmakers] = cvar.getIntValue(); write(playmakers); });
     auto startsaves = cvarManager->registerCvar("counter_set_saves", "0", "sets saves value");
-    startsaves.addOnValueChanged([this](std::string, CVarWrapper cvar) { saves = cvar.getIntValue(); writeSaves(); });
+    startsaves.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[saves] = cvar.getIntValue(); write(saves); });
     auto startepicSaves = cvarManager->registerCvar("counter_set_epicSaves", "0", "sets epicSaves value");
-    startepicSaves.addOnValueChanged([this](std::string, CVarWrapper cvar) { epicSaves = cvar.getIntValue(); writeEpicSaves(); });
+    startepicSaves.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[epicSaves] = cvar.getIntValue(); write(epicSaves); });
     auto startsaviors = cvarManager->registerCvar("counter_set_saviors", "0", "sets saviors value");
-    startsaviors.addOnValueChanged([this](std::string, CVarWrapper cvar) { saviors = cvar.getIntValue(); writeSaviors(); });
+    startsaviors.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[saviors] = cvar.getIntValue(); write(saviors); });
     auto startshots = cvarManager->registerCvar("counter_set_shots", "0", "sets shots value");
-    startshots.addOnValueChanged([this](std::string, CVarWrapper cvar) { shots = cvar.getIntValue(); writeShots(); });
+    startshots.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[shots] = cvar.getIntValue(); write(shots); });
     auto startcenters = cvarManager->registerCvar("counter_set_centers", "0", "sets centers value");
-    startcenters.addOnValueChanged([this](std::string, CVarWrapper cvar) { centers = cvar.getIntValue(); writeCenters(); });
+    startcenters.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[centers] = cvar.getIntValue(); write(centers); });
     auto startclears = cvarManager->registerCvar("counter_set_clears", "0", "sets clears value");
-    startclears.addOnValueChanged([this](std::string, CVarWrapper cvar) { clears = cvar.getIntValue(); writeClears(); });
+    startclears.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[clears] = cvar.getIntValue(); write(clears); });
     auto startfirstTouchs = cvarManager->registerCvar("counter_set_firstTouchs", "0", "sets firstTouchs value");
-    startfirstTouchs.addOnValueChanged([this](std::string, CVarWrapper cvar) { firstTouchs = cvar.getIntValue(); writeFirstTouchs(); });
+    startfirstTouchs.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[firstTouchs] = cvar.getIntValue(); write(firstTouchs); });
     auto startdamages = cvarManager->registerCvar("counter_set_damages", "0", "sets damages value");
-    startdamages.addOnValueChanged([this](std::string, CVarWrapper cvar) { damages = cvar.getIntValue(); writeDamages(); });
+    startdamages.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[damages] = cvar.getIntValue(); write(damages); });
     auto startultraDamages = cvarManager->registerCvar("counter_set_ultraDamages", "0", "sets ultraDamages value");
-    startultraDamages.addOnValueChanged([this](std::string, CVarWrapper cvar) { ultraDamages = cvar.getIntValue(); writeUltraDamages(); });
+    startultraDamages.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[ultraDamages] = cvar.getIntValue(); write(ultraDamages); });
     auto startlowFives = cvarManager->registerCvar("counter_set_lowFives", "0", "sets lowFives value");
-    startlowFives.addOnValueChanged([this](std::string, CVarWrapper cvar) { lowFives = cvar.getIntValue(); writeLowFives(); });
+    startlowFives.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[lowFives] = cvar.getIntValue(); write(lowFives); });
     auto starthighFives = cvarManager->registerCvar("counter_set_highFives", "0", "sets highFives value");
-    starthighFives.addOnValueChanged([this](std::string, CVarWrapper cvar) { highFives = cvar.getIntValue(); writeHighFives(); });
+    starthighFives.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[highFives] = cvar.getIntValue(); write(highFives); });
     auto startswishs = cvarManager->registerCvar("counter_set_swishs", "0", "sets swishs value");
-    startswishs.addOnValueChanged([this](std::string, CVarWrapper cvar) { swishs = cvar.getIntValue(); writeSwishs(); });
+    startswishs.addOnValueChanged([this](std::string, CVarWrapper cvar) { statArray[swishs] = cvar.getIntValue(); write(swishs); });
 }
 
 void DemolitionCounter::hookEvents() {
@@ -182,11 +187,15 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     // special case for demolitions to check for the player's death
     if (label.ToString().compare("Demolition") == 0) {
         if (DemolitionCounter::isPrimaryPlayer(receiver)) {
-            DemolitionCounter::demolition();
+            statArray[demos]++;
+            statArray[gameDemos]++;
+            write(demos);
             return;
         }
         else if (DemolitionCounter::isPrimaryPlayer(victim)) {
-            DemolitionCounter::death();
+            statArray[deaths]++;
+            statArray[gameDeaths]++;
+		    write(deaths);
             return;
         }
         return;
@@ -199,111 +208,162 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     // Checks for each possible event name
     // no switches in c++ for strings
    /* if (label.ToString().compare("Demolition") == 0) {
-        DemolitionCounter::demolition();
+        statArray[demolitions]++;
+		write(demolitions);
         return; 
     }*/
     if (label.ToString().compare("Extermination") == 0) {
-        DemolitionCounter::extermination();
+        statArray[exterms]++;
+        statArray[gameExterms]++;
+		write(exterms);
         return;
     }
     if (label.ToString().compare("Win") == 0) {
-        DemolitionCounter::win();
+        statArray[wins]++;
+		write(wins);
         return;
     }
     if (label.ToString().compare("Goal") == 0) {
-        DemolitionCounter::goal();
+        statArray[goals]++;
+        statArray[gameGoals]++;
+		write(goals);
         return;
     }
     if (label.ToString().compare("MVP") == 0) {
-        DemolitionCounter::mvp();
+        statArray[mvps]++;
+		write(mvps);
         return;
     }
     if (label.ToString().compare("Aerial Goal") == 0) {
-        DemolitionCounter::aerialGoal();
+        statArray[aerialGoals]++;
+        statArray[gameAerialGoals]++;
+		write(aerialGoals);
         return;
     }
     if (label.ToString().compare("Backwards Goal") == 0) {
-        DemolitionCounter::backwardsGoal();
+        statArray[backwardsGoals]++;
+        statArray[gameBackwardsGoals]++;
+		write(backwardsGoals);
         return;
     }
     if (label.ToString().compare("Bicycle Goal") == 0) {
-        DemolitionCounter::bicycleGoal();
+        statArray[bicycleGoals]++;
+        statArray[gameBicycleGoals]++;
+		write(bicycleGoals);
         return;
     }
     if (label.ToString().compare("Long Goal") == 0) {
-        DemolitionCounter::longGoal();
+        statArray[longGoals]++;
+        statArray[gameLongGoals]++;
+		write(longGoals);
         return;
     }
     if (label.ToString().compare("Turtle Goal") == 0) {
-        DemolitionCounter::turtleGoal();
+        statArray[turtleGoals]++;
+        statArray[gameTurtleGoals]++;
+		write(turtleGoals);
         return;
     }
     if (label.ToString().compare("Pool Shot") == 0) {
-        DemolitionCounter::poolShot();
+        statArray[poolShots]++;
+        statArray[gamePoolShots]++;
+		write(poolShots);
         return;
     }
     if (label.ToString().compare("Overtime Goal") == 0) {
-        DemolitionCounter::overtimeGoal();
+        statArray[overtimeGoals]++;
+        statArray[gameOvertimeGoals]++;
+		write(overtimeGoals);
         return;
     }
     if (label.ToString().compare("Hat Trick") == 0) {
-        DemolitionCounter::hatTrick();
+        statArray[hatTricks]++;
+        statArray[gameHatTricks]++;
+		write(hatTricks);
         return;
     }
     if (label.ToString().compare("Assist") == 0) {
-        DemolitionCounter::assist();
+        statArray[assists]++;
+        statArray[gameAssists]++;
+		write(assists);
         return;
     }
     if (label.ToString().compare("Playmaker") == 0) {
-        DemolitionCounter::playmaker();
+        statArray[playmakers]++;
+        statArray[gamePlaymakers]++;
+		write(playmakers);
         return;
     }
     if (label.ToString().compare("Save") == 0) {
-        DemolitionCounter::save();
+        statArray[saves]++;
+        statArray[gameSaves]++;
+		write(saves);
         return;
     }
     if (label.ToString().compare("Epic Save") == 0) {
-        DemolitionCounter::epicSave();
+        statArray[epicSaves]++;
+        statArray[gameEpicSaves]++;
+		write(epicSaves);
         return;
     }
     if (label.ToString().compare("Savior") == 0) {
-        DemolitionCounter::savior();
+        statArray[saviors]++;
+        statArray[gameSaviors]++;
+		write(saviors);
         return;
     }
     if (label.ToString().compare("Shot on Goal") == 0) {
-        DemolitionCounter::shot();
+        statArray[shots]++;
+        statArray[gameShots]++;
+		write(shots);
         return;
     }
     if (label.ToString().compare("Center Ball") == 0) {
-        DemolitionCounter::center();
+        statArray[centers]++;
+        statArray[gameCenters]++;
+		write(centers);
         return;
     }
     if (label.ToString().compare("Clear Ball") == 0) {
-        DemolitionCounter::clear();
+        statArray[clears]++;
+        statArray[gameClears]++;
+		write(clears);
         return;
     }
     if (label.ToString().compare("First Touch") == 0) {
-        DemolitionCounter::firstTouch();
+        statArray[firstTouchs]++;
+        statArray[gameFirstTouchs]++;
+		write(firstTouchs);
         return;
     }
     if (label.ToString().compare("Damage") == 0) {
-        DemolitionCounter::damage();
+        statArray[damages]++;
+        statArray[gameDamages]++;
+		write(damages);
         return;
     }
     if (label.ToString().compare("Ultra Damage") == 0) {
-        DemolitionCounter::ultraDamage();
+        statArray[ultraDamages]++;
+        statArray[gameUltraDamages]++;
+		write(ultraDamages);
         return;
     }
     if (label.ToString().compare("Low Five") == 0) {
-        DemolitionCounter::lowFive();
+        statArray[lowFives]++;
+        statArray[gameLowFives]++;
+		write(lowFives);
         return;
     }
     if (label.ToString().compare("High Five") == 0) {
-        DemolitionCounter::highFive();
+        statArray[highFives]++;
+        statArray[gameHighFives]++;
+		write(highFives);
         return;
     }
     if (label.ToString().compare("Swish Goal") == 0) {
-        DemolitionCounter::swish();
+        statArray[swishs]++;
+        statArray[swishs]++;
+		write(swishs);
         return;
     }
 }
@@ -357,187 +417,39 @@ void DemolitionCounter::startGame() {
     }
     endedGame = false;
 
-    games++;
-    gameExterms = 0;
-    gameDemos = 0;
-    gameDeaths = 0;
-    gameGoals = 0;
-    gameAerialGoals = 0;
-    gameBackwardsGoals = 0;
-    gameBicycleGoals = 0;
-    gameLongGoals = 0;
-    gameTurtleGoals = 0;
-    gamePoolShots = 0;
-    gameOvertimeGoals = 0;
-    gameHatTricks = 0;
-    gameAssists = 0;
-    gamePlaymakers = 0;
-    gameSaves = 0;
-    gameEpicSaves = 0;
-    gameSaviors = 0;
-    gameShots = 0;
-    gameCenters = 0;
-    gameClears = 0;
-    gameFirstTouchs = 0;
-    gameDamages = 0;
-    gameUltraDamages = 0;
-    gameLowFives = 0;
-    gameHighFives = 0;
-    gameSwishs = 0;
+    statArray[games]++;
+    statArray[gameExterms] = 0;
+    statArray[gameDemos] = 0;
+    statArray[gameDeaths] = 0;
+    statArray[gameGoals] = 0;
+    statArray[gameAerialGoals] = 0;
+    statArray[gameBackwardsGoals] = 0;
+    statArray[gameBicycleGoals] = 0;
+    statArray[gameLongGoals] = 0;
+    statArray[gameTurtleGoals] = 0;
+    statArray[gamePoolShots] = 0;
+    statArray[gameOvertimeGoals] = 0;
+    statArray[gameHatTricks] = 0;
+    statArray[gameAssists] = 0;
+    statArray[gamePlaymakers] = 0;
+    statArray[gameSaves] = 0;
+    statArray[gameEpicSaves] = 0;
+    statArray[gameSaviors] = 0;
+    statArray[gameShots] = 0;
+    statArray[gameCenters] = 0;
+    statArray[gameClears] = 0;
+    statArray[gameFirstTouchs] = 0;
+    statArray[gameDamages] = 0;
+    statArray[gameUltraDamages] = 0;
+    statArray[gameLowFives] = 0;
+    statArray[gameHighFives] = 0;
+    statArray[gameSwishs] = 0;
 
     writeAll();
 }
 
 void DemolitionCounter::endGame() {
     endedGame = true;
-}
-
-// saving to variables as a stat happens and then call write functions
-void DemolitionCounter::demolition() {
-    //cvarManager->log("main player demo");
-    demos++;
-    gameDemos++;
-    //cvarManager->log(std::to_string(demos));
-
-    DemolitionCounter::writeDemos();
-}
-void DemolitionCounter::death() {
-    deaths++;
-    gameDeaths++;
-    DemolitionCounter::writeDeaths();
-}
-void DemolitionCounter::extermination() {
-    //cvarManager->log("main player exterm");
-    exterms++;
-    gameExterms++;
-    //cvarManager->log(std::to_string(exterms));
-
-    DemolitionCounter::writeExterms();
-}
-void DemolitionCounter::win() {
-    wins++;
-    DemolitionCounter::writeWins();
-}
-void DemolitionCounter::mvp() {
-    mvps++;
-    DemolitionCounter::writeMvps();
-}
-void DemolitionCounter::goal() {
-    goals++;
-    gameGoals++;
-    DemolitionCounter::writeGoals();
-    DemolitionCounter::writeShootingPercentage();
-}
-void DemolitionCounter::aerialGoal() {
-    aerialGoals++;
-    gameAerialGoals++;
-    DemolitionCounter::writeAerialGoals();
-}
-void DemolitionCounter::backwardsGoal() {
-    backwardsGoals++;
-    gameBackwardsGoals++;
-    DemolitionCounter::writeBackwardsGoals();
-}
-void DemolitionCounter::bicycleGoal() {
-    bicycleGoals++;
-    gameBicycleGoals++;
-    DemolitionCounter::writeBicycleGoals();
-}
-void DemolitionCounter::longGoal() {
-    longGoals++;
-    gameLongGoals++;
-    DemolitionCounter::writeLongGoals();
-}
-void DemolitionCounter::turtleGoal() {
-    turtleGoals++;
-    gameTurtleGoals++;
-    DemolitionCounter::writeTurtleGoals();
-}
-void DemolitionCounter::poolShot() {
-    poolShots++;
-    gamePoolShots++;
-    DemolitionCounter::writePoolShots();
-}
-void DemolitionCounter::overtimeGoal() {
-    overtimeGoals++;
-    gameOvertimeGoals++;
-    DemolitionCounter::writeOvertimeGoals();
-}
-void DemolitionCounter::hatTrick() {
-    hatTricks++;
-    gameHatTricks++;
-    DemolitionCounter::writeHatTricks();
-}
-void DemolitionCounter::assist() {
-    assists++;
-    gameAssists++;
-    DemolitionCounter::writeAssists();
-}
-void DemolitionCounter::playmaker() {
-    playmakers++;
-    gamePlaymakers++;
-    DemolitionCounter::writePlaymakers();
-}
-void DemolitionCounter::save() {
-    saves++;
-    gameSaves++;
-    DemolitionCounter::writeSaves();
-}
-void DemolitionCounter::epicSave() {
-    epicSaves++;
-    gameEpicSaves++;
-    DemolitionCounter::writeEpicSaves();
-}
-void DemolitionCounter::savior() {
-    saviors++;
-    gameSaviors++;
-    DemolitionCounter::writeSaviors();
-}
-void DemolitionCounter::shot() {
-    shots++;
-    gameShots++;
-    DemolitionCounter::writeShots();
-    DemolitionCounter::writeShootingPercentage();
-}
-void DemolitionCounter::center() {
-    centers++;
-    gameCenters++;
-    DemolitionCounter::writeCenters();
-}
-void DemolitionCounter::clear() {
-    clears++;
-    gameClears++;
-    DemolitionCounter::writeClears();
-}
-void DemolitionCounter::firstTouch() {
-    firstTouchs++;
-    gameFirstTouchs++;
-    DemolitionCounter::writeFirstTouchs();
-}
-void DemolitionCounter::damage() {
-    damages++;
-    gameDamages++;
-    DemolitionCounter::writeDamages();
-}
-void DemolitionCounter::ultraDamage() {
-    ultraDamages++;
-    gameUltraDamages++;
-    DemolitionCounter::writeUltraDamages();
-}
-void DemolitionCounter::lowFive() {
-    lowFives++;
-    gameLowFives++;
-    DemolitionCounter::writeLowFives();
-}
-void DemolitionCounter::highFive() {
-    highFives++;
-    gameHighFives++;
-    DemolitionCounter::writeHighFives();
-}
-void DemolitionCounter::swish() {
-    swishs++;
-    gameSwishs++;
-    DemolitionCounter::writeSwishs();
 }
 
 // writing stats to to files
