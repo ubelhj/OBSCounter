@@ -12,13 +12,16 @@ int decimalPlaces = 2;
 
 // Macros for all stat indexes 
 // easier to refer back with macro
+// total stats are from 0 to 28
+// these stats have no game counterpart
 constexpr int wins = 0;
 constexpr int mvps = 1;
 constexpr int games = 2;
-constexpr int demos = 3;
-constexpr int deaths = 4;
-constexpr int exterms = 5;
-constexpr int goals = 6;
+// stat + 26 = gameStat
+constexpr int goals = 3;
+constexpr int demos = 4;
+constexpr int deaths = 5;
+constexpr int exterms = 6;
 constexpr int aerialGoals = 7;
 constexpr int backwardsGoals = 8;
 constexpr int bicycleGoals = 9;
@@ -41,6 +44,7 @@ constexpr int ultraDamages = 25;
 constexpr int lowFives = 26;
 constexpr int highFives = 27;
 constexpr int swishs = 28;
+// game stats are from 29-end
 constexpr int gameGoals = 29;
 constexpr int gameDemos = 30;
 constexpr int gameDeaths = 31;
@@ -68,6 +72,69 @@ constexpr int gameLowFives = 52;
 constexpr int gameHighFives = 53;
 constexpr int gameSwishs = 54;
 constexpr int numStats = 55;
+// jump from a stat to its most recent game stat
+constexpr int totalToGame = 26;
+// number of stats without game counterpart
+constexpr int statsWithoutGame = 3;
+
+// maps the indexes to their respective strings
+std::string indexStringMap[] = {
+    "wins",
+    "mvps",
+    "games",
+    "goals",
+    "demos",
+    "deaths",
+    "exterms",
+    "aerialGoals",
+    "backwardsGoals",
+    "bicycleGoals",
+    "longGoals",
+    "turtleGoals",
+    "poolShots",
+    "overtimeGoals",
+    "hatTricks",
+    "assists",
+    "playmakers",
+    "saves",
+    "epicSaves",
+    "saviors",
+    "shots",
+    "centers",
+    "clears",
+    "firstTouchs",
+    "damages",
+    "ultraDamages",
+    "lowFives",
+    "highFives",
+    "swishs",
+    "gameGoals",
+    "gameDemos",
+    "gameDeaths",
+    "gameExterms",
+    "gameAerialGoals",
+    "gameBackwardsGoals",
+    "gameBicycleGoals",
+    "gameLongGoals",
+    "gameTurtleGoals",
+    "gamePoolShots",
+    "gameOvertimeGoals",
+    "gameHatTricks",
+    "gameAssists",
+    "gamePlaymakers",
+    "gameSaves",
+    "gameEpicSaves",
+    "gameSaviors",
+    "gameShots",
+    "gameCenters",
+    "gameClears",
+    "gameFirstTouchs",
+    "gameDamages",
+    "gameUltraDamages",
+    "gameLowFives",
+    "gameHighFives",
+    "gameSwishs"
+};
 
 // holds all stats
 int statArray[numStats];
@@ -1108,6 +1175,53 @@ void DemolitionCounter::writeShootingPercentage() {
     file << std::fixed << std::setprecision(decimalPlaces);
     file << totalShooting;
     file.close();
+}
+
+// writes a stat to its files
+void DemolitionCounter::write(int statIndex) {
+    // first writes average of stat per game
+    std::ofstream averageFile;
+
+    // games don't need an average -- solve later
+
+    // sets up average file location
+    std::string averageLocation = "./OBSCounter/average";
+    // makes the first letter uppercase for nice looking files
+    std::string statNameUpper = indexStringMap[statIndex];
+    std::toupper(statNameUpper[0]);
+    averageLocation += statNameUpper + ".txt";
+    averageFile.open(averageLocation);
+
+    float averageStat;
+    if (statArray[games] == 0) {
+        averageStat = 0.0;
+    } else {
+        averageStat = (float)statArray[statIndex] / (float)statArray[games];
+    }
+    averageFile << std::fixed << std::setprecision(decimalPlaces);
+    averageFile << averageStat;
+    averageFile.close();
+
+    // writes the total stat
+    std::ofstream totalFile;
+    totalFile.open("./OBSCounter/" + indexStringMap[statIndex] + ".txt");
+    totalFile << statArray[statIndex];
+    totalFile.close();
+
+    // writes the game stat
+    // only writes if stat has a game version
+    if (statIndex >= statsWithoutGame) {
+        std::ofstream gameStatFile;
+        gameStatFile.open("./OBSCounter/game" + statNameUpper + ".txt");
+        // jumps from stat to its game counterpart
+        gameStatFile << statArray[statIndex + totalToGame];
+        gameStatFile.close();
+    }
+
+    // any extra stats needed on a case by case basis
+    // shooting % (shot or goal)
+    // k/d (demo or death)
+    // missed exterm % (demo or exterm)
 }
 
 // calls all write functions at once

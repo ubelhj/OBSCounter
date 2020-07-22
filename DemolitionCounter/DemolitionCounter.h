@@ -33,6 +33,7 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 
 	// writes the .txt files
 	void writeAll();
+	void write(int statIndex);
 	void writeDemos();
 	void writeDeaths();
 	void writeExterms();
