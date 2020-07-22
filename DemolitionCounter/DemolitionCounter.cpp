@@ -87,9 +87,9 @@ std::string indexStringMap[] = {
     "mvps",
     "games",
     "goals",
-    "demos",
+    "demolitions",
     "deaths",
-    "exterms",
+    "exterminations",
     "aerialGoals",
     "backwardsGoals",
     "bicycleGoals",
@@ -113,9 +113,9 @@ std::string indexStringMap[] = {
     "highFives",
     "swishs",
     "gameGoals",
-    "gameDemos",
+    "gameDemolitions",
     "gameDeaths",
-    "gameExterms",
+    "gameExterminations",
     "gameAerialGoals",
     "gameBackwardsGoals",
     "gameBicycleGoals",
@@ -529,7 +529,7 @@ void DemolitionCounter::endGame() {
 void DemolitionCounter::writeShootingPercentage() {
     std::ofstream gameFile;
     float gameShooting;
-    if (gameShots == 0) {
+    if (statArray[gameShots] == 0) {
         gameShooting = 0.0;
     }
     else {
