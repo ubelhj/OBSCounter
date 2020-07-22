@@ -32,55 +32,17 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	void endGame();
 
 	// writes the .txt files
+	// writes all at once
 	void writeAll();
+	// writes all game stats
+	void writeAllGameStats();
+	// writes a specific stat
 	void write(int statIndex);
-	void writeDemos();
-	void writeDeaths();
-	void writeExterms();
-	void writeGames();
-	void writeWins();
-	void writeMvps();
-	void writeGoals();
-	void writeAerialGoals();
-	void writeBackwardsGoals();
-	void writeBicycleGoals();
-	void writeLongGoals();
-	void writeTurtleGoals();
-	void writePoolShots();
-	void writeOvertimeGoals();
-	void writeHatTricks();
-	void writeAssists();
-	void writePlaymakers();
-	void writeSaves();
-	void writeEpicSaves();
-	void writeSaviors();
-	void writeShots();
-	void writeCenters();
-	void writeClears();
-	void writeFirstTouchs();
-	void writeDamages();
-	void writeUltraDamages();
-	void writeLowFives();
-	void writeHighFives();
-	void writeSwishs();
+	// writes a game stat only
+	void writeGameStat(int statIndex);
+
+	// extra stats beyond basic ones
+	// writes shooting percentage on a shot or a goal
 	void writeShootingPercentage();
-	
-	// Inherited via PluginWindow
-	/*
-
-	bool isWindowOpen_ = false;
-	bool isMinimized_ = false;
-	std::string menuTitle_ = "DemolitionCounter";
-
-	virtual void Render() override;
-	virtual std::string GetMenuName() override;
-	virtual std::string GetMenuTitle() override;
-	virtual void SetImGuiContext(uintptr_t ctx) override;
-	virtual bool ShouldBlockInput() override;
-	virtual bool IsActiveOverlay() override;
-	virtual void OnOpen() override;
-	virtual void OnClose() override;
-	
-	*/
 };
 

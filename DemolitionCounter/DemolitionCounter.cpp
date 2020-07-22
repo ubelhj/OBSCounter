@@ -76,8 +76,11 @@ constexpr int numStats = 55;
 constexpr int totalToGame = 26;
 // number of stats without game counterpart
 constexpr int statsWithoutGame = 3;
+// start of game stats
+constexpr int startGameStats = gameGoals;
 
 // maps the indexes to their respective strings
+// index to string
 std::string indexStringMap[] = {
     "wins",
     "mvps",
@@ -156,7 +159,8 @@ void DemolitionCounter::onLoad()
 
     hookEvents();
     
-    writeAll();
+    // no longer needed for anything
+   // writeAll();
 }
 
 void DemolitionCounter::setCvars() {
@@ -429,7 +433,7 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     }
     if (label.ToString().compare("Swish Goal") == 0) {
         statArray[swishs]++;
-        statArray[swishs]++;
+        statArray[gameSwishs]++;
 		write(swishs);
         return;
     }
@@ -512,7 +516,8 @@ void DemolitionCounter::startGame() {
     statArray[gameHighFives] = 0;
     statArray[gameSwishs] = 0;
 
-    writeAll();
+    writeAllGameStats();
+    write(games);
 }
 
 void DemolitionCounter::endGame() {
@@ -520,643 +525,14 @@ void DemolitionCounter::endGame() {
 }
 
 // writing stats to to files
-void DemolitionCounter::writeDemos() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageDemos.txt");
-    float averageDemos;
-    if (games == 0) {
-        averageDemos = 0.00;
-    } else {
-        averageDemos = (float) demos / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageDemos;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/demolitions.txt");
-    file << std::to_string(demos);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameDemolitions.txt");
-    gameFile << std::to_string(gameDemos);
-    gameFile.close();
-}
-void DemolitionCounter::writeDeaths() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageDeaths.txt");
-    float averageDeaths;
-    if (games == 0) {
-        averageDeaths = 0.00;
-    }
-    else {
-        averageDeaths = (float)deaths / (float)games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageDeaths;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/deaths.txt");
-    file << std::to_string(deaths);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameDeaths.txt");
-    gameFile << std::to_string(gameDeaths);
-    gameFile.close();
-}
-void DemolitionCounter::writeGoals() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageGoals.txt");
-    float averageGoals;
-    if (games == 0) {
-        averageGoals = 0;
-    } else {
-        averageGoals = (float) goals / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageGoals;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/goals.txt");
-    file << std::to_string(goals);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameGoals.txt");
-    gameFile << std::to_string(gameGoals);
-    gameFile.close();
-}
-void DemolitionCounter::writeAerialGoals() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageAerialGoals.txt");
-    float averageAerialGoals;
-    if (games == 0) {
-        averageAerialGoals = 0;
-    } else {
-        averageAerialGoals = (float) aerialGoals / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageAerialGoals;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/aerialGoals.txt");
-    file << std::to_string(aerialGoals);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameAerialGoals.txt");
-    gameFile << std::to_string(gameAerialGoals);
-    gameFile.close();
-}
-void DemolitionCounter::writeBackwardsGoals() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageBackwardsGoals.txt");
-    float averageBackwardsGoals;
-    if (games == 0) {
-        averageBackwardsGoals = 0;
-    } else {
-        averageBackwardsGoals = (float) backwardsGoals / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageBackwardsGoals;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/backwardsGoals.txt");
-    file << std::to_string(backwardsGoals);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameBackwardsGoals.txt");
-    gameFile << std::to_string(gameBackwardsGoals);
-    gameFile.close();
-}
-void DemolitionCounter::writeBicycleGoals() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageBicycleGoals.txt");
-    float averageBicycleGoals;
-    if (games == 0) {
-        averageBicycleGoals = 0;
-    } else {
-        averageBicycleGoals = (float) bicycleGoals / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageBicycleGoals;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/bicycleGoals.txt");
-    file << std::to_string(bicycleGoals);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameBicycleGoals.txt");
-    gameFile << std::to_string(gameBicycleGoals);
-    gameFile.close();
-}
-void DemolitionCounter::writeLongGoals() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageLongGoals.txt");
-    float averageLongGoals;
-    if (games == 0) {
-        averageLongGoals = 0;
-    } else {
-        averageLongGoals = (float) longGoals / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageLongGoals;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/longGoals.txt");
-    file << std::to_string(longGoals);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameLongGoals.txt");
-    gameFile << std::to_string(gameLongGoals);
-    gameFile.close();
-}
-void DemolitionCounter::writeTurtleGoals() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageTurtleGoals.txt");
-    float averageTurtleGoals;
-    if (games == 0) {
-        averageTurtleGoals = 0;
-    } else {
-        averageTurtleGoals = (float) turtleGoals / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageTurtleGoals;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/turtleGoals.txt");
-    file << std::to_string(turtleGoals);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameTurtleGoals.txt");
-    gameFile << std::to_string(gameTurtleGoals);
-    gameFile.close();
-}
-void DemolitionCounter::writePoolShots() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averagePoolShots.txt");
-    float averagePoolShots;
-    if (games == 0) {
-        averagePoolShots = 0;
-    } else {
-        averagePoolShots = (float) poolShots / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averagePoolShots;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/poolShots.txt");
-    file << std::to_string(poolShots);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gamePoolShots.txt");
-    gameFile << std::to_string(gamePoolShots);
-    gameFile.close();
-}
-void DemolitionCounter::writeOvertimeGoals() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageOvertimeGoals.txt");
-    float averageOvertimeGoals;
-    if (games == 0) {
-        averageOvertimeGoals = 0;
-    } else {
-        averageOvertimeGoals = (float) overtimeGoals / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageOvertimeGoals;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/overtimeGoals.txt");
-    file << std::to_string(overtimeGoals);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameOvertimeGoals.txt");
-    gameFile << std::to_string(gameOvertimeGoals);
-    gameFile.close();
-}
-void DemolitionCounter::writeHatTricks() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageHatTricks.txt");
-    float averageHatTricks;
-    if (games == 0) {
-        averageHatTricks = 0;
-    } else {
-        averageHatTricks = (float) hatTricks / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageHatTricks;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/hatTricks.txt");
-    file << std::to_string(hatTricks);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameHatTricks.txt");
-    gameFile << std::to_string(gameHatTricks);
-    gameFile.close();
-}
-void DemolitionCounter::writeAssists() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageAssists.txt");
-    float averageAssists;
-    if (games == 0) {
-        averageAssists = 0;
-    } else {
-        averageAssists = (float) assists / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageAssists;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/assists.txt");
-    file << std::to_string(assists);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameAssists.txt");
-    gameFile << std::to_string(gameAssists);
-    gameFile.close();
-}
-void DemolitionCounter::writePlaymakers() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averagePlaymakers.txt");
-    float averagePlaymakers;
-    if (games == 0) {
-        averagePlaymakers = 0;
-    } else {
-        averagePlaymakers = (float) playmakers / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averagePlaymakers;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/playmakers.txt");
-    file << std::to_string(playmakers);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gamePlaymakers.txt");
-    gameFile << std::to_string(gamePlaymakers);
-    gameFile.close();
-}
-void DemolitionCounter::writeSaves() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageSaves.txt");
-    float averageSaves;
-    if (games == 0) {
-        averageSaves = 0;
-    } else {
-        averageSaves = (float) saves / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageSaves;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/saves.txt");
-    file << std::to_string(saves);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameSaves.txt");
-    gameFile << std::to_string(gameSaves);
-    gameFile.close();
-}
-void DemolitionCounter::writeEpicSaves() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageEpicSaves.txt");
-    float averageEpicSaves;
-    if (games == 0) {
-        averageEpicSaves = 0;
-    } else {
-        averageEpicSaves = (float) epicSaves / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageEpicSaves;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/epicSaves.txt");
-    file << std::to_string(epicSaves);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameEpicSaves.txt");
-    gameFile << std::to_string(gameEpicSaves);
-    gameFile.close();
-}
-void DemolitionCounter::writeSaviors() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageSaviors.txt");
-    float averageSaviors;
-    if (games == 0) {
-        averageSaviors = 0;
-    } else {
-        averageSaviors = (float) saviors / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageSaviors;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/saviors.txt");
-    file << std::to_string(saviors);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameSaviors.txt");
-    gameFile << std::to_string(gameSaviors);
-    gameFile.close();
-}
-void DemolitionCounter::writeShots() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageShots.txt");
-    float averageShots;
-    if (games == 0) {
-        averageShots = 0;
-    } else {
-        averageShots = (float) shots / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageShots;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/shots.txt");
-    file << std::to_string(shots);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameShots.txt");
-    gameFile << std::to_string(gameShots);
-    gameFile.close();
-}
-void DemolitionCounter::writeCenters() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageCenters.txt");
-    float averageCenters;
-    if (games == 0) {
-        averageCenters = 0;
-    } else {
-        averageCenters = (float) centers / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageCenters;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/centers.txt");
-    file << std::to_string(centers);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameCenters.txt");
-    gameFile << std::to_string(gameCenters);
-    gameFile.close();
-}
-void DemolitionCounter::writeClears() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageClears.txt");
-    float averageClears;
-    if (games == 0) {
-        averageClears = 0;
-    } else {
-        averageClears = (float) clears / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageClears;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/clears.txt");
-    file << std::to_string(clears);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameClears.txt");
-    gameFile << std::to_string(gameClears);
-    gameFile.close();
-}
-void DemolitionCounter::writeFirstTouchs() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageFirstTouchs.txt");
-    float averageFirstTouchs;
-    if (games == 0) {
-        averageFirstTouchs = 0;
-    } else {
-        averageFirstTouchs = (float) firstTouchs / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageFirstTouchs;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/firstTouchs.txt");
-    file << std::to_string(firstTouchs);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameFirstTouchs.txt");
-    gameFile << std::to_string(gameFirstTouchs);
-    gameFile.close();
-}
-void DemolitionCounter::writeDamages() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageDamages.txt");
-    float averageDamages;
-    if (games == 0) {
-        averageDamages = 0;
-    } else {
-        averageDamages = (float) damages / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageDamages;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/damages.txt");
-    file << std::to_string(damages);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameDamages.txt");
-    gameFile << std::to_string(gameDamages);
-    gameFile.close();
-}
-void DemolitionCounter::writeUltraDamages() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageUltraDamages.txt");
-    float averageUltraDamages;
-    if (games == 0) {
-        averageUltraDamages = 0;
-    } else {
-        averageUltraDamages = (float) ultraDamages / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageUltraDamages;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/ultraDamages.txt");
-    file << std::to_string(ultraDamages);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameUltraDamages.txt");
-    gameFile << std::to_string(gameUltraDamages);
-    gameFile.close();
-}
-void DemolitionCounter::writeLowFives() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageLowFives.txt");
-    float averageLowFives;
-    if (games == 0) {
-        averageLowFives = 0;
-    } else {
-        averageLowFives = (float) lowFives / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageLowFives;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/lowFives.txt");
-    file << std::to_string(lowFives);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameLowFives.txt");
-    gameFile << std::to_string(gameLowFives);
-    gameFile.close();
-}
-void DemolitionCounter::writeHighFives() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageHighFives.txt");
-    float averageHighFives;
-    if (games == 0) {
-        averageHighFives = 0;
-    } else {
-        averageHighFives = (float) highFives / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageHighFives;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/highFives.txt");
-    file << std::to_string(highFives);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameHighFives.txt");
-    gameFile << std::to_string(gameHighFives);
-    gameFile.close();
-}
-void DemolitionCounter::writeSwishs() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageSwishs.txt");
-    float averageSwishs;
-    if (games == 0) {
-        averageSwishs = 0;
-    } else {
-        averageSwishs = (float) swishs / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageSwishs;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/swishs.txt");
-    file << std::to_string(swishs);
-    file.close();
-
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/gameSwishs.txt");
-    gameFile << std::to_string(gameSwishs);
-    gameFile.close();
-}
-void DemolitionCounter::writeExterms() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageExterms.txt");
-    float averageExterms;
-    if (games == 0) {
-        averageExterms = 0;
-    } else {
-        averageExterms = (float) exterms / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageExterms;
-    averageFile.close();
-
-    std::ofstream extermFile;
-    extermFile.open("./OBSCounter/exterminations.txt");
-    extermFile << std::to_string(exterms);
-    extermFile.close();
-
-    std::ofstream gameExtermFile;
-    gameExtermFile.open("./OBSCounter/gameExterminations.txt");
-    gameExtermFile << std::to_string(gameExterms);
-    gameExtermFile.close();
-}
-void DemolitionCounter::writeWins() {
-    std::ofstream file;
-    file.open("./OBSCounter/wins.txt");
-    file << std::to_string(wins);
-    file.close();
-}
-void DemolitionCounter::writeMvps() {
-    std::ofstream averageFile;
-    averageFile.open("./OBSCounter/averageMvps.txt");
-    float averageMvps;
-    if (games == 0) {
-        averageMvps = 0;
-    } else {
-        averageMvps = (float) mvps / (float) games;
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageMvps;
-    averageFile.close();
-
-    std::ofstream file;
-    file.open("./OBSCounter/mvps.txt");
-    file << std::to_string(mvps);
-    file.close();
-}
-void DemolitionCounter::writeGames() {
-    std::ofstream gameFile;
-    gameFile.open("./OBSCounter/games.txt");
-    gameFile << std::to_string(games);
-    gameFile.close();
-}
 void DemolitionCounter::writeShootingPercentage() {
     std::ofstream gameFile;
     float gameShooting;
     if (gameShots == 0) {
-        gameShooting = 0;
+        gameShooting = 0.0;
     }
     else {
-        gameShooting = (float)gameGoals / (float)gameShots;
+        gameShooting = (float)statArray[gameGoals] / (float)statArray[gameShots];
     }
     gameFile.open("./OBSCounter/gameShootingPercentage.txt");
     gameFile << std::fixed << std::setprecision(decimalPlaces);
@@ -1165,10 +541,10 @@ void DemolitionCounter::writeShootingPercentage() {
 
     float totalShooting;
     if (shots == 0) {
-        totalShooting = 0;
+        totalShooting = 0.0;
     }
     else {
-        totalShooting = (float)goals / (float)shots;
+        totalShooting = (float)statArray[goals] / (float)statArray[shots];
     }
     std::ofstream file;
     file.open("./OBSCounter/shootingPercentage.txt");
@@ -1179,83 +555,78 @@ void DemolitionCounter::writeShootingPercentage() {
 
 // writes a stat to its files
 void DemolitionCounter::write(int statIndex) {
-    // first writes average of stat per game
-    std::ofstream averageFile;
-
-    // games don't need an average -- solve later
-
-    // sets up average file location
-    std::string averageLocation = "./OBSCounter/average";
-    // makes the first letter uppercase for nice looking files
-    std::string statNameUpper = indexStringMap[statIndex];
-    std::toupper(statNameUpper[0]);
-    averageLocation += statNameUpper + ".txt";
-    averageFile.open(averageLocation);
-
-    float averageStat;
-    if (statArray[games] == 0) {
-        averageStat = 0.0;
-    } else {
-        averageStat = (float)statArray[statIndex] / (float)statArray[games];
-    }
-    averageFile << std::fixed << std::setprecision(decimalPlaces);
-    averageFile << averageStat;
-    averageFile.close();
-
     // writes the total stat
     std::ofstream totalFile;
     totalFile.open("./OBSCounter/" + indexStringMap[statIndex] + ".txt");
     totalFile << statArray[statIndex];
     totalFile.close();
 
+    if (statIndex != games) {
+        // writes average of stat per game
+        std::ofstream averageFile;
+        // sets up average file location
+        std::string averageLocation = "./OBSCounter/average";
+        // makes the first letter uppercase for nice looking files
+        std::string statNameUpper = indexStringMap[statIndex];
+        std::toupper(statNameUpper[0]);
+        averageLocation += statNameUpper + ".txt";
+        averageFile.open(averageLocation);
+
+        float averageStat;
+        if (statArray[games] == 0) {
+            averageStat = 0.0;
+        }
+        else {
+            averageStat = (float)statArray[statIndex] / (float)statArray[games];
+        }
+        averageFile << std::fixed << std::setprecision(decimalPlaces);
+        averageFile << averageStat;
+        averageFile.close();
+    }
+
     // writes the game stat
     // only writes if stat has a game version
     if (statIndex >= statsWithoutGame) {
-        std::ofstream gameStatFile;
-        gameStatFile.open("./OBSCounter/game" + statNameUpper + ".txt");
-        // jumps from stat to its game counterpart
-        gameStatFile << statArray[statIndex + totalToGame];
-        gameStatFile.close();
+        writeGameStat(statIndex + totalToGame);
     }
 
-    // any extra stats needed on a case by case basis
+    // any extra stats needed with more computing
     // shooting % (shot or goal)
     // k/d (demo or death)
     // missed exterm % (demo or exterm)
+    switch (statIndex) {
+    case shots:
+    case goals:
+        writeShootingPercentage();
+        break;
+    }
+}
+
+// writes a game stat, must be a game stat index
+void DemolitionCounter::writeGameStat(int statIndex) {
+    // holds stat name with uppercase first letter
+    std::string statNameUpper = indexStringMap[statIndex];
+    std::toupper(statNameUpper[0]);
+
+    std::ofstream gameStatFile;
+    gameStatFile.open("./OBSCounter/game" + statNameUpper + ".txt");
+    // jumps from stat to its game counterpart
+    gameStatFile << statArray[statIndex];
+    gameStatFile.close();
+}
+
+// writes all game stats at once
+void DemolitionCounter::writeAllGameStats() {
+    for (int i = startGameStats; i < numStats; i++) {
+        writeGameStat(i);
+    }
 }
 
 // calls all write functions at once
 void DemolitionCounter::writeAll() {
-    writeDemos();
-    writeDeaths();
-    writeExterms();
-    writeGames();
-    writeWins();
-    writeMvps();
-    writeGoals();
-    writeAerialGoals();
-    writeBackwardsGoals();
-    writeBicycleGoals();
-    writeLongGoals();
-    writeTurtleGoals();
-    writePoolShots();
-    writeOvertimeGoals();
-    writeHatTricks();
-    writeAssists();
-    writePlaymakers();
-    writeSaves();
-    writeEpicSaves();
-    writeSaviors();
-    writeShots();
-    writeCenters();
-    writeClears();
-    writeFirstTouchs();
-    writeDamages();
-    writeUltraDamages();
-    writeLowFives();
-    writeHighFives();
-    writeSwishs();
-    writeShootingPercentage();
+    for (int i = 0; i < startGameStats; i++) {
+        write(i);
+    }
 }
 
 void DemolitionCounter::onUnload()
