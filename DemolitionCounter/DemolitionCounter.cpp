@@ -541,7 +541,7 @@ void DemolitionCounter::writeShootingPercentage() {
     gameFile.close();
 
     float totalShooting;
-    if (shots == 0) {
+    if (statArray[shots] == 0) {
         totalShooting = 0.0;
     }
     else {
