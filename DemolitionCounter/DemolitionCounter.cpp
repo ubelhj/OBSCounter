@@ -525,7 +525,7 @@ void DemolitionCounter::endGame() {
     endedGame = true;
 }
 
-// writing stats to to files
+// writing stats to files
 void DemolitionCounter::writeShootingPercentage() {
     std::ofstream gameFile;
     float gameShooting;
@@ -551,6 +551,59 @@ void DemolitionCounter::writeShootingPercentage() {
     file.open("./OBSCounter/shootingPercentage.txt");
     file << std::fixed << std::setprecision(decimalPlaces);
     file << totalShooting;
+    file.close();
+}
+
+// writes K/D ratio
+void DemolitionCounter::writeKillPercentage() {
+    std::ofstream gameFile;
+    float gameKD;
+    if (statArray[gameDeaths] == 0) {
+        gameKD = 0.0;
+    }
+    else {
+        gameKD = (float)statArray[gameDemos] / (float)statArray[gameDeaths];
+    }
+    gameFile.open("./OBSCounter/gameKDRatio.txt");
+    gameFile << std::fixed << std::setprecision(decimalPlaces);
+    gameFile << gameKD;
+    gameFile.close();
+
+    float totalKDRatio;
+    if (statArray[deaths] == 0) {
+        totalKDRatio = 0.0;
+    }
+    else {
+        totalKDRatio = (float)statArray[demos] / (float)statArray[deaths];
+    }
+    std::ofstream file;
+    file.open("./OBSCounter/KDRatio.txt");
+    file << std::fixed << std::setprecision(decimalPlaces);
+    file << totalKDRatio;
+    file.close();
+}
+
+// writes missed exterm % for the session
+void DemolitionCounter::writeMissedExterms() {
+    // calculates possible exterms (demos / 7)
+    std::ofstream totalFile;
+    int possibleExterms = statArray[demos] / 7;
+    totalFile.open("./OBSCounter/possibleExterms.txt");
+    totalFile << std::fixed << std::setprecision(decimalPlaces);
+    totalFile << possibleExterms;
+    totalFile.close();
+
+    float missedExtermPercent;
+    if (possibleExterms == 0) {
+        missedExtermPercent = 0.0;
+    }
+    else {
+        missedExtermPercent = (float)statArray[exterms] / possibleExterms;
+    }
+    std::ofstream file;
+    file.open("./OBSCounter/wastedDemoRatio.txt");
+    file << std::fixed << std::setprecision(decimalPlaces);
+    file << missedExtermPercent;
     file.close();
 }
 
@@ -600,6 +653,13 @@ void DemolitionCounter::write(int statIndex) {
     case goals:
         writeShootingPercentage();
         break;
+    case demos:
+        writeKillPercentage();
+    case exterms:
+        writeMissedExterms();
+        break;
+    case deaths:
+        writeKillPercentage();
     }
 }
 

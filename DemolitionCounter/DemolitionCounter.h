@@ -47,5 +47,11 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// extra stats beyond basic ones
 	// writes shooting percentage on a shot or a goal
 	void writeShootingPercentage();
+
+	// writes K/D ratio
+	void writeKillPercentage();
+
+	// writes missed exterms
+	void writeMissedExterms();
 };
 
