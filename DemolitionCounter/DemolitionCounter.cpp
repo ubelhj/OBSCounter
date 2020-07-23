@@ -588,22 +588,21 @@ void DemolitionCounter::writeMissedExterms() {
     // calculates possible exterms (demos / 7)
     std::ofstream totalFile;
     int possibleExterms = statArray[demos] / 7;
-    totalFile.open("./OBSCounter/possibleExterms.txt");
+    totalFile.open("./OBSCounter/possibleExterminations.txt");
     totalFile << std::fixed << std::setprecision(decimalPlaces);
     totalFile << possibleExterms;
     totalFile.close();
 
-    float missedExtermPercent;
+    int missedExtermPercent;
     if (possibleExterms == 0) {
-        missedExtermPercent = 0.0;
+        missedExtermPercent = 0;
     }
     else {
-        missedExtermPercent = (float)statArray[exterms] / possibleExterms;
+        missedExtermPercent = ((float)statArray[exterms] / (float)possibleExterms) * 100;
     }
     std::ofstream file;
-    file.open("./OBSCounter/wastedDemoRatio.txt");
-    file << std::fixed << std::setprecision(decimalPlaces);
-    file << missedExtermPercent;
+    file.open("./OBSCounter/missedExterminationPercent.txt");
+    file << missedExtermPercent << "%";
     file.close();
 }
 
