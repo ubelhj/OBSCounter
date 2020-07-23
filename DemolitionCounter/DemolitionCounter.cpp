@@ -9,6 +9,7 @@ BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", plugin
 
 bool endedGame = true;
 int decimalPlaces = 2;
+bool enabledOverlay = false;
 
 // constexpr for all stat indexes 
 // easier to refer back to stat names
@@ -154,6 +155,14 @@ void DemolitionCounter::onLoad()
                 writeAll();
             }
         });
+
+    // enables or disables overlay
+    auto overlayEnableVar = cvarManager->registerCvar("counter_enable_ingame", "0", "enables in game overlay");
+    overlayEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+            enabledOverlay = cvar.getBoolValue();
+        });
+
+    gameWrapper->RegisterDrawable(std::bind(&DemolitionCounter::render, this, std::placeholders::_1));
 
     // setters for totals
     setCvars();
@@ -683,6 +692,29 @@ void DemolitionCounter::writeAll() {
     for (int i = 0; i < startGameStats; i++) {
         write(i);
     }
+}
+
+// Renders in game overlay
+void DemolitionCounter::render(CanvasWrapper canvas) {
+    if (!enabledOverlay) {
+        return;
+    }
+
+    Vector2 screen = canvas.GetSize();
+
+    // in 1080p font size is 2
+    // y value of 2 size text is approx 20
+    float fontSize = ((float)screen.X / (float)1920) * 2;
+
+    // sets to red
+    canvas.SetColor(255, 0, 0, 255);
+
+    canvas.SetPosition(Vector2({ int(0), int(fontSize) }));
+    canvas.DrawString(indexStringMap[demos] + ": " + std::to_string(statArray[demos]), fontSize, fontSize);
+    canvas.SetPosition(Vector2({ int(0), int(10 * fontSize) }));
+    canvas.DrawString(indexStringMap[exterms] + ": " + std::to_string(statArray[exterms]), fontSize, fontSize);
+
+    cvarManager->log(std::to_string(fontSize));
 }
 
 void DemolitionCounter::onUnload()

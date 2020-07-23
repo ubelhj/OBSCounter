@@ -53,5 +53,7 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 
 	// writes missed exterms
 	void writeMissedExterms();
+
+	void render(CanvasWrapper canvas);
 };
 
