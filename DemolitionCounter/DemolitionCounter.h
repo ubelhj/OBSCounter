@@ -42,8 +42,8 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	void write(int statIndex);
 	// writes a game stat only
 	void writeGameStat(int statIndex);
-	// calculates an average
-	float average(int statIndex);
+	// calculates an average of a stat
+	float average(int statValue);
 
 
 	// extra stats beyond basic ones

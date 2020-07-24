@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "DemolitionCounter.h"
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <fstream>
 #include "bakkesmod/wrappers/GameObject/Stats/StatEventWrapper.h"
@@ -794,13 +795,18 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
 
     for (int i = 0; i < overlayNum; i++) {
         canvas.SetPosition(Vector2({ int(0), int((fontSize * (11 * i)) + 10) }));
-        if (overlayAverages[i]) {
+        if (overlayAverages[i] && overlayStats[i] < startGameStats) {
             std::string statName;
             std::string statToUpper = indexStringMap[overlayStats[i]];
             statToUpper[0] = std::toupper(statToUpper[0]);
             statName = "average" + statToUpper;
 
-            canvas.DrawString(statName + ": " + std::to_string(average(overlayStats[i])), fontSize, fontSize);
+            // makes sure string has right number of decimal places
+            std::ostringstream averageStream;
+            averageStream << std::fixed << std::setprecision(decimalPlaces);
+            averageStream << average(overlayStats[i]);
+
+            canvas.DrawString(statName + ": " + averageStream.str(), fontSize, fontSize);
         }
         else {
             canvas.DrawString(indexStringMap[overlayStats[i]] + ": " + std::to_string(statArray[overlayStats[i]]), fontSize, fontSize);
