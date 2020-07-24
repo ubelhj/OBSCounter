@@ -12,6 +12,7 @@ int decimalPlaces = 2;
 bool enabledOverlay = false;
 int overlayNum = 5;
 int overlayStats[5];
+bool overlayAverages[5];
 
 // constexpr for all stat indexes 
 // easier to refer back to stat names
@@ -182,11 +183,25 @@ void DemolitionCounter::onLoad()
         overlayStats[0] = cvar.getIntValue();
         });
 
+    // sets first stat in overlay to average or not
+    auto overlayOneAvgVar = cvarManager->registerCvar("counter_ingame_stat_one_average", "0", "Toggles average of first stat in overlay", true, true, 0, true, 1);
+    overlayAverages[0] = overlayOneAvgVar.getBoolValue();
+    overlayOneAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayAverages[0] = cvar.getBoolValue();
+        });
+
     // second stat in overlay (defaults to exterms/6)
     auto overlayTwoVar = cvarManager->registerCvar("counter_ingame_stat_two", "6", "Second stat in overlay", true, true, 0, true, numStats - 1);
     overlayStats[1] = overlayTwoVar.getIntValue();
     overlayTwoVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayStats[1] = cvar.getIntValue();
+        });
+
+    // sets second stat in overlay to average or not
+    auto overlayTwoAvgVar = cvarManager->registerCvar("counter_ingame_stat_two_average", "0", "Toggles average of second stat in overlay", true, true, 0, true, 1);
+    overlayAverages[1] = overlayTwoAvgVar.getBoolValue();
+    overlayTwoAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayAverages[1] = cvar.getBoolValue();
         });
 
     // third stat in overlay (defaults to gameDemos/30)
@@ -196,6 +211,13 @@ void DemolitionCounter::onLoad()
         overlayStats[2] = cvar.getIntValue();
         });
 
+    // sets third stat in overlay to average or not
+    auto overlayThreeAvgVar = cvarManager->registerCvar("counter_ingame_stat_three_average", "0", "Toggles average of third stat in overlay", true, true, 0, true, 1);
+    overlayAverages[2] = overlayThreeAvgVar.getBoolValue();
+    overlayThreeAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayAverages[2] = cvar.getBoolValue();
+        });
+
     // fourth stat in overlay (defaults to games/2)
     auto overlayFourVar = cvarManager->registerCvar("counter_ingame_stat_four", "2", "Fourth stat in overlay", true, true, 0, true, numStats - 1);
     overlayStats[3] = overlayFourVar.getIntValue();
@@ -203,11 +225,25 @@ void DemolitionCounter::onLoad()
         overlayStats[3] = cvar.getIntValue();
         });
 
+    // sets fourth stat in overlay to average or not
+    auto overlayFourAvgVar = cvarManager->registerCvar("counter_ingame_stat_four_average", "0", "Toggles average of fourth stat in overlay", true, true, 0, true, 1);
+    overlayAverages[3] = overlayFourAvgVar.getBoolValue();
+    overlayFourAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayAverages[3] = cvar.getBoolValue();
+        });
+
     // fifth stat in overlay (defaults to deaths/5)
     auto overlayFiveVar = cvarManager->registerCvar("counter_ingame_stat_five", "5", "Fifth stat in overlay", true, true, 0, true, numStats - 1);
     overlayStats[4] = overlayFiveVar.getIntValue();
     overlayFiveVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayStats[4] = cvar.getIntValue();
+        });
+
+    // sets fifth stat in overlay to average or not
+    auto overlayFiveAvgVar = cvarManager->registerCvar("counter_ingame_stat_five_average", "0", "Toggles average of fifth stat in overlay", true, true, 0, true, 1);
+    overlayAverages[4] = overlayFiveAvgVar.getBoolValue();
+    overlayFiveAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayAverages[4] = cvar.getBoolValue();
         });
 
     cvarManager->registerNotifier("counter_list_stats", [this](std::vector<std::string> params) {
@@ -686,13 +722,8 @@ void DemolitionCounter::write(int statIndex) {
         averageLocation += statNameUpper + ".txt";
         averageFile.open(averageLocation);
 
-        float averageStat;
-        if (statArray[games] == 0) {
-            averageStat = 0.0;
-        }
-        else {
-            averageStat = (float)statArray[statIndex] / (float)statArray[games];
-        }
+        float averageStat = average(statIndex);
+        
         averageFile << std::fixed << std::setprecision(decimalPlaces);
         averageFile << averageStat;
         averageFile.close();
@@ -763,7 +794,18 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
 
     for (int i = 0; i < overlayNum; i++) {
         canvas.SetPosition(Vector2({ int(0), int((fontSize * (11 * i)) + 10) }));
-        canvas.DrawString(indexStringMap[overlayStats[i]] + ": " + std::to_string(statArray[overlayStats[i]]), fontSize, fontSize);
+        if (overlayAverages[i]) {
+            std::string statName;
+            std::string statToUpper = indexStringMap[overlayStats[i]];
+            statToUpper[0] = std::toupper(statToUpper[0]);
+            statName = "average" + statToUpper;
+
+            canvas.DrawString(statName + ": " + std::to_string(average(overlayStats[i])), fontSize, fontSize);
+        }
+        else {
+            canvas.DrawString(indexStringMap[overlayStats[i]] + ": " + std::to_string(statArray[overlayStats[i]]), fontSize, fontSize);
+        }
+        
     }
 
     //cvarManager->log(std::to_string(fontSize));
@@ -773,6 +815,16 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
 void DemolitionCounter::listStats() {
     for (int i = 0; i < numStats; i++) {
         cvarManager->log(std::to_string(i) + ": " + indexStringMap[i]);
+    }
+}
+
+// calculates average of stat and avoids NaN
+float DemolitionCounter::average(int statIndex) {
+    if (statArray[games] == 0) {
+        return 0.0;
+    }
+    else {
+        return (float)statArray[statIndex] / (float)statArray[games];
     }
 }
 
