@@ -10,6 +10,8 @@ BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", plugin
 bool endedGame = true;
 int decimalPlaces = 2;
 bool enabledOverlay = false;
+int overlayNum = 5;
+int overlayStats[5];
 
 // constexpr for all stat indexes 
 // easier to refer back to stat names
@@ -148,6 +150,7 @@ void DemolitionCounter::onLoad()
 {
     cvarManager->log("Plugin loaded!");
     auto decimalsVar = cvarManager->registerCvar("counter_decimals", "2", "set decimal places in averages (1 - 10)");
+    decimalPlaces = decimalsVar.getIntValue();
     decimalsVar.addOnValueChanged([this](std::string, CVarWrapper cvar) { 
             int newValue = cvar.getIntValue();
             if (newValue >= 1 && newValue <= 10) {
@@ -156,10 +159,55 @@ void DemolitionCounter::onLoad()
             }
         });
 
+    // in-game overlay cvars
     // enables or disables overlay
     auto overlayEnableVar = cvarManager->registerCvar("counter_enable_ingame", "0", "enables in game overlay");
+    enabledOverlay = overlayEnableVar.getBoolValue();
     overlayEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
             enabledOverlay = cvar.getBoolValue();
+        });
+
+    // sets number of stats in in game overlay
+    // 1-5 allowed
+    auto overlayNumberVar = cvarManager->registerCvar("counter_ingame_numStats", "5", "number of stats in in game overlay", true, true, 1, true, 5);
+    overlayNum = overlayNumberVar.getIntValue();
+    overlayNumberVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayNum = cvar.getIntValue();
+        });
+
+    // first stat in overlay (defaults to demos/4)
+    auto overlayOneVar = cvarManager->registerCvar("counter_ingame_stat_one", "4", "First stat in overlay", true, true, 0, true, numStats - 1);
+    overlayStats[0] = overlayOneVar.getIntValue();
+    overlayOneVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayStats[0] = cvar.getIntValue();
+        });
+
+    // second stat in overlay (defaults to exterms/6)
+    auto overlayTwoVar = cvarManager->registerCvar("counter_ingame_stat_two", "6", "Second stat in overlay", true, true, 0, true, numStats - 1);
+    overlayStats[1] = overlayTwoVar.getIntValue();
+    overlayTwoVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayStats[1] = cvar.getIntValue();
+        });
+
+    // third stat in overlay (defaults to gameDemos/30)
+    auto overlayThreeVar = cvarManager->registerCvar("counter_ingame_stat_three", "30", "Third stat in overlay", true, true, 0, true, numStats - 1);
+    overlayStats[2] = overlayThreeVar.getIntValue();
+    overlayThreeVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayStats[2] = cvar.getIntValue();
+        });
+
+    // fourth stat in overlay (defaults to games/2)
+    auto overlayFourVar = cvarManager->registerCvar("counter_ingame_stat_four", "2", "Fourth stat in overlay", true, true, 0, true, numStats - 1);
+    overlayStats[3] = overlayFourVar.getIntValue();
+    overlayFourVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayStats[3] = cvar.getIntValue();
+        });
+
+    // fifth stat in overlay (defaults to deaths/5)
+    auto overlayFiveVar = cvarManager->registerCvar("counter_ingame_stat_five", "5", "Fifth stat in overlay", true, true, 0, true, numStats - 1);
+    overlayStats[4] = overlayFiveVar.getIntValue();
+    overlayFiveVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayStats[4] = cvar.getIntValue();
         });
 
     gameWrapper->RegisterDrawable(std::bind(&DemolitionCounter::render, this, std::placeholders::_1));
@@ -709,12 +757,12 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     // sets to red
     canvas.SetColor(255, 0, 0, 255);
 
-    canvas.SetPosition(Vector2({ int(0), int(fontSize) }));
-    canvas.DrawString(indexStringMap[demos] + ": " + std::to_string(statArray[demos]), fontSize, fontSize);
-    canvas.SetPosition(Vector2({ int(0), int(10 * fontSize) }));
-    canvas.DrawString(indexStringMap[exterms] + ": " + std::to_string(statArray[exterms]), fontSize, fontSize);
+    for (int i = 0; i < overlayNum; i++) {
+        canvas.SetPosition(Vector2({ int(0), int((fontSize * (11 * i)) + 10) }));
+        canvas.DrawString(indexStringMap[overlayStats[i]] + ": " + std::to_string(statArray[overlayStats[i]]), fontSize, fontSize);
+    }
 
-    cvarManager->log(std::to_string(fontSize));
+    //cvarManager->log(std::to_string(fontSize));
 }
 
 void DemolitionCounter::onUnload()
