@@ -210,6 +210,10 @@ void DemolitionCounter::onLoad()
         overlayStats[4] = cvar.getIntValue();
         });
 
+    cvarManager->registerNotifier("counter_list_stats", [this](std::vector<std::string> params) {
+        listStats();
+        }, "List all different stat types", PERMISSION_ALL);
+
     gameWrapper->RegisterDrawable(std::bind(&DemolitionCounter::render, this, std::placeholders::_1));
 
     // setters for totals
@@ -763,6 +767,13 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     }
 
     //cvarManager->log(std::to_string(fontSize));
+}
+
+// Lists all stats to console
+void DemolitionCounter::listStats() {
+    for (int i = 0; i < numStats; i++) {
+        cvarManager->log(std::to_string(i) + ": " + indexStringMap[i]);
+    }
 }
 
 void DemolitionCounter::onUnload()

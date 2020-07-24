@@ -54,6 +54,10 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// writes missed exterms
 	void writeMissedExterms();
 
+	// renders overlay
 	void render(CanvasWrapper canvas);
+
+	// prints all stat types
+	void listStats();
 };
 
