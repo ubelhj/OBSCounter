@@ -16,6 +16,7 @@ int overlayStats[5];
 bool overlayAverages[5];
 float xLocation;
 float yLocation;
+int overlayColors[3];
 
 // constexpr for all stat indexes 
 // easier to refer back to stat names
@@ -249,18 +250,39 @@ void DemolitionCounter::onLoad()
         overlayAverages[4] = cvar.getBoolValue();
         });
 
-    // sets cvar to move counter's X
-    auto xLocVar = cvarManager->registerCvar("counter_ingame_x_location", "0.86", "set location of ingame counter's X in % of screen", true, true, 0.0, true, 1.0);
+    // sets cvar to move counter's X location
+    auto xLocVar = cvarManager->registerCvar("counter_ingame_x_location", "0.86", "set location of ingame counter X in % of screen", true, true, 0.0, true, 1.0);
     xLocation = xLocVar.getFloatValue();
     xLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         xLocation = cvar.getFloatValue();
         });
 
-    // sets cvar to move counter's Y
-    auto yLocVar = cvarManager->registerCvar("counter_ingame_y_location", "0.025", "set location of ingame counter's Y in % of screen", true, true, 0.0, true, 1.0);
+    // sets cvar to move counter's Y location
+    auto yLocVar = cvarManager->registerCvar("counter_ingame_y_location", "0.025", "set location of ingame counter Y in % of screen", true, true, 0.0, true, 1.0);
     yLocation = yLocVar.getFloatValue();
     yLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         yLocation = cvar.getFloatValue();
+        });
+
+    // overlay red value changer 
+    auto overlayRedVar = cvarManager->registerCvar("counter_ingame_red", "255", "Red value in overlay", true, true, 0, true, 255);
+    overlayColors[0] = overlayRedVar.getIntValue();
+    overlayRedVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayColors[0] = cvar.getIntValue();
+        });
+
+    // overlay green value changer 
+    auto overlayGreenVar = cvarManager->registerCvar("counter_ingame_green", "0", "green value in overlay", true, true, 0, true, 255);
+    overlayColors[1] = overlayGreenVar.getIntValue();
+    overlayGreenVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayColors[1] = cvar.getIntValue();
+        });
+
+    // overlay blue value changer 
+    auto overlayBlueVar = cvarManager->registerCvar("counter_ingame_blue", "0", "blue value in overlay", true, true, 0, true, 255);
+    overlayColors[2] = overlayBlueVar.getIntValue();
+    overlayBlueVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayColors[2] = cvar.getIntValue();
         });
 
     cvarManager->registerNotifier("counter_list_stats", [this](std::vector<std::string> params) {
@@ -807,7 +829,7 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     float fontSize = ((float)screen.X / (float)1920) * 2;
 
     // sets to red
-    canvas.SetColor(255, 0, 0, 255);
+    canvas.SetColor(overlayColors[0], overlayColors[1], overlayColors[2], 255);
 
     for (int i = 0; i < overlayNum; i++) {
         // locates based on screen and font size
