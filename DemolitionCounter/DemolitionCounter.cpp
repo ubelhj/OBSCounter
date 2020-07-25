@@ -14,6 +14,8 @@ bool enabledOverlay = false;
 int overlayNum = 5;
 int overlayStats[5];
 bool overlayAverages[5];
+float xLocation;
+float yLocation;
 
 // constexpr for all stat indexes 
 // easier to refer back to stat names
@@ -245,6 +247,20 @@ void DemolitionCounter::onLoad()
     overlayAverages[4] = overlayFiveAvgVar.getBoolValue();
     overlayFiveAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayAverages[4] = cvar.getBoolValue();
+        });
+
+    // sets cvar to move counter's X
+    auto xLocVar = cvarManager->registerCvar("counter_ingame_x_location", "0.86", "set location of ingame counter's X in % of screen", true, true, 0.0, true, 1.0);
+    xLocation = xLocVar.getFloatValue();
+    xLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        xLocation = cvar.getFloatValue();
+        });
+
+    // sets cvar to move counter's Y
+    auto yLocVar = cvarManager->registerCvar("counter_ingame_y_location", "0.025", "set location of ingame counter's Y in % of screen", true, true, 0.0, true, 1.0);
+    yLocation = yLocVar.getFloatValue();
+    yLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        yLocation = cvar.getFloatValue();
         });
 
     cvarManager->registerNotifier("counter_list_stats", [this](std::vector<std::string> params) {
@@ -794,7 +810,8 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     canvas.SetColor(255, 0, 0, 255);
 
     for (int i = 0; i < overlayNum; i++) {
-        canvas.SetPosition(Vector2({ int(0), int((fontSize * (11 * i)) + 10) }));
+        // locates based on screen and font size
+        canvas.SetPosition(Vector2({ int((float)screen.X * xLocation), int((fontSize * (11 * i)) + ((float) screen.Y * yLocation)) }));
         if (overlayAverages[i] && overlayStats[i] < startGameStats) {
             std::string statName;
             std::string statToUpper = indexStringMap[overlayStats[i]];
