@@ -151,6 +151,42 @@ std::string indexStringMap[] = {
 // holds all stats
 int statArray[numStats];
 
+// holds strings for averages (doesn't include game stats)
+std::string averageStrings[startGameStats] = {
+    "averageWins",
+    "averageMvps",
+    "averageGames",
+    "averageGoals",
+    "averageDemolitions",
+    "averageDeaths",
+    "averageExterminations",
+    "averageAerialGoals",
+    "averageBackwardsGoals",
+    "averageBicycleGoals",
+    "averageLongGoals",
+    "averageTurtleGoals",
+    "averagePoolShots",
+    "averageOvertimeGoals",
+    "averageHatTricks",
+    "averageAssists",
+    "averagePlaymakers",
+    "averageSaves",
+    "averageEpicSaves",
+    "averageSaviors",
+    "averageShots",
+    "averageCenters",
+    "averageClears",
+    "averageFirstTouchs",
+    "averageDamages",
+    "averageUltraDamages",
+    "averageLowFives",
+    "averageHighFives",
+    "averageSwishs"
+};
+
+// holds all averages
+float averages[startGameStats];
+
 void DemolitionCounter::onLoad()
 {
     cvarManager->log("Plugin loaded!");
@@ -754,11 +790,9 @@ void DemolitionCounter::write(int statIndex) {
         // writes average of stat per game
         std::ofstream averageFile;
         // sets up average file location
-        std::string averageLocation = "./OBSCounter/average";
+        std::string averageLocation = "./OBSCounter/";
         // makes the first letter uppercase for nice looking files
-        std::string statNameUpper = indexStringMap[statIndex];
-        statNameUpper[0] = std::toupper(statNameUpper[0]);
-        averageLocation += statNameUpper + ".txt";
+        averageLocation += averageStrings[statIndex] + ".txt";
         averageFile.open(averageLocation);
 
         float averageStat = average(statIndex);
@@ -834,18 +868,14 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     for (int i = 0; i < overlayNum; i++) {
         // locates based on screen and font size
         canvas.SetPosition(Vector2({ int((float)screen.X * xLocation), int((fontSize * (11 * i)) + ((float) screen.Y * yLocation)) }));
+        // does averages if the user wants them
         if (overlayAverages[i] && overlayStats[i] < startGameStats) {
-            std::string statName;
-            std::string statToUpper = indexStringMap[overlayStats[i]];
-            statToUpper[0] = std::toupper(statToUpper[0]);
-            statName = "average" + statToUpper;
-
             // makes sure string has right number of decimal places
             std::ostringstream averageStream;
             averageStream << std::fixed << std::setprecision(decimalPlaces);
-            averageStream << average(overlayStats[i]);
+            averageStream << averages[overlayStats[i]];
 
-            canvas.DrawString(statName + ": " + averageStream.str(), fontSize, fontSize);
+            canvas.DrawString(averageStrings[overlayStats[i]] + ": " + averageStream.str(), fontSize, fontSize);
         }
         else {
             canvas.DrawString(indexStringMap[overlayStats[i]] + ": " + std::to_string(statArray[overlayStats[i]]), fontSize, fontSize);
@@ -866,11 +896,12 @@ void DemolitionCounter::listStats() {
 // calculates average of stat and avoids NaN
 float DemolitionCounter::average(int statIndex) {
     if (statArray[games] == 0) {
-        return 0.0;
+        averages[statIndex] = 0.0;
     }
     else {
-        return (float)statArray[statIndex] / (float)statArray[games];
+        averages[statIndex] = (float)statArray[statIndex] / (float)statArray[games];
     }
+    return averages[statIndex];
 }
 
 void DemolitionCounter::onUnload()
