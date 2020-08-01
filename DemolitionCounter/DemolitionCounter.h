@@ -6,7 +6,7 @@
 
 constexpr auto plugin_version = "1.0";
 
-class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public BakkesMod::Plugin::PluginWindow*/
+class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 {
 
 	//Boilerplate
@@ -19,7 +19,7 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// hooks events for stats
 	void hookEvents();
 
-	// fires when a stat happens and this is enabled
+	// fires when a stat happens
 	void statEvent(ServerWrapper caller, void* args);
 
 	// checks if the plyer that received a stat is the main player
@@ -28,22 +28,19 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin/*, public Bak
 	// called when a new game starts, resets game stats
 	void startGame();
 
-	// called when a game ends, allows next game to be started
-	void endGame();
-
 
 	// writes the .txt files
+
 	// writes all at once
 	void writeAll();
-	// writes all game stats
-	void writeAllGameStats();
-
 	// writes a specific stat
 	void write(int statIndex);
 	// writes a game stat only
 	void writeGameStat(int statIndex);
 	// calculates an average of a stat
 	float average(int statValue);
+	// divides two stats and prevents NaN
+	float divide(int firstStatIndex, int secondStatIndex);
 
 
 	// extra stats beyond basic ones
