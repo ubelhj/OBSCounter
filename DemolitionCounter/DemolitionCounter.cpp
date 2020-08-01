@@ -705,6 +705,11 @@ void DemolitionCounter::startGame() {
         writeGameStat(i);
     }
 
+    // writes all the averages
+    for (int i = 0; i < startGameStats; i++) {
+        average(i);
+    }
+
     write(games);
 }
 
