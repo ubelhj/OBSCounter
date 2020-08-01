@@ -1,6 +1,6 @@
 # OBSCounter
 Counts demolitions in rocket league and outputs to files
-[https://bakkesplugins.com/plugins/view/123](https://bakkesplugins.com/plugins/view/126)
+[https://bakkesplugins.com/plugins/view/126](https://bakkesplugins.com/plugins/view/126)
 
 Takes all major stat notifications and creates .txt files to read and use in OBS. Demolitions, Goals, MVPS, even High Fives. Any stat you want all available for streaming or recording. This works only if you're playing, not spectating, and only tracks your individual stats.
 [gif demonstration](https://gfycat.com/reasonableunhappygar)
