@@ -384,6 +384,14 @@ void DemolitionCounter::setCvars() {
             listStats();
         }, "List all different stat types", PERMISSION_ALL);
 
+    // allows toggling of in game counter
+    // use by typing in console 
+    //  "bind XboxTypeS_LeftShoulder "counter_ingame_toggle"" 
+    //  with your button preference
+    cvarManager->registerNotifier("counter_ingame_toggle",
+        [this](std::vector<std::string> params) {
+            enabledOverlay = !enabledOverlay;
+        }, "Toggle in game overlay", PERMISSION_ALL);
 
     // creates setters for the default start value for each stat
     // also writes these new values to files
