@@ -385,7 +385,7 @@ void DemolitionCounter::setCvars() {
         }, "List all different stat types", PERMISSION_ALL);
 
     // allows toggling of in game counter
-    // use by typing in console 
+    // use by adding a line in bakkesmod/cfg/binds.cfg
     //  "bind XboxTypeS_LeftShoulder "counter_ingame_toggle"" 
     //  with your button preference
     cvarManager->registerNotifier("counter_ingame_toggle",
