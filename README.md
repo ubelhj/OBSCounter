@@ -5,6 +5,9 @@ Counts demolitions in rocket league and outputs to files
 Takes all major stat notifications and creates .txt files to read and use in OBS. Demolitions, Goals, MVPS, even High Fives. Any stat you want all available for streaming or recording. This works only if you're playing, not spectating, and only tracks your individual stats.
 [gif demonstration](https://gfycat.com/reasonableunhappygar)
 
+**New Feature**:
+In game overlay to see your stats in game as well as in OBS.
+
 Outputs in files in a folder /OBSCounter/ next to your rocket league.exe. You have to make this folder in advance before the plugin runs or it will be unable to write the files. 
 
 enable the plugin in BakkesMod console by pressing f6 and typing counter_enabled 1
@@ -16,7 +19,7 @@ There are also setters for the stats files, by pressing f6 to enter the BakkesMo
 
 If you have any permissions issues, try creating the /OBSCounter/ folder first
 
-**CURRENTLY KNOWN ISSUE **
+**CURRENTLY KNOWN ISSUE**
 First Touches, Centers, and Clears fail to count. Only stats that can appear on the right side ticker are counted properly. 
 
 The .dll and .set files have been renamed from DemolitionCounter to OBSCounter. Please make sure that all old copies are deleted to prevent the code from running twice.
