@@ -96,8 +96,8 @@ constexpr int numStats = 55;
 
 // jump from a stat to its most recent game stat by adding this number
 constexpr int totalToGame = 26;
-// number of stats without game counterpart
-constexpr int statsWithoutGame = 3;
+// end of stats without game counterpart
+constexpr int statsWithoutGame = games;
 // start of game stats and/or 1 after the end of non-game stats
 constexpr int startGameStats = gameGoals;
 
@@ -195,6 +195,36 @@ std::string averageStrings[startGameStats] = {
     "averageLowFives",
     "averageHighFives",
     "averageSwishs"
+};
+
+const std::map<std::string, int> eventDictionary = {
+    { "Demolition", demos},
+    { "Extermination", exterms},
+    { "Goal", goals},
+    { "Win", wins},
+    { "MVP", mvps},
+    { "Aerial Goal", aerialGoals},
+    { "Backwards Goal", backwardsGoals},
+    { "Bicycle Goal", bicycleGoals},
+    { "Long Goal", longGoals},
+    { "Turtle Goal", turtleGoals},
+    { "Pool Shot", poolShots},
+    { "Overtime Goal", overtimeGoals},
+    { "Hat Trick", hatTricks},
+    { "Assist", assists},
+    { "Playmaker", playmakers},
+    { "Save", saves},
+    { "Epic Save", epicSaves},
+    { "Savior", saviors},
+    { "Shot on Goal", shots},
+    { "Center Ball", centers},
+    { "Clear Ball", clears},
+    { "First Touch", firstTouchs},
+    { "Damage", damages},
+    { "Ultra Damage", ultraDamages},
+    { "Low Five", lowFives},
+    { "High Five", highFives},
+    { "Swish Goal", swishs}
 };
 
 // holds all averages
@@ -464,8 +494,22 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     auto label = statEvent.GetLabel();
     //cvarManager->log(label.ToString());
 
+    auto eventTypePtr = eventDictionary.find(label.ToString());
+
+    int eventType;
+
+    if (eventTypePtr != eventDictionary.end()) {
+        eventType = eventTypePtr->second;
+        cvarManager->log("event type: " + label.ToString());
+        cvarManager->log("event num: " + std::to_string(eventType));
+    }
+    else {
+        cvarManager->log("missing stat: " + label.ToString());
+        return;
+    }
+
     // special case for demolitions to check for the player's death
-    if (label.ToString().compare("Demolition") == 0) {
+    if (eventType == demos) {
         if (DemolitionCounter::isPrimaryPlayer(receiver)) {
             statArray[demos]++;
             statArray[gameDemos]++;
@@ -495,162 +539,13 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
         return; 
     }*/
     // if the stat event matches a label, 
-    //  adds 1 to the stat and 1 to the game stat equivalent
     // then writes that stat to files
-    if (label.ToString().compare("Extermination") == 0) {
-        statArray[exterms]++;
-        statArray[gameExterms]++;
-        write(exterms);
-        return;
+    statArray[eventType]++;
+    // adds 1 to the game stat equivalent if applicable
+    if (eventType > statsWithoutGame) {
+        statArray[eventType + totalToGame]++;
     }
-    if (label.ToString().compare("Win") == 0) {
-        statArray[wins]++;
-        write(wins);
-        return;
-    }
-    if (label.ToString().compare("Goal") == 0) {
-        statArray[goals]++;
-        statArray[gameGoals]++;
-        write(goals);
-        return;
-    }
-    if (label.ToString().compare("MVP") == 0) {
-        statArray[mvps]++;
-        write(mvps);
-        return;
-    }
-    if (label.ToString().compare("Aerial Goal") == 0) {
-        statArray[aerialGoals]++;
-        statArray[gameAerialGoals]++;
-        write(aerialGoals);
-        return;
-    }
-    if (label.ToString().compare("Backwards Goal") == 0) {
-        statArray[backwardsGoals]++;
-        statArray[gameBackwardsGoals]++;
-        write(backwardsGoals);
-        return;
-    }
-    if (label.ToString().compare("Bicycle Goal") == 0) {
-        statArray[bicycleGoals]++;
-        statArray[gameBicycleGoals]++;
-        write(bicycleGoals);
-        return;
-    }
-    if (label.ToString().compare("Long Goal") == 0) {
-        statArray[longGoals]++;
-        statArray[gameLongGoals]++;
-        write(longGoals);
-        return;
-    }
-    if (label.ToString().compare("Turtle Goal") == 0) {
-        statArray[turtleGoals]++;
-        statArray[gameTurtleGoals]++;
-        write(turtleGoals);
-        return;
-    }
-    if (label.ToString().compare("Pool Shot") == 0) {
-        statArray[poolShots]++;
-        statArray[gamePoolShots]++;
-        write(poolShots);
-        return;
-    }
-    if (label.ToString().compare("Overtime Goal") == 0) {
-        statArray[overtimeGoals]++;
-        statArray[gameOvertimeGoals]++;
-        write(overtimeGoals);
-        return;
-    }
-    if (label.ToString().compare("Hat Trick") == 0) {
-        statArray[hatTricks]++;
-        statArray[gameHatTricks]++;
-        write(hatTricks);
-        return;
-    }
-    if (label.ToString().compare("Assist") == 0) {
-        statArray[assists]++;
-        statArray[gameAssists]++;
-        write(assists);
-        return;
-    }
-    if (label.ToString().compare("Playmaker") == 0) {
-        statArray[playmakers]++;
-        statArray[gamePlaymakers]++;
-        write(playmakers);
-        return;
-    }
-    if (label.ToString().compare("Save") == 0) {
-        statArray[saves]++;
-        statArray[gameSaves]++;
-        write(saves);
-        return;
-    }
-    if (label.ToString().compare("Epic Save") == 0) {
-        statArray[epicSaves]++;
-        statArray[gameEpicSaves]++;
-        write(epicSaves);
-        return;
-    }
-    if (label.ToString().compare("Savior") == 0) {
-        statArray[saviors]++;
-        statArray[gameSaviors]++;
-        write(saviors);
-        return;
-    }
-    if (label.ToString().compare("Shot on Goal") == 0) {
-        statArray[shots]++;
-        statArray[gameShots]++;
-        write(shots);
-        return;
-    }
-    if (label.ToString().compare("Center Ball") == 0) {
-        statArray[centers]++;
-        statArray[gameCenters]++;
-        write(centers);
-        return;
-    }
-    if (label.ToString().compare("Clear Ball") == 0) {
-        statArray[clears]++;
-        statArray[gameClears]++;
-        write(clears);
-        return;
-    }
-    if (label.ToString().compare("First Touch") == 0) {
-        statArray[firstTouchs]++;
-        statArray[gameFirstTouchs]++;
-        write(firstTouchs);
-        return;
-    }
-    if (label.ToString().compare("Damage") == 0) {
-        statArray[damages]++;
-        statArray[gameDamages]++;
-        write(damages);
-        return;
-    }
-    if (label.ToString().compare("Ultra Damage") == 0) {
-        statArray[ultraDamages]++;
-        statArray[gameUltraDamages]++;
-        write(ultraDamages);
-        return;
-    }
-    if (label.ToString().compare("Low Five") == 0) {
-        statArray[lowFives]++;
-        statArray[gameLowFives]++;
-        write(lowFives);
-        return;
-    }
-    if (label.ToString().compare("High Five") == 0) {
-        statArray[highFives]++;
-        statArray[gameHighFives]++;
-        write(highFives);
-        return;
-    }
-    if (label.ToString().compare("Swish Goal") == 0) {
-        statArray[swishs]++;
-        statArray[gameSwishs]++;
-        write(swishs);
-        return;
-    }
+    write(eventType);
 }
 
 // checks if the player who received a stat is the user's player
@@ -751,7 +646,7 @@ void DemolitionCounter::write(int statIndex) {
 
     // writes the game version of stat
     // only writes if stat has a game version
-    if (statIndex >= statsWithoutGame) {
+    if (statIndex > statsWithoutGame) {
         writeGameStat(statIndex + totalToGame);
     }
 
