@@ -384,21 +384,20 @@ void DemolitionCounter::setCvars() {
             listStats();
         }, "List all different stat types", PERMISSION_ALL);
 
-    // allows toggling of in game counter
-    // use by adding a line in bakkesmod/cfg/binds.cfg
-    //  "bind XboxTypeS_LeftShoulder "counter_ingame_toggle"" 
-    //  with your button preference
-    cvarManager->registerNotifier("counter_ingame_toggle",
+    // adds 1 to games to fix any errors in game tracking
+    cvarManager->registerNotifier("counter_add_game",
         [this](std::vector<std::string> params) {
-            enabledOverlay = !enabledOverlay;
-        }, "Toggle in game overlay", PERMISSION_ALL);
+            endedGame = true;
+            startGame();
+            endedGame = true;
+        }, "Add a game to stats to fix any sync issues", PERMISSION_ALL);
 
     // creates setters for the default start value for each stat
     // also writes these new values to files
     for (int i = 0; i < startGameStats; i++) {
         std::string cvarName = "counter_set_" + indexStringMap[i];
         std::string cvarTip = "sets " + indexStringMap[i] + " value";
-        cvarManager->registerCvar(cvarName, "0", cvarTip);
+        cvarManager->registerCvar(cvarName, "0", cvarTip, true, false, 0, false, 0, false);
         auto cvar = cvarManager->getCvar(cvarName);
         statArray[i] = cvar.getIntValue();
         
