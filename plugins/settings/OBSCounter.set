@@ -14,19 +14,19 @@ OBS Counter Plugin
 9|You can also set each counter in the console with counter_ingame_stat_ if the slider isn't precise enough
 9|Average stats do not work with game stats or the other advanced stats (only works with stats 0-28)
 9|Your choices will stay across game sessions so this is one time setup :)
-5|First stat|counter_ingame_stat_one|0|54
+5|First stat|counter_ingame_stat_one|0|57
 7|
 1|Average (stat/games)##averageone|counter_ingame_stat_one_average
-5|Second stat|counter_ingame_stat_two|0|54
+5|Second stat|counter_ingame_stat_two|0|57
 7|
 1|Average (stat/games)##averagetwo|counter_ingame_stat_two_average
-5|Third stat|counter_ingame_stat_three|0|54
+5|Third stat|counter_ingame_stat_three|0|57
 7|
 1|Average (stat/games)##averagethree|counter_ingame_stat_three_average
-5|Fourth stat|counter_ingame_stat_four|0|54
+5|Fourth stat|counter_ingame_stat_four|0|57
 7|
 1|Average (stat/games)##averagefour|counter_ingame_stat_four_average
-5|Fifth stat|counter_ingame_stat_five|0|54
+5|Fifth stat|counter_ingame_stat_five|0|57
 7|
 1|Average (stat/games)##averagefive|counter_ingame_stat_five_average
 9|Plugin made by JerryTheBee#1117

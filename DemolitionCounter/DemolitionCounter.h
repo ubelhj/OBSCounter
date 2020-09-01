@@ -4,7 +4,7 @@
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/pluginwindow.h"
 
-constexpr auto plugin_version = "2.0";
+constexpr auto plugin_version = "2.1";
 
 class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 {
@@ -27,6 +27,8 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 
 	// called when a new game starts, resets game stats
 	void startGame();
+
+	void endGame();
 
 
 	// writes the .txt files
@@ -52,6 +54,11 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 
 	// writes missed exterms
 	void writeMissedExterms();
+
+	// writes win percentage
+	void writeWinPercentage();
+
+	int getPercentage(int numerator, int denominator);
 
 	// renders overlay
 	void render(CanvasWrapper canvas);

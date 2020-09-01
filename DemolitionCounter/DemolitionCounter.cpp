@@ -31,71 +31,77 @@ int overlayColors[3];
 
 // constexpr for all stat indexes 
 // easier to refer back to stat names
-// total stats are from 0 to 28, game stats from 29 to end
-
+// total stats are from 0 to 30, game stats from 31 to end
 // these stats have no game counterpart
 constexpr int wins = 0;
-constexpr int mvps = 1;
-constexpr int games = 2;
-// stat + 26 = gameStat
-constexpr int goals = 3;
-constexpr int demos = 4;
-constexpr int deaths = 5;
-constexpr int exterms = 6;
-constexpr int aerialGoals = 7;
-constexpr int backwardsGoals = 8;
-constexpr int bicycleGoals = 9;
-constexpr int longGoals = 10;
-constexpr int turtleGoals = 11;
-constexpr int poolShots = 12;
-constexpr int overtimeGoals = 13;
-constexpr int hatTricks = 14;
-constexpr int assists = 15;
-constexpr int playmakers = 16;
-constexpr int saves = 17;
-constexpr int epicSaves = 18;
-constexpr int saviors = 19;
-constexpr int shots = 20;
-constexpr int centers = 21;
-constexpr int clears = 22;
-constexpr int firstTouchs = 23;
-constexpr int damages = 24;
-constexpr int ultraDamages = 25;
-constexpr int lowFives = 26;
-constexpr int highFives = 27;
-constexpr int swishs = 28;
-// game stats are from 29 -> end
-constexpr int gameGoals = 29;
-constexpr int gameDemos = 30;
-constexpr int gameDeaths = 31;
-constexpr int gameExterms = 32;
-constexpr int gameAerialGoals = 33;
-constexpr int gameBackwardsGoals = 34;
-constexpr int gameBicycleGoals = 35;
-constexpr int gameLongGoals = 36;
-constexpr int gameTurtleGoals = 37;
-constexpr int gamePoolShots = 38;
-constexpr int gameOvertimeGoals = 39;
-constexpr int gameHatTricks = 40;
-constexpr int gameAssists = 41;
-constexpr int gamePlaymakers = 42;
-constexpr int gameSaves = 43;
-constexpr int gameEpicSaves = 44;
-constexpr int gameSaviors = 45;
-constexpr int gameShots = 46;
-constexpr int gameCenters = 47;
-constexpr int gameClears = 48;
-constexpr int gameFirstTouchs = 49;
-constexpr int gameDamages = 50;
-constexpr int gameUltraDamages = 51;
-constexpr int gameLowFives = 52;
-constexpr int gameHighFives = 53;
-constexpr int gameSwishs = 54;
-// total number of stats in the stat array
-constexpr int numStats = 55;
+constexpr int losses = 1;
+constexpr int mvps = 2;
+constexpr int games = 3;
+// stat + 27 = gameStat
+constexpr int goals = 4;
+constexpr int demos = 5;
+constexpr int deaths = 6;
+constexpr int exterms = 7;
+constexpr int aerialGoals = 8;
+constexpr int backwardsGoals = 9;
+constexpr int bicycleGoals = 10;
+constexpr int longGoals = 11;
+constexpr int turtleGoals = 12;
+constexpr int poolShots = 13;
+constexpr int overtimeGoals = 14;
+constexpr int hatTricks = 15;
+constexpr int assists = 16;
+constexpr int playmakers = 17;
+constexpr int saves = 18;
+constexpr int epicSaves = 19;
+constexpr int saviors = 20;
+constexpr int shots = 21;
+constexpr int centers = 22;
+constexpr int clears = 23;
+constexpr int firstTouchs = 24;
+constexpr int damages = 25;
+constexpr int ultraDamages = 26;
+constexpr int lowFives = 27;
+constexpr int highFives = 28;
+constexpr int swishs = 29;
+constexpr int bicycleHits = 30;
+// game stats are from 31 -> end
+// goals + 27 = gameGoals
 
-// jump from a stat to its most recent game stat by adding this number
-constexpr int totalToGame = 26;
+// jump from a stat to its most recent game stat by adding this number (27)
+constexpr int totalToGame = 27;
+
+constexpr int gameGoals = goals + totalToGame;
+constexpr int gameDemos = demos + totalToGame;
+constexpr int gameDeaths = deaths + totalToGame;
+constexpr int gameExterms = exterms + totalToGame;
+constexpr int gameAerialGoals = aerialGoals + totalToGame;
+constexpr int gameBackwardsGoals = backwardsGoals + totalToGame;
+constexpr int gameBicycleGoals = bicycleGoals + totalToGame;
+constexpr int gameLongGoals = longGoals + totalToGame;
+constexpr int gameTurtleGoals = turtleGoals + totalToGame;
+constexpr int gamePoolShots = poolShots + totalToGame;
+constexpr int gameOvertimeGoals = overtimeGoals + totalToGame;
+constexpr int gameHatTricks = hatTricks + totalToGame;
+constexpr int gameAssists = assists + totalToGame;
+constexpr int gamePlaymakers = playmakers + totalToGame;
+constexpr int gameSaves = saves + totalToGame;
+constexpr int gameEpicSaves = epicSaves + totalToGame;
+constexpr int gameSaviors = saviors + totalToGame;
+constexpr int gameShots = shots + totalToGame;
+constexpr int gameCenters = centers + totalToGame;
+constexpr int gameClears = clears + totalToGame;
+constexpr int gameFirstTouchs = firstTouchs + totalToGame;
+constexpr int gameDamages = damages + totalToGame;
+constexpr int gameUltraDamages = ultraDamages + totalToGame;
+constexpr int gameLowFives = lowFives + totalToGame;
+constexpr int gameHighFives = highFives + totalToGame;
+constexpr int gameSwishs = swishs + totalToGame;
+constexpr int gameBicycleHits = bicycleHits + totalToGame;
+// total number of stats in the stat array
+// also index of last stat (57)
+constexpr int numStats = gameBicycleHits + 1;
+
 // end of stats without game counterpart
 constexpr int statsWithoutGame = games;
 // start of game stats and/or 1 after the end of non-game stats
@@ -105,6 +111,7 @@ constexpr int startGameStats = gameGoals;
 // index to string
 std::string indexStringMap[] = {
     "wins",
+    "losses",
     "mvps",
     "games",
     "goals",
@@ -133,6 +140,7 @@ std::string indexStringMap[] = {
     "lowFives",
     "highFives",
     "swishs",
+    "bicycleHits",
     "gameGoals",
     "gameDemolitions",
     "gameDeaths",
@@ -158,15 +166,17 @@ std::string indexStringMap[] = {
     "gameUltraDamages",
     "gameLowFives",
     "gameHighFives",
-    "gameSwishs"
+    "gameSwishs",
+    "gameBicycleHits"
 };
 
 // holds all stats
 int statArray[numStats];
 
 // holds strings for averages (doesn't include game stats)
-std::string averageStrings[startGameStats] = {
+std::string averageStrings[] = {
     "averageWins",
+    "averageLosses",
     "averageMvps",
     "averageGames",
     "averageGoals",
@@ -194,7 +204,8 @@ std::string averageStrings[startGameStats] = {
     "averageUltraDamages",
     "averageLowFives",
     "averageHighFives",
-    "averageSwishs"
+    "averageSwishs",
+    "averageBicycleHits"
 };
 
 const std::map<std::string, int> eventDictionary = {
@@ -224,7 +235,8 @@ const std::map<std::string, int> eventDictionary = {
     { "Ultra Damage", ultraDamages},
     { "Low Five", lowFives},
     { "High Five", highFives},
-    { "Swish Goal", swishs}
+    { "Swish Goal", swishs},
+    { "Bicycle Hit", bicycleHits}
 };
 
 // holds all averages
@@ -465,7 +477,7 @@ void DemolitionCounter::hookEvents() {
     // works on ended game
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", 
-        [this](std::string eventName) { endedGame = true; });
+        std::bind(&DemolitionCounter::endGame, this));
 }
 
 // The structure of a stat event
@@ -531,13 +543,6 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
         return;
     }
 
-    // Checks for each possible event name
-    // no switches in c++ for strings so this looks kind of ugly :(
-   /* if (label.ToString().compare("Demolition") == 0) {
-        statArray[demolitions]++;
-        write(demolitions);
-        return; 
-    }*/
     // if the stat event matches a label, 
     // then writes that stat to files
     statArray[eventType]++;
@@ -615,6 +620,45 @@ void DemolitionCounter::startGame() {
     write(games);
 }
 
+void DemolitionCounter::endGame() {
+    if (!gameWrapper->IsInOnlineGame()) {
+        cvarManager->log("not in online game");
+        return;
+    }
+
+    ServerWrapper sw = gameWrapper->GetOnlineGame();
+
+    if (sw.IsNull()) {
+        cvarManager->log("null server");
+        return;
+    }
+
+    auto primary = sw.GetLocalPrimaryPlayer();
+
+    if (primary.IsNull()) {
+        cvarManager->log("null primary player");
+        return;
+    }
+
+    auto primaryNum = primary.GetTeamNum2();
+
+    auto winner = sw.GetWinningTeam();
+
+    if (winner.IsNull()) {
+        cvarManager->log("null winner");
+        return;
+    }
+
+    auto winningNum = winner.GetTeamNum2();
+
+    if (winningNum != primaryNum) {
+        statArray[losses]++;
+        write(losses);
+    }
+
+    endedGame = true;
+}
+
 // writes a stat to its files
 // can only be called with a stat index and not a game stat index
 void DemolitionCounter::write(int statIndex) {
@@ -654,6 +698,7 @@ void DemolitionCounter::write(int statIndex) {
     // shooting % (shot or goal)
     // k/d (demo or death)
     // missed exterm % (demo or exterm)
+    // wins / losses (win or loss)
     switch (statIndex) {
     case shots:
     case goals:
@@ -666,6 +711,11 @@ void DemolitionCounter::write(int statIndex) {
         break;
     case deaths:
         writeKillPercentage();
+        break;
+    case wins:
+    case losses:
+        writeWinPercentage();
+        break;
     }
 }
 
@@ -690,18 +740,16 @@ void DemolitionCounter::writeShootingPercentage() {
     // calculates current game shooting %
     std::ofstream gameFile;
     // divides and checks for NaN
-    float gameShooting = divide(gameGoals, gameShots);
+    int gameShooting = getPercentage(statArray[gameGoals], statArray[gameShots]);
     gameFile.open("./OBSCounter/gameShootingPercentage.txt");
-    gameFile << std::fixed << std::setprecision(decimalPlaces);
-    gameFile << gameShooting;
+    gameFile << gameShooting << "%";
     gameFile.close();
 
     // writes total session shooting
-    float totalShooting = divide(goals, shots);
+    int totalShooting = getPercentage(statArray[goals], statArray[shots]);
     std::ofstream file;
     file.open("./OBSCounter/shootingPercentage.txt");
-    file << std::fixed << std::setprecision(decimalPlaces);
-    file << totalShooting;
+    file << totalShooting << "%";
     file.close();
 }
 
@@ -732,18 +780,30 @@ void DemolitionCounter::writeMissedExterms() {
     totalFile << possibleExterms;
     totalFile.close();
 
-    int missedExtermPercent;
-    if (possibleExterms == 0) {
-        missedExtermPercent = 0;
-    }
-    else {
-        missedExtermPercent = 
-            ((float)statArray[exterms] / (float)possibleExterms) * 100;
-    }
+    int missedExtermPercent = getPercentage(statArray[exterms], possibleExterms);
+    
     std::ofstream file;
     file.open("./OBSCounter/missedExterminationPercent.txt");
     file << missedExtermPercent << "%";
     file.close();
+}
+
+void DemolitionCounter::writeWinPercentage() {
+    int winPercent = getPercentage(statArray[wins], statArray[wins] + statArray[losses]);
+
+    std::ofstream file;
+    file.open("./OBSCounter/winPercent.txt");
+    file << winPercent << "%";
+    file.close();
+}
+
+int DemolitionCounter::getPercentage(int numerator, int denominator) {
+    if (denominator == 0) {
+        return 0;
+    }
+    else {
+       return ((float)numerator / (float) denominator) * 100;
+    }
 }
 
 // Renders in game overlay
