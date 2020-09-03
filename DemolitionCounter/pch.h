@@ -1,5 +1,5 @@
 #pragma once
-#pragma comment(lib, "bakkesmod.lib")
+#pragma comment(lib, "pluginsdk.lib")
 
 #define WIN32_LEAN_AND_MEAN
 #define _CRT_SECURE_NO_WARNINGS

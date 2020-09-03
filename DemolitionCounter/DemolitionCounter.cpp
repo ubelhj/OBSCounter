@@ -99,7 +99,7 @@ constexpr int gameHighFives = highFives + totalToGame;
 constexpr int gameSwishs = swishs + totalToGame;
 constexpr int gameBicycleHits = bicycleHits + totalToGame;
 // total number of stats in the stat array
-// also index of last stat (57)
+// also index of last stat + 1 (58)
 constexpr int numStats = gameBicycleHits + 1;
 
 // end of stats without game counterpart
