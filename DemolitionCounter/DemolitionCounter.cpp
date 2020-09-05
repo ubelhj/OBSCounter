@@ -33,71 +33,71 @@ int overlayColors[3];
 // easier to refer back to stat names
 // total stats are from 0 to 30, game stats from 31 to end
 // these stats have no game counterpart
-constexpr int wins = 0;
-constexpr int losses = 1;
-constexpr int mvps = 2;
-constexpr int games = 3;
-// stat + 27 = gameStat
-constexpr int goals = 4;
-constexpr int demos = 5;
-constexpr int deaths = 6;
-constexpr int exterms = 7;
-constexpr int aerialGoals = 8;
-constexpr int backwardsGoals = 9;
-constexpr int bicycleGoals = 10;
-constexpr int longGoals = 11;
-constexpr int turtleGoals = 12;
-constexpr int poolShots = 13;
-constexpr int overtimeGoals = 14;
-constexpr int hatTricks = 15;
-constexpr int assists = 16;
-constexpr int playmakers = 17;
-constexpr int saves = 18;
-constexpr int epicSaves = 19;
-constexpr int saviors = 20;
-constexpr int shots = 21;
-constexpr int centers = 22;
-constexpr int clears = 23;
-constexpr int firstTouchs = 24;
-constexpr int damages = 25;
-constexpr int ultraDamages = 26;
-constexpr int lowFives = 27;
-constexpr int highFives = 28;
-constexpr int swishs = 29;
-constexpr int bicycleHits = 30;
-// game stats are from 31 -> end
-// goals + 27 = gameGoals
+enum stats {
+    wins, 
+    losses, 
+    mvps,
+    games,
+    // stat + 27 = gameStat
+    goals,
+    demos,
+    deaths,
+    exterms,
+    aerialGoals,
+    backwardsGoals,
+    bicycleGoals,
+    longGoals,
+    turtleGoals,
+    poolShots,
+    overtimeGoals,
+    hatTricks,
+    assists,
+    playmakers,
+    saves,
+    epicSaves,
+    saviors,
+    shots,
+    centers,
+    clears,
+    firstTouchs,
+    damages,
+    ultraDamages,
+    lowFives,
+    highFives,
+    swishs,
+    bicycleHits,
+    // game stats are from 31 -> end
+    // goals + 27 = gameGoals
+    gameGoals,
+    gameDemos,
+    gameDeaths,
+    gameExterms,
+    gameAerialGoals,
+    gameBackwardsGoals,
+    gameBicycleGoals,
+    gameLongGoals,
+    gameTurtleGoals,
+    gamePoolShots,
+    gameOvertimeGoals,
+    gameHatTricks,
+    gameAssists,
+    gamePlaymakers,
+    gameSaves,
+    gameEpicSaves,
+    gameSaviors,
+    gameShots,
+    gameCenters,
+    gameClears,
+    gameFirstTouchs,
+    gameDamages,
+    gameUltraDamages,
+    gameLowFives,
+    gameHighFives,
+    gameSwishs,
+    gameBicycleHits
+};
 
-// jump from a stat to its most recent game stat by adding this number (27)
-constexpr int totalToGame = 27;
 
-constexpr int gameGoals = goals + totalToGame;
-constexpr int gameDemos = demos + totalToGame;
-constexpr int gameDeaths = deaths + totalToGame;
-constexpr int gameExterms = exterms + totalToGame;
-constexpr int gameAerialGoals = aerialGoals + totalToGame;
-constexpr int gameBackwardsGoals = backwardsGoals + totalToGame;
-constexpr int gameBicycleGoals = bicycleGoals + totalToGame;
-constexpr int gameLongGoals = longGoals + totalToGame;
-constexpr int gameTurtleGoals = turtleGoals + totalToGame;
-constexpr int gamePoolShots = poolShots + totalToGame;
-constexpr int gameOvertimeGoals = overtimeGoals + totalToGame;
-constexpr int gameHatTricks = hatTricks + totalToGame;
-constexpr int gameAssists = assists + totalToGame;
-constexpr int gamePlaymakers = playmakers + totalToGame;
-constexpr int gameSaves = saves + totalToGame;
-constexpr int gameEpicSaves = epicSaves + totalToGame;
-constexpr int gameSaviors = saviors + totalToGame;
-constexpr int gameShots = shots + totalToGame;
-constexpr int gameCenters = centers + totalToGame;
-constexpr int gameClears = clears + totalToGame;
-constexpr int gameFirstTouchs = firstTouchs + totalToGame;
-constexpr int gameDamages = damages + totalToGame;
-constexpr int gameUltraDamages = ultraDamages + totalToGame;
-constexpr int gameLowFives = lowFives + totalToGame;
-constexpr int gameHighFives = highFives + totalToGame;
-constexpr int gameSwishs = swishs + totalToGame;
-constexpr int gameBicycleHits = bicycleHits + totalToGame;
 // total number of stats in the stat array
 // also index of last stat + 1 (58)
 constexpr int numStats = gameBicycleHits + 1;
@@ -106,6 +106,10 @@ constexpr int numStats = gameBicycleHits + 1;
 constexpr int statsWithoutGame = games;
 // start of game stats and/or 1 after the end of non-game stats
 constexpr int startGameStats = gameGoals;
+
+// jump from a stat to its most recent game stat by adding this number (27)
+// goals + 27 = gameGoals
+constexpr int totalToGame = startGameStats - 1 - statsWithoutGame;
 
 // maps the stat indexes to their respective strings to write files
 // index to string
@@ -290,93 +294,33 @@ void DemolitionCounter::setCvars() {
         overlayNum = cvar.getIntValue();
         });
 
-    // first stat in overlay (defaults to demos/4)
-    auto overlayOneVar = cvarManager->registerCvar("counter_ingame_stat_one",
-        "4", "First stat in overlay", true, true, 0, true, numStats - 1);
-    overlayStats[0] = overlayOneVar.getIntValue();
-    overlayOneVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayStats[0] = cvar.getIntValue();
-        });
+    std::string numberStrings[] = {
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+    };
 
-    // sets first stat in overlay to average or not
-    auto overlayOneAvgVar = cvarManager->registerCvar(
-        "counter_ingame_stat_one_average", "0",
-        "Toggles average of first stat in overlay", true, true, 0, true, 1);
-    overlayAverages[0] = overlayOneAvgVar.getBoolValue();
-    overlayOneAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayAverages[0] = cvar.getBoolValue();
-        });
+    for (int i = 0; i < 5; i++) {
+        std::string str = numberStrings[i];
+        // sets stat in overlay
+        auto overlayVar = cvarManager->registerCvar("counter_ingame_stat_" + str,
+            std::to_string(i), "stat " + str + " in overlay", true, true, 0, true, numStats - 1);
+        overlayStats[i] = overlayVar.getIntValue();
+        overlayVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            overlayStats[i] = cvar.getIntValue();
+            });
 
-    // second stat in overlay (defaults to exterms/6)
-    auto overlayTwoVar = cvarManager->registerCvar("counter_ingame_stat_two",
-        "6", "Second stat in overlay", true, true, 0, true, numStats - 1);
-    overlayStats[1] = overlayTwoVar.getIntValue();
-    overlayTwoVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayStats[1] = cvar.getIntValue();
-        });
-
-    // sets second stat in overlay to average or not
-    auto overlayTwoAvgVar = cvarManager->registerCvar(
-        "counter_ingame_stat_two_average", "0",
-        "Toggles average of second stat in overlay", true, true, 0, true, 1);
-    overlayAverages[1] = overlayTwoAvgVar.getBoolValue();
-    overlayTwoAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayAverages[1] = cvar.getBoolValue();
-        });
-
-    // third stat in overlay (defaults to gameDemos/30)
-    auto overlayThreeVar = cvarManager->registerCvar(
-        "counter_ingame_stat_three", "30", "Third stat in overlay",
-        true, true, 0, true, numStats - 1);
-    overlayStats[2] = overlayThreeVar.getIntValue();
-    overlayThreeVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayStats[2] = cvar.getIntValue();
-        });
-
-    // sets third stat in overlay to average or not
-    auto overlayThreeAvgVar = cvarManager->registerCvar(
-        "counter_ingame_stat_three_average", "0",
-        "Toggles average of third stat in overlay", true, true, 0, true, 1);
-    overlayAverages[2] = overlayThreeAvgVar.getBoolValue();
-    overlayThreeAvgVar.addOnValueChanged(
-        [this](std::string, CVarWrapper cvar) {
-            overlayAverages[2] = cvar.getBoolValue();
-        });
-
-    // fourth stat in overlay (defaults to games/2)
-    auto overlayFourVar = cvarManager->registerCvar("counter_ingame_stat_four",
-        "2", "Fourth stat in overlay", true, true, 0, true, numStats - 1);
-    overlayStats[3] = overlayFourVar.getIntValue();
-    overlayFourVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayStats[3] = cvar.getIntValue();
-        });
-
-    // sets fourth stat in overlay to average or not
-    auto overlayFourAvgVar = cvarManager->registerCvar(
-        "counter_ingame_stat_four_average", "0",
-        "Toggles average of fourth stat in overlay", true, true, 0, true, 1);
-    overlayAverages[3] = overlayFourAvgVar.getBoolValue();
-    overlayFourAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayAverages[3] = cvar.getBoolValue();
-        });
-
-    // fifth stat in overlay (defaults to deaths/5)
-    auto overlayFiveVar = cvarManager->registerCvar(
-        "counter_ingame_stat_five", "5", "Fifth stat in overlay",
-        true, true, 0, true, numStats - 1);
-    overlayStats[4] = overlayFiveVar.getIntValue();
-    overlayFiveVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayStats[4] = cvar.getIntValue();
-        });
-
-    // sets fifth stat in overlay to average or not
-    auto overlayFiveAvgVar = cvarManager->registerCvar(
-        "counter_ingame_stat_five_average", "0",
-        "Toggles average of fifth stat in overlay", true, true, 0, true, 1);
-    overlayAverages[4] = overlayFiveAvgVar.getBoolValue();
-    overlayFiveAvgVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayAverages[4] = cvar.getBoolValue();
-        });
+        // sets stat in overlay to average or not
+        auto overlayAvgVar = cvarManager->registerCvar(
+            "counter_ingame_stat_" + str + "_average", "0",
+            "Toggles average of stat " + str + " in overlay", true, true, 0, true, 1);
+        overlayAverages[i] = overlayAvgVar.getBoolValue();
+        overlayAvgVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            overlayAverages[i] = cvar.getBoolValue();
+            });
+    }
 
     // sets cvar to move counter's X location
     auto xLocVar = cvarManager->registerCvar("counter_ingame_x_location",
