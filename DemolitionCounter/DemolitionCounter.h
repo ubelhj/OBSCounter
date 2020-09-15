@@ -22,6 +22,13 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 	// fires when a stat happens
 	void statEvent(ServerWrapper caller, void* args);
 
+	// special stat cases
+	void firstTouch();
+
+	void clear();
+
+	void center();
+
 	// checks if the plyer that received a stat is the main player
 	bool isPrimaryPlayer(PriWrapper receiver);
 

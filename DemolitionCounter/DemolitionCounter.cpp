@@ -408,6 +408,7 @@ void DemolitionCounter::hookEvents() {
     //  (even if stat display is turned off)
     gameWrapper->HookEventWithCaller<ServerWrapper>(
         "Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
+        //"Function TAGame.PRI_TA.ClientNotifyStatTickerMessage", 
         std::bind(&DemolitionCounter::statEvent, this, 
             std::placeholders::_1, std::placeholders::_2));
 
@@ -422,6 +423,14 @@ void DemolitionCounter::hookEvents() {
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", 
         std::bind(&DemolitionCounter::endGame, this));
+    gameWrapper->HookEventWithCallerPost<CarWrapper>(
+        "Function TAGame.GameEvent_Soccar_TA.EventFirstBallHit",
+        std::bind(&DemolitionCounter::firstTouch, this));
+
+    /*
+    Function TAGame.ProductStat_Centers_TA.OnStatEvent
+    Function TAGame.ProductStat_Clears_TA.OnStatEvent*/
+
 }
 
 // The structure of a stat event
@@ -819,6 +828,18 @@ float DemolitionCounter::divide(int firstStatIndex, int secondStatIndex) {
         return (float)statArray[firstStatIndex] / 
             (float)statArray[secondStatIndex];
     }
+}
+
+void DemolitionCounter::firstTouch() {
+    
+}
+
+void DemolitionCounter::clear() {
+
+}
+
+void DemolitionCounter::center() {
+
 }
 
 // plugin is unloaded by the plugin manager, and as no state needs to be saved,
