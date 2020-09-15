@@ -4,7 +4,7 @@
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/pluginwindow.h"
 
-constexpr auto plugin_version = "2.1";
+constexpr auto plugin_version = "3.0";
 
 class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 {

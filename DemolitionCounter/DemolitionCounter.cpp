@@ -1,9 +1,8 @@
 #include "pch.h"
 #include "DemolitionCounter.h"
-#include <iostream>
 #include <sstream>
-#include <iomanip>
 #include <fstream>
+#include <filesystem>
 #include "bakkesmod/wrappers/GameObject/Stats/StatEventWrapper.h"
 
 BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", 
@@ -29,6 +28,7 @@ float xLocation;
 float yLocation;
 int overlayColors[3];
 bool nextNotify = true;
+std::string fileLocation = "./OBSCounter/";
 
 // enum for all stat indexes 
 // easier to refer back to stat names
@@ -260,19 +260,19 @@ void DemolitionCounter::onLoad()
 
     // hooks the events for the plugin to work
     hookEvents();
+
+    namespace fs = std::filesystem;
+    fs::create_directory(fileLocation);
 }
 
 // creates cvars and sets global variable defaults to prevent any nulls
 void DemolitionCounter::setCvars() {
-    auto decimalsVar = cvarManager->registerCvar("counter_decimals", "2",
-        "set decimal places in averages (1 - 10)");
+    auto decimalsVar = cvarManager->registerCvar("counter_decimals", "1",
+        "set decimal places in averages (1 - 10)", true, true, 1, true, 10);
     decimalPlaces = decimalsVar.getIntValue();
     decimalsVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        int newValue = cvar.getIntValue();
-        if (newValue >= 1 && newValue <= 10) {
-            decimalPlaces = newValue;
-            writeAll();
-        }
+        decimalPlaces = cvar.getIntValue();
+        writeAll();
         });
 
 
@@ -334,7 +334,7 @@ void DemolitionCounter::setCvars() {
 
     // sets cvar to move counter's Y location
     auto yLocVar = cvarManager->registerCvar("counter_ingame_y_location",
-        "0.025", "set location of ingame counter Y in % of screen",
+        "0", "set location of ingame counter Y in % of screen",
         true, true, 0.0, true, 1.0);
     yLocation = yLocVar.getFloatValue();
     yLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
@@ -351,7 +351,7 @@ void DemolitionCounter::setCvars() {
 
     // overlay green value changer 
     auto overlayGreenVar = cvarManager->registerCvar("counter_ingame_green",
-        "0", "green value in overlay", true, true, 0, true, 255);
+        "255", "green value in overlay", true, true, 0, true, 255);
     overlayColors[1] = overlayGreenVar.getIntValue();
     overlayGreenVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayColors[1] = cvar.getIntValue();
@@ -359,7 +359,7 @@ void DemolitionCounter::setCvars() {
 
     // overlay blue value changer 
     auto overlayBlueVar = cvarManager->registerCvar("counter_ingame_blue",
-        "0", "blue value in overlay", true, true, 0, true, 255);
+        "255", "blue value in overlay", true, true, 0, true, 255);
     overlayColors[2] = overlayBlueVar.getIntValue();
     overlayBlueVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayColors[2] = cvar.getIntValue();
@@ -640,7 +640,7 @@ void DemolitionCounter::endGame() {
 void DemolitionCounter::write(int statIndex) {
     // writes the total stat
     std::ofstream totalFile;
-    totalFile.open("./OBSCounter/" + indexStringMap[statIndex] + ".txt");
+    totalFile.open(fileLocation + indexStringMap[statIndex] + ".txt");
     totalFile << statArray[statIndex];
     totalFile.close();
 
@@ -650,7 +650,7 @@ void DemolitionCounter::write(int statIndex) {
         // writes average of stat per game
         std::ofstream averageFile;
         // sets up average file location
-        std::string averageLocation = "./OBSCounter/";
+        std::string averageLocation = fileLocation;
         // makes the first letter uppercase for nice looking files
         averageLocation += averageStrings[statIndex] + ".txt";
         averageFile.open(averageLocation);
@@ -698,7 +698,7 @@ void DemolitionCounter::write(int statIndex) {
 // writes a game stat, only supposed to be used with a game stat index 
 void DemolitionCounter::writeGameStat(int statIndex) {
     std::ofstream gameStatFile;
-    gameStatFile.open("./OBSCounter/" + indexStringMap[statIndex] + ".txt");
+    gameStatFile.open(fileLocation + indexStringMap[statIndex] + ".txt");
     gameStatFile << statArray[statIndex];
     gameStatFile.close();
 }
@@ -717,14 +717,14 @@ void DemolitionCounter::writeShootingPercentage() {
     std::ofstream gameFile;
     // divides and checks for NaN
     int gameShooting = getPercentage(statArray[gameGoals], statArray[gameShots]);
-    gameFile.open("./OBSCounter/gameShootingPercentage.txt");
+    gameFile.open(fileLocation + "gameShootingPercentage.txt");
     gameFile << gameShooting << "%";
     gameFile.close();
 
     // writes total session shooting
     int totalShooting = getPercentage(statArray[goals], statArray[shots]);
     std::ofstream file;
-    file.open("./OBSCounter/shootingPercentage.txt");
+    file.open(fileLocation + "shootingPercentage.txt");
     file << totalShooting << "%";
     file.close();
 }
@@ -733,14 +733,14 @@ void DemolitionCounter::writeShootingPercentage() {
 void DemolitionCounter::writeKillPercentage() {
     std::ofstream gameFile;
     float gameKD = divide(gameDemos, gameDeaths);
-    gameFile.open("./OBSCounter/gameKDRatio.txt");
+    gameFile.open(fileLocation + "gameKDRatio.txt");
     gameFile << std::fixed << std::setprecision(decimalPlaces);
     gameFile << gameKD;
     gameFile.close();
 
     float totalKDRatio = divide(demos, deaths);
     std::ofstream file;
-    file.open("./OBSCounter/KDRatio.txt");
+    file.open(fileLocation + "KDRatio.txt");
     file << std::fixed << std::setprecision(decimalPlaces);
     file << totalKDRatio;
     file.close();
@@ -752,14 +752,14 @@ void DemolitionCounter::writeMissedExterms() {
     // calculates possible exterms (demos / 7)
     std::ofstream totalFile;
     int possibleExterms = statArray[demos] / 7;
-    totalFile.open("./OBSCounter/possibleExterminations.txt");
+    totalFile.open(fileLocation + "possibleExterminations.txt");
     totalFile << possibleExterms;
     totalFile.close();
 
     int missedExtermPercent = getPercentage(statArray[exterms], possibleExterms);
     
     std::ofstream file;
-    file.open("./OBSCounter/missedExterminationPercent.txt");
+    file.open(fileLocation + "missedExterminationPercent.txt");
     file << missedExtermPercent << "%";
     file.close();
 }
@@ -768,7 +768,7 @@ void DemolitionCounter::writeWinPercentage() {
     int winPercent = getPercentage(statArray[wins], statArray[wins] + statArray[losses]);
 
     std::ofstream file;
-    file.open("./OBSCounter/winPercent.txt");
+    file.open(fileLocation + "winPercent.txt");
     file << winPercent << "%";
     file.close();
 }
