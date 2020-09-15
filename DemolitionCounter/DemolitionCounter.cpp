@@ -28,6 +28,7 @@ bool overlayAverages[5];
 float xLocation;
 float yLocation;
 int overlayColors[3];
+bool nextNotify = true;
 
 // constexpr for all stat indexes 
 // easier to refer back to stat names
@@ -406,10 +407,18 @@ void DemolitionCounter::setCvars() {
 void DemolitionCounter::hookEvents() {
     // hooked whenever a stat appears in the top right corner of rocket league
     //  (even if stat display is turned off)
-    gameWrapper->HookEventWithCaller<ServerWrapper>(
-        "Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
+    gameWrapper->HookEventWithCallerPost<ServerWrapper>(
+        "Function TAGame.GFxHUD_TA.CanDisplayStatEvent",
+        //"Function TAGame.GFxData_GameEvent_TA.OnStatEvent", 
+        //"Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
         //"Function TAGame.PRI_TA.ClientNotifyStatTickerMessage", 
-        std::bind(&DemolitionCounter::statEvent, this, 
+        std::bind(&DemolitionCounter::statEvent, this,
+            std::placeholders::_1, std::placeholders::_2));
+
+    // hooked whenever a stat appears on the screen
+    gameWrapper->HookEventWithCallerPost<ServerWrapper>(
+        "Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
+        std::bind(&DemolitionCounter::statTickerEvent, this, 
             std::placeholders::_1, std::placeholders::_2));
 
     // hookss on a starting game 
@@ -423,18 +432,16 @@ void DemolitionCounter::hookEvents() {
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", 
         std::bind(&DemolitionCounter::endGame, this));
-    gameWrapper->HookEventWithCallerPost<CarWrapper>(
-        "Function TAGame.GameEvent_Soccar_TA.EventFirstBallHit",
-        std::bind(&DemolitionCounter::firstTouch, this));
 
     /*
     Function TAGame.ProductStat_Centers_TA.OnStatEvent
+    "Function TAGame.GameEvent_Soccar_TA.EventFirstBallHit",
     Function TAGame.ProductStat_Clears_TA.OnStatEvent*/
 
 }
 
-// The structure of a stat event
-struct TheArgStruct
+// The structure of a ticker stat event
+struct TickerStruct
 {
     // person who got a stat
     uintptr_t Receiver;
@@ -444,15 +451,60 @@ struct TheArgStruct
     uintptr_t StatEvent;
 };
 
-// called whenever a stat appears in the top right and 
-//  decides whether to update a file
+// structure of a stat event
+struct StatEventStruct {
+    uintptr_t StatEvent;
+};
+
+// called whenever a stat appears in the center of the screen  
 void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
-    auto tArgs = (TheArgStruct*)args;
+    cvarManager->log("stat event!");
+    auto tArgs = (StatEventStruct*)args;
+    //separates the parts of the stat event args
+    auto statEvent = StatEventWrapper(tArgs->StatEvent);
+    auto label = statEvent.GetLabel();
+    auto eventStr = label.ToString();
+
+    auto eventTypePtr = eventDictionary.find(eventStr);
+
+    int eventType;
+
+    if (eventTypePtr != eventDictionary.end()) {
+        eventType = eventTypePtr->second;
+        cvarManager->log("event type: " + eventStr);
+        cvarManager->log("event num: " + std::to_string(eventType));
+    }
+    else {
+        cvarManager->log("missing stat: " + eventStr);
+        return;
+    }
+
+    auto notify = statEvent.GetbNotifyTicker();
+    cvarManager->log("notify: " + std::to_string(notify));
+    if (notify) {
+        nextNotify = !nextNotify;
+        if (!nextNotify) {
+            cvarManager->log("skipped duplicate stat");
+            return;
+        }
+    }
+    
+    // if the stat event matches a label, 
+    // then writes that stat to files
+    statArray[eventType]++;
+    // adds 1 to the game stat equivalent if applicable
+    if (eventType > statsWithoutGame) {
+        statArray[eventType + totalToGame]++;
+    }
+    write(eventType);
+}
+
+void DemolitionCounter::statTickerEvent(ServerWrapper caller, void* args) {
+    auto tArgs = (TickerStruct*)args;
     //cvarManager->log("stat event!");
 
     // separates the parts of the stat event args
     auto victim = PriWrapper(tArgs->Victim);
-    auto receiver = PriWrapper(tArgs->Receiver);
     auto statEvent = StatEventWrapper(tArgs->StatEvent);
     // name of the stat as shown in rocket league 
     //  (Demolition, Extermination, etc.)
@@ -474,36 +526,12 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     }
 
     // special case for demolitions to check for the player's death
-    if (eventType == demos) {
-        if (DemolitionCounter::isPrimaryPlayer(receiver)) {
-            statArray[demos]++;
-            statArray[gameDemos]++;
-            write(demos);
-            return;
-        }
-        else if (DemolitionCounter::isPrimaryPlayer(victim)) {
-            statArray[deaths]++;
-            statArray[gameDeaths]++;
-            write(deaths);
-            return;
-        }
+    if (eventType == demos && isPrimaryPlayer(victim)) {
+        statArray[deaths]++;
+        statArray[gameDeaths]++;
+        write(deaths);
         return;
     }
-
-    // if the stat reciever isn't the person with the plugin, 
-    //  doesn't count the stat
-    if (!DemolitionCounter::isPrimaryPlayer(receiver)) {
-        return;
-    }
-
-    // if the stat event matches a label, 
-    // then writes that stat to files
-    statArray[eventType]++;
-    // adds 1 to the game stat equivalent if applicable
-    if (eventType > statsWithoutGame) {
-        statArray[eventType + totalToGame]++;
-    }
-    write(eventType);
 }
 
 // checks if the player who received a stat is the user's player
@@ -828,18 +856,6 @@ float DemolitionCounter::divide(int firstStatIndex, int secondStatIndex) {
         return (float)statArray[firstStatIndex] / 
             (float)statArray[secondStatIndex];
     }
-}
-
-void DemolitionCounter::firstTouch() {
-    
-}
-
-void DemolitionCounter::clear() {
-
-}
-
-void DemolitionCounter::center() {
-
 }
 
 // plugin is unloaded by the plugin manager, and as no state needs to be saved,
