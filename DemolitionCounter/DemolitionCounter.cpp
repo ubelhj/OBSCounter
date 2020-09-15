@@ -30,15 +30,16 @@ float yLocation;
 int overlayColors[3];
 bool nextNotify = true;
 
-// constexpr for all stat indexes 
+// enum for all stat indexes 
 // easier to refer back to stat names
 // total stats are from 0 to 30, game stats from 31 to end
-// these stats have no game counterpart
 enum stats {
     wins, 
     losses, 
     mvps,
     games,
+    // end of stats without game counterpart
+    statsWithoutGame = games,
     // stat + 27 = gameStat
     goals,
     demos,
@@ -67,9 +68,12 @@ enum stats {
     highFives,
     swishs,
     bicycleHits,
+    points,
     // game stats are from 31 -> end
     // goals + 27 = gameGoals
     gameGoals,
+    // start of game stats and/or 1 after the end of non-game stats
+    startGameStats = gameGoals,
     gameDemos,
     gameDeaths,
     gameExterms,
@@ -95,18 +99,11 @@ enum stats {
     gameLowFives,
     gameHighFives,
     gameSwishs,
-    gameBicycleHits
+    gameBicycleHits,
+    gamePoints,
+    // total number of stats in the stat array
+    numStats
 };
-
-
-// total number of stats in the stat array
-// also index of last stat + 1 (58)
-constexpr int numStats = gameBicycleHits + 1;
-
-// end of stats without game counterpart
-constexpr int statsWithoutGame = games;
-// start of game stats and/or 1 after the end of non-game stats
-constexpr int startGameStats = gameGoals;
 
 // jump from a stat to its most recent game stat by adding this number (27)
 // goals + 27 = gameGoals
@@ -146,6 +143,7 @@ std::string indexStringMap[] = {
     "highFives",
     "swishs",
     "bicycleHits",
+    "points",
     "gameGoals",
     "gameDemolitions",
     "gameDeaths",
@@ -172,7 +170,8 @@ std::string indexStringMap[] = {
     "gameLowFives",
     "gameHighFives",
     "gameSwishs",
-    "gameBicycleHits"
+    "gameBicycleHits",
+    "gamePoints"
 };
 
 // holds all stats
@@ -210,7 +209,8 @@ std::string averageStrings[] = {
     "averageLowFives",
     "averageHighFives",
     "averageSwishs",
-    "averageBicycleHits"
+    "averageBicycleHits",
+    "averagePoints"
 };
 
 const std::map<std::string, int> eventDictionary = {
@@ -409,9 +409,6 @@ void DemolitionCounter::hookEvents() {
     //  (even if stat display is turned off)
     gameWrapper->HookEventWithCallerPost<ServerWrapper>(
         "Function TAGame.GFxHUD_TA.CanDisplayStatEvent",
-        //"Function TAGame.GFxData_GameEvent_TA.OnStatEvent", 
-        //"Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
-        //"Function TAGame.PRI_TA.ClientNotifyStatTickerMessage", 
         std::bind(&DemolitionCounter::statEvent, this,
             std::placeholders::_1, std::placeholders::_2));
 
@@ -421,7 +418,7 @@ void DemolitionCounter::hookEvents() {
         std::bind(&DemolitionCounter::statTickerEvent, this, 
             std::placeholders::_1, std::placeholders::_2));
 
-    // hookss on a starting game 
+    // hooks on a starting game 
     gameWrapper->HookEventPost(
         "Function GameEvent_Soccar_TA.WaitingForPlayers.BeginState", 
         std::bind(&DemolitionCounter::startGame, this));
@@ -432,17 +429,10 @@ void DemolitionCounter::hookEvents() {
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", 
         std::bind(&DemolitionCounter::endGame, this));
-
-    /*
-    Function TAGame.ProductStat_Centers_TA.OnStatEvent
-    "Function TAGame.GameEvent_Soccar_TA.EventFirstBallHit",
-    Function TAGame.ProductStat_Clears_TA.OnStatEvent*/
-
 }
 
 // The structure of a ticker stat event
-struct TickerStruct
-{
+struct TickerStruct {
     // person who got a stat
     uintptr_t Receiver;
     // person who is victim of a stat (only exists for demos afaik)
@@ -489,8 +479,13 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
         }
     }
     
-    // if the stat event matches a label, 
-    // then writes that stat to files
+    int statPoints = statEvent.GetPoints();
+    cvarManager->log("points: " + std::to_string(statPoints));
+    if (statPoints > 0) {
+        statArray[points] += statPoints;
+        statArray[gamePoints] += statPoints;
+        write(points);
+    }
     statArray[eventType]++;
     // adds 1 to the game stat equivalent if applicable
     if (eventType > statsWithoutGame) {
