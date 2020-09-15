@@ -104,9 +104,6 @@
     <ClInclude Include="DemolitionCounter.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="demolitions.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\plugins\settings\OBSCounter.set" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

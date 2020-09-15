@@ -405,14 +405,14 @@ void DemolitionCounter::setCvars() {
 
 // hooks events to allow the plugin to work
 void DemolitionCounter::hookEvents() {
-    // hooked whenever a stat appears in the top right corner of rocket league
-    //  (even if stat display is turned off)
+    // hooked whenever a stat appears on the screen
     gameWrapper->HookEventWithCallerPost<ServerWrapper>(
         "Function TAGame.GFxHUD_TA.CanDisplayStatEvent",
         std::bind(&DemolitionCounter::statEvent, this,
             std::placeholders::_1, std::placeholders::_2));
 
-    // hooked whenever a stat appears on the screen
+    // hooked whenever a stat appears in the top right corner of rocket league
+    //  (even if stat display is turned off)
     gameWrapper->HookEventWithCallerPost<ServerWrapper>(
         "Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
         std::bind(&DemolitionCounter::statTickerEvent, this, 
@@ -427,7 +427,7 @@ void DemolitionCounter::hookEvents() {
         std::bind(&DemolitionCounter::startGame, this));
     // works on ended game
     gameWrapper->HookEventPost(
-        "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded", 
+        "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded",
         std::bind(&DemolitionCounter::endGame, this));
 }
 

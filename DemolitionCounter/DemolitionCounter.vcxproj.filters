@@ -31,11 +31,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="demolitions.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\plugins\settings\OBSCounter.set">
       <Filter>Source Files</Filter>
     </None>
