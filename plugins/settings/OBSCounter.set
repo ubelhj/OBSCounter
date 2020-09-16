@@ -4,12 +4,10 @@ OBS Counter Plugin
 8|
 9|In game overlay
 1|Enable in game overlay|counter_enable_ingame
+13|Color Selector|counter_color
 5|Number of stats to display|counter_ingame_numStats|1|5
 4|Counter X-location (% of screen)|counter_ingame_x_location|0.0|1.0
 4|Counter Y-location (% of screen)|counter_ingame_y_location|0.0|1.0
-5|Counter red value|counter_ingame_red|0|255
-5|Counter green value|counter_ingame_green|0|255
-5|Counter blue value|counter_ingame_blue|0|255
 0|Press f6 to open your bakkesmod console, then hit this button to see all possible stats and their corresponding numbers|counter_list_stats
 9|You can also set each counter in the console with counter_ingame_stat_ if the slider isn't precise enough
 9|Average stats do not work with game stats

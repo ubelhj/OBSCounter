@@ -26,7 +26,7 @@ int overlayStats[5];
 bool overlayAverages[5];
 float xLocation;
 float yLocation;
-int overlayColors[3];
+LinearColor overlayColor;
 bool nextNotify = true;
 std::string fileLocation = "./OBSCounter/";
 
@@ -341,28 +341,10 @@ void DemolitionCounter::setCvars() {
         yLocation = cvar.getFloatValue();
         });
 
-    // overlay red value changer 
-    auto overlayRedVar = cvarManager->registerCvar("counter_ingame_red",
-        "255", "Red value in overlay", true, true, 0, true, 255);
-    overlayColors[0] = overlayRedVar.getIntValue();
-    overlayRedVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayColors[0] = cvar.getIntValue();
-        });
-
-    // overlay green value changer 
-    auto overlayGreenVar = cvarManager->registerCvar("counter_ingame_green",
-        "255", "green value in overlay", true, true, 0, true, 255);
-    overlayColors[1] = overlayGreenVar.getIntValue();
-    overlayGreenVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayColors[1] = cvar.getIntValue();
-        });
-
-    // overlay blue value changer 
-    auto overlayBlueVar = cvarManager->registerCvar("counter_ingame_blue",
-        "255", "blue value in overlay", true, true, 0, true, 255);
-    overlayColors[2] = overlayBlueVar.getIntValue();
-    overlayBlueVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayColors[2] = cvar.getIntValue();
+    auto colorVar = cvarManager->registerCvar("counter_color", "#FFFFFF", "color of overlay");
+    overlayColor = colorVar.getColorValue();
+    colorVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayColor = cvar.getColorValue();
         });
 
     // lists all the stats and their numbers to use in the in game counter
@@ -808,7 +790,8 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     float fontSize = ((float)screen.X / (float)1920) * 2;
 
     // sets to user-chosen color
-    canvas.SetColor(overlayColors[0], overlayColors[1], overlayColors[2], 255);
+    //canvas.SetColor(overlayColors[0], overlayColors[1], overlayColors[2], 255);
+    canvas.SetColor(overlayColor);
 
     for (int i = 0; i < overlayNum; i++) {
         // locates based on screen and font size
