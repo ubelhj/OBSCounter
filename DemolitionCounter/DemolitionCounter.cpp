@@ -171,7 +171,7 @@ std::string indexStringMap[] = {
     "gameHighFives",
     "gameSwishs",
     "gameBicycleHits",
-    "gamePoints"
+    "gamePoints",
 };
 
 // holds all stats
@@ -210,7 +210,7 @@ std::string averageStrings[] = {
     "averageHighFives",
     "averageSwishs",
     "averageBicycleHits",
-    "averagePoints"
+    "averagePoints",
 };
 
 const std::map<std::string, int> eventDictionary = {
@@ -405,17 +405,17 @@ void DemolitionCounter::setCvars() {
 
 // hooks events to allow the plugin to work
 void DemolitionCounter::hookEvents() {
-    // hooked whenever a stat appears on the screen
-    gameWrapper->HookEventWithCallerPost<ServerWrapper>(
-        "Function TAGame.GFxHUD_TA.CanDisplayStatEvent",
-        std::bind(&DemolitionCounter::statEvent, this,
-            std::placeholders::_1, std::placeholders::_2));
-
     // hooked whenever a stat appears in the top right corner of rocket league
     //  (even if stat display is turned off)
     gameWrapper->HookEventWithCallerPost<ServerWrapper>(
         "Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
         std::bind(&DemolitionCounter::statTickerEvent, this, 
+            std::placeholders::_1, std::placeholders::_2));
+
+    // hooked whenever the primary player earns a stat
+    gameWrapper->HookEventWithCallerPost<ServerWrapper>(
+        "Function TAGame.GFxHUD_TA.HandleStatEvent",
+        std::bind(&DemolitionCounter::statEvent, this,
             std::placeholders::_1, std::placeholders::_2));
 
     // hooks on a starting game 
@@ -443,17 +443,31 @@ struct TickerStruct {
 
 // structure of a stat event
 struct StatEventStruct {
-    uintptr_t StatEvent;
+    uintptr_t PRI; 
+    uintptr_t StatEvent; 
+    // Count always is int_max. No idea why
+    uintptr_t Count;
 };
 
-// called whenever a stat appears in the center of the screen  
 void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     cvarManager->log("stat event!");
+    if (!gameWrapper->IsInOnlineGame()) {
+        cvarManager->log("not in online game");
+        return;
+    }
     auto tArgs = (StatEventStruct*)args;
-    //separates the parts of the stat event args
+
     auto statEvent = StatEventWrapper(tArgs->StatEvent);
     auto label = statEvent.GetLabel();
     auto eventStr = label.ToString();
+
+    // PRI is always main player for this event
+    /*auto pri = PriWrapper(tArgs->PRI);
+    cvarManager->log("is primary: " + std::to_string(pri.IsLocalPlayerPRI()));*/
+
+    // Count always is int_max. No idea why
+    /*auto count = tArgs->Count;
+    cvarManager->log("count: " + std::to_string(count));*/
 
     auto eventTypePtr = eventDictionary.find(eventStr);
 
@@ -467,16 +481,6 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     else {
         cvarManager->log("missing stat: " + eventStr);
         return;
-    }
-
-    auto notify = statEvent.GetbNotifyTicker();
-    cvarManager->log("notify: " + std::to_string(notify));
-    if (notify) {
-        nextNotify = !nextNotify;
-        if (!nextNotify) {
-            cvarManager->log("skipped duplicate stat");
-            return;
-        }
     }
     
     int statPoints = statEvent.GetPoints();
@@ -496,15 +500,19 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
 
 void DemolitionCounter::statTickerEvent(ServerWrapper caller, void* args) {
     auto tArgs = (TickerStruct*)args;
-    //cvarManager->log("stat event!");
+    cvarManager->log("stat ticker event!");
+    if (!gameWrapper->IsInOnlineGame()) {
+        cvarManager->log("not in online game");
+        return;
+    }
 
     // separates the parts of the stat event args
+    auto receiver = PriWrapper(tArgs->Receiver);
     auto victim = PriWrapper(tArgs->Victim);
     auto statEvent = StatEventWrapper(tArgs->StatEvent);
     // name of the stat as shown in rocket league 
     //  (Demolition, Extermination, etc.)
     auto label = statEvent.GetLabel();
-    //cvarManager->log(label.ToString());
 
     auto eventTypePtr = eventDictionary.find(label.ToString());
 
@@ -522,6 +530,7 @@ void DemolitionCounter::statTickerEvent(ServerWrapper caller, void* args) {
 
     // special case for demolitions to check for the player's death
     if (eventType == demos && isPrimaryPlayer(victim)) {
+        cvarManager->log("player died");
         statArray[deaths]++;
         statArray[gameDeaths]++;
         write(deaths);

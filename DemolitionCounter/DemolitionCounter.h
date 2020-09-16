@@ -21,6 +21,7 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 
 	// fires when a stat happens
 	void statEvent(ServerWrapper caller, void* args);
+	void statEvent2(ServerWrapper caller, void* args);
 
 	// fires when the stat ticker is updated
 	void statTickerEvent(ServerWrapper caller, void* args);
