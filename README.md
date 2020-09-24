@@ -21,6 +21,3 @@ Download for yourself at [https://bakkesplugins.com/plugins/view/126](https://ba
 
 **Known Issue**  
 Ragequitting casual games messes up the games tracking. You must wait until the end of games for the plugin to count them. It was really hard already to get the plugin to support casual games and joining matches in progress, so this issue is unlikely to be fixable. If you want to reset your most recent game stats, just press the add a game button in the f2 -> plugins -> OBSCounter menu.
-
-If you have a great idea and need an implementation I have a Fiverr now for bakkesmod plugins! 
-[https://www.fiverr.com/share/DQzRlP](https://www.fiverr.com/share/DQzRlP)
