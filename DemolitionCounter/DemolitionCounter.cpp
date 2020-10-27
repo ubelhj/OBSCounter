@@ -27,15 +27,14 @@ bool overlayAverages[5];
 float xLocation;
 float yLocation;
 LinearColor overlayColor;
-bool nextNotify = true;
 std::string fileLocation = "./OBSCounter/";
 
 // enum for all stat indexes 
 // easier to refer back to stat names
 // total stats are from 0 to 30, game stats from 31 to end
 enum stats {
-    wins, 
-    losses, 
+    wins,
+    losses,
     mvps,
     games,
     // end of stats without game counterpart
@@ -69,6 +68,11 @@ enum stats {
     swishs,
     bicycleHits,
     points,
+    // last stat with normal output type
+    endNormalStats = points,
+    timePlayed,
+    offenseTime,
+    defenseTime,
     // game stats are from 31 -> end
     // goals + 27 = gameGoals
     gameGoals,
@@ -101,6 +105,9 @@ enum stats {
     gameSwishs,
     gameBicycleHits,
     gamePoints,
+    gameTime,
+    gameOffenseTime,
+    gameDefenseTime,
     // total number of stats in the stat array
     numStats
 };
@@ -144,6 +151,9 @@ std::string indexStringMap[] = {
     "swishs",
     "bicycleHits",
     "points",
+    "timePlayed",
+    "offenseTime",
+    "defenseTime",
     "gameGoals",
     "gameDemolitions",
     "gameDeaths",
@@ -172,6 +182,9 @@ std::string indexStringMap[] = {
     "gameSwishs",
     "gameBicycleHits",
     "gamePoints",
+    "gameTimePlayed",
+    "gameOffenseTime",
+    "gameDefenseTime"
 };
 
 // holds all stats
@@ -211,6 +224,9 @@ std::string averageStrings[] = {
     "averageSwishs",
     "averageBicycleHits",
     "averagePoints",
+    "averageTimePlayed",
+    "averageOffenseTime",
+    "averageDefenseTime"
 };
 
 const std::map<std::string, int> eventDictionary = {
@@ -363,7 +379,7 @@ void DemolitionCounter::setCvars() {
 
     // creates setters for the default start value for each stat
     // also writes these new values to files
-    for (int i = 0; i < startGameStats; i++) {
+    for (int i = 0; i <= endNormalStats; i++) {
         std::string cvarName = "counter_set_" + indexStringMap[i];
         std::string cvarTip = "sets " + indexStringMap[i] + " value";
         cvarManager->registerCvar(cvarName, "0", cvarTip, true, false, 0, false, 0, false);
@@ -374,6 +390,19 @@ void DemolitionCounter::setCvars() {
             cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
                 statArray[i] = cvar.getIntValue(); write(i); });
         }
+    }
+
+    // creates setters for the default start value for each stat
+    // also writes these new values to files
+    for (int i = endNormalStats + 1; i < startGameStats; i++) {
+        std::string cvarName = "counter_set_" + indexStringMap[i];
+        std::string cvarTip = "sets " + indexStringMap[i] + " value";
+        cvarManager->registerCvar(cvarName, "0", cvarTip, true, false, 0, false, 0, false);
+        auto cvar = cvarManager->getCvar(cvarName);
+        statArray[i] = cvar.getIntValue();
+
+        cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            statArray[i] = cvar.getIntValue(); writeTimeStat(i); });
     }
 
     // special case to make sure games update properly
@@ -411,6 +440,10 @@ void DemolitionCounter::hookEvents() {
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded",
         std::bind(&DemolitionCounter::endGame, this));
+    // works on time tick
+    gameWrapper->HookEventPost(
+        "Function TAGame.GameEvent_Soccar_TA.OnGameTimeUpdated",
+        [this](auto) { checkCarLocation(); });
 }
 
 // The structure of a ticker stat event
@@ -462,6 +495,7 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     }
     else {
         cvarManager->log("missing stat: " + eventStr);
+        cvarManager->log("missing stat points: " + statEvent.GetPoints());
         return;
     }
     
@@ -507,6 +541,7 @@ void DemolitionCounter::statTickerEvent(ServerWrapper caller, void* args) {
     }
     else {
         cvarManager->log("missing stat: " + label.ToString());
+        cvarManager->log("missing stat points: " + statEvent.GetPoints());
         return;
     }
 
@@ -626,6 +661,55 @@ void DemolitionCounter::endGame() {
     endedGame = true;
 }
 
+// called every second to log car location on offense or defense
+void DemolitionCounter::checkCarLocation() {
+    cvarManager->log("updated time");
+    if (!gameWrapper->IsInOnlineGame()) {
+        cvarManager->log("not in online game");
+        return;
+    }
+
+    ServerWrapper sw = gameWrapper->GetOnlineGame();
+
+    if (sw.IsNull()) {
+        cvarManager->log("null server");
+        return;
+    }
+
+    auto car = gameWrapper->GetLocalCar();
+
+    if (car.IsNull()) {
+        cvarManager->log("null car");
+        return;
+    }
+
+    auto loc = car.GetLocation();
+
+    auto team = car.GetTeamNum2();
+    // offense for team 0 is y > 0
+    // offense for team 1 is y < 0
+
+    // inverts team 1 so both have the same offense / defense
+    if (team) {
+        loc = loc * -1;
+    }
+
+    if (loc.Y > 0) {
+        cvarManager->log("offense time");
+        statArray[offenseTime]++;
+        statArray[gameOffenseTime]++;
+        writeTimeStat(offenseTime);
+    } else {
+        cvarManager->log("defense time");
+        statArray[defenseTime]++;
+        statArray[gameDefenseTime]++;
+        writeTimeStat(defenseTime);
+    }
+    statArray[timePlayed]++;
+    statArray[gameTime]++;
+    writeTimeStat(timePlayed);
+}
+
 // writes a stat to its files
 // can only be called with a stat index and not a game stat index
 void DemolitionCounter::write(int statIndex) {
@@ -694,10 +778,78 @@ void DemolitionCounter::writeGameStat(int statIndex) {
     gameStatFile.close();
 }
 
+// writes a time stat with special formatting minutes:seconds
+void DemolitionCounter::writeTimeStat(int statIndex) {
+    int totalSeconds = statArray[statIndex];
+    // writes the total stat
+    std::ofstream totalFile;
+    totalFile.open(fileLocation + indexStringMap[statIndex] + ".txt");
+    totalFile << totalSeconds / 60;
+    totalFile << ":";
+    int remSeconds = totalSeconds % 60;
+    if (remSeconds < 10) {
+        totalFile << "0";
+    }
+    totalFile << remSeconds;
+    totalFile.close();
+
+    // writes average of stat per game
+    std::ofstream averageFile;
+    // sets up average file location
+    std::string averageLocation = fileLocation;
+    // makes the first letter uppercase for nice looking files
+    averageLocation += averageStrings[statIndex] + ".txt";
+    averageFile.open(averageLocation);
+
+    // average time is total / games
+    int avgSeconds;
+    if (statArray[games] == 0) {
+        avgSeconds = 0;
+    } else {
+        avgSeconds = totalSeconds / statArray[games];
+    }
+    averages[statIndex] = avgSeconds;
+    averageFile << avgSeconds / 60;
+    averageFile << ":";
+    remSeconds = avgSeconds % 60;
+    if (remSeconds < 10) {
+        averageFile << "0";
+    }
+    averageFile << remSeconds;
+    averageFile.close();
+    
+
+    // writes the game version of stat
+    // only writes if stat has a game version
+    if (statIndex > statsWithoutGame) {
+        writeGameTimeStat(statIndex + totalToGame);
+    }
+}
+
+// writes only the game time stat
+void DemolitionCounter::writeGameTimeStat(int statIndex) {
+    int totalSeconds = statArray[statIndex];
+    // writes the stat
+    std::ofstream file;
+    file.open(fileLocation + indexStringMap[statIndex] + ".txt");
+    file << totalSeconds / 60;
+    file << ":";
+    int remSeconds = totalSeconds % 60;
+    if (remSeconds < 10) {
+        file << "0";
+    }
+    file << remSeconds;
+    file.close();
+}
+
 // calls all write functions at once
 void DemolitionCounter::writeAll() {
-    for (int i = 0; i < startGameStats; i++) {
+    for (int i = 0; i <= endNormalStats; i++) {
         write(i);
+    }
+
+    for (int i = endNormalStats + 1; i < startGameStats; i++) {
+        writeTimeStat(i);
     }
 }
 
@@ -801,15 +953,42 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
         if (overlayAverages[i] && overlayStats[i] < startGameStats) {
             // makes sure string has right number of decimal places
             std::ostringstream averageStream;
-            averageStream << std::fixed << std::setprecision(decimalPlaces);
-            averageStream << averages[overlayStats[i]];
 
-            canvas.DrawString(averageStrings[overlayStats[i]] + ": " + 
+            if (overlayStats[i] > endNormalStats) {
+                int totalSeconds = averages[overlayStats[i]];
+                // writes the stat
+                averageStream << totalSeconds / 60;
+                averageStream << ":";
+                int remSeconds = totalSeconds % 60;
+                if (remSeconds < 10) {
+                    averageStream << "0";
+                }
+                averageStream << remSeconds;
+            } else {
+                averageStream << std::fixed << std::setprecision(decimalPlaces);
+                averageStream << averages[overlayStats[i]];
+            }
+            canvas.DrawString(averageStrings[overlayStats[i]] + ": " +
                 averageStream.str(), fontSize, fontSize);
         }
         else {
+            std::ostringstream strStream;
+
+            if (overlayStats[i] > endNormalStats) {
+                int totalSeconds = statArray[overlayStats[i]];
+                // writes the stat
+                strStream << totalSeconds / 60;
+                strStream << ":";
+                int remSeconds = totalSeconds % 60;
+                if (remSeconds < 10) {
+                    strStream << "0";
+                }
+                strStream << remSeconds;
+            } else {
+                strStream << statArray[overlayStats[i]];
+            }
             canvas.DrawString(indexStringMap[overlayStats[i]] + ": " + 
-                std::to_string(statArray[overlayStats[i]]), 
+                strStream.str(),
                 fontSize, fontSize);
         }
         

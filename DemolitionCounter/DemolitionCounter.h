@@ -21,7 +21,6 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 
 	// fires when a stat happens
 	void statEvent(ServerWrapper caller, void* args);
-	void statEvent2(ServerWrapper caller, void* args);
 
 	// fires when the stat ticker is updated
 	void statTickerEvent(ServerWrapper caller, void* args);
@@ -32,8 +31,11 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 	// called when a new game starts, resets game stats
 	void startGame();
 
+	// called at the end of a game
 	void endGame();
 
+	// called each second to write to player location stats
+	void checkCarLocation();
 
 	// writes the .txt files
 
@@ -43,6 +45,10 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 	void write(int statIndex);
 	// writes a game stat only
 	void writeGameStat(int statIndex);
+	// writes time stats
+	void writeTimeStat(int statIndex);
+	// writes a game stat only but formats for time
+	void writeGameTimeStat(int statIndex);
 	// calculates an average of a stat
 	float average(int statValue);
 	// divides two stats and prevents NaN
