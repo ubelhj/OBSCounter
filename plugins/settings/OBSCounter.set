@@ -16,7 +16,6 @@ OBS Counter Plugin
 0|Press f6 to open your bakkesmod console, then hit this button to see all possible stats and their corresponding numbers|counter_list_stats
 9|You can also set each counter in the console with counter_ingame_stat_ if the slider isn't precise enough
 9|Average stats do not work with game stats
-9|Your choices will stay across game sessions so this is one time setup :)
 5|First stat|counter_ingame_stat_one|0|65
 7|
 1|Average (stat/games)##averageone|counter_ingame_stat_one_average
@@ -32,4 +31,6 @@ OBS Counter Plugin
 5|Fifth stat|counter_ingame_stat_five|0|65
 7|
 1|Average (stat/games)##averagefive|counter_ingame_stat_five_average
-9|Plugin made by JerryTheBee#1117
+9|Time on offense/defense added thanks to a Fiverr commission by samstlaurent
+9|If you want a new feature and to support the plugin, feel free to check my fiverr or DM me on discord
+9|Plugin made by JerryTheBee#1117 - fiverr.com/share/Wbev17

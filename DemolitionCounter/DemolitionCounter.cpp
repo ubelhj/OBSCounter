@@ -109,6 +109,7 @@ enum stats {
     gameSwishs,
     gameBicycleHits,
     gamePoints,
+    endNormalGameStats = gamePoints,
     gameTime,
     gameOffenseTime,
     gameDefenseTime,
@@ -1001,8 +1002,8 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
 }
 
 std::string DemolitionCounter::statToRenderString(int index, bool isAverage) {
+    // writes averages of stats
     if (isAverage && index < startGameStats) {
-        // makes sure string has right number of decimal places
         std::ostringstream averageStream;
 
         if (index > endNormalStats) {
@@ -1022,17 +1023,18 @@ std::string DemolitionCounter::statToRenderString(int index, bool isAverage) {
         }
         return averageStrings[index] + ": " +
             averageStream.str();
-    }
-    else {
+        // writes non-averages
+    } else {
         std::ostringstream strStream;
 
-        if (index > endNormalStats && index < startGameStats) {
+        // writes time stats
+        if ((index > endNormalStats && index < startGameStats) || index > endNormalGameStats) {
             int totalSeconds = statArray[index];
             // writes the stat
             strStream << totalSeconds / 60;
             strStream << ":";
             int remSeconds = totalSeconds % 60;
-            if (remSeconds < 10) {
+            if (remSeconds < 10) { 
                 strStream << "0";
             }
             strStream << remSeconds;
