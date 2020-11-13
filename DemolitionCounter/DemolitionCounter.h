@@ -4,7 +4,7 @@
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/pluginwindow.h"
 
-constexpr auto plugin_version = "3.1";
+constexpr auto plugin_version = "3.11";
 
 class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 {
@@ -72,6 +72,8 @@ class DemolitionCounter: public BakkesMod::Plugin::BakkesModPlugin
 
 	// renders overlay
 	void render(CanvasWrapper canvas);
+
+	std::string statToRenderString(int statIndex, bool isAverage);
 
 	// prints all stat types
 	void listStats();

@@ -21,12 +21,16 @@ int decimalPlaces;
 // global vars to control overlay
 // are initialized in onLoad()
 bool enabledOverlay;
+bool enabledOverlayBackground;
 int overlayNum;
 int overlayStats[5];
 bool overlayAverages[5];
 float xLocation;
 float yLocation;
+float xEndBackground;
+float yEndBackground;
 LinearColor overlayColor;
+LinearColor overlayBackgroundColor;
 std::string fileLocation = "./OBSCounter/";
 
 // enum for all stat indexes 
@@ -361,6 +365,37 @@ void DemolitionCounter::setCvars() {
     overlayColor = colorVar.getColorValue();
     colorVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayColor = cvar.getColorValue();
+        });
+
+    auto overlayBackgroundEnableVar = cvarManager->registerCvar("counter_enable_background",
+        "0", "enables in game overlay background");
+    enabledOverlayBackground = overlayBackgroundEnableVar.getBoolValue();
+    overlayBackgroundEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        enabledOverlayBackground = cvar.getBoolValue();
+        });
+
+    // sets cvar to move counter's X location
+    auto xEndVar = cvarManager->registerCvar("counter_ingame_x_location_background",
+        "0.075", "set end location of ingame counter ba X in % of screen",
+        true, true, 0.0, true, 1.0);
+    xEndBackground = xEndVar.getFloatValue();
+    xEndVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        xEndBackground = cvar.getFloatValue();
+        });
+
+    // sets cvar to move counter's Y location
+    auto yEndVar = cvarManager->registerCvar("counter_ingame_y_location_background",
+        "0.115", "set location of ingame counter Y in % of screen",
+        true, true, 0.0, true, 1.0);
+    yEndBackground = yEndVar.getFloatValue();
+    yEndVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        yEndBackground = cvar.getFloatValue();
+        });
+
+    auto backColorVar = cvarManager->registerCvar("counter_color_background", "#0000008C", "color of overlay background");
+    overlayBackgroundColor = backColorVar.getColorValue();
+    backColorVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayBackgroundColor = cvar.getColorValue();
         });
 
     // lists all the stats and their numbers to use in the in game counter
@@ -940,6 +975,14 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     // if you notice an issue please let me 
     //  know by @ing me in the bakkesmod discord
     float fontSize = ((float)screen.X / (float)1920) * 2;
+    int xValue = int((float)screen.X * xLocation);
+    int yValue = int((float)screen.Y * yLocation);
+
+    if (enabledOverlayBackground) {
+        canvas.SetColor(overlayBackgroundColor);
+        canvas.SetPosition(Vector2({ xValue, yValue }));
+        canvas.FillBox(Vector2({ int((float)screen.X * xEndBackground), int((float)screen.Y * yEndBackground) }));
+    }
 
     // sets to user-chosen color
     //canvas.SetColor(overlayColors[0], overlayColors[1], overlayColors[2], 255);
@@ -947,54 +990,59 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
 
     for (int i = 0; i < overlayNum; i++) {
         // locates based on screen and font size
-        canvas.SetPosition(Vector2({ int((float)screen.X * xLocation), 
-            int((fontSize * (11 * i)) + ((float) screen.Y * yLocation)) }));
+        canvas.SetPosition(Vector2({ xValue, int((fontSize * (11 * i)) + yValue) }));
         // does averages if the user wants them and if a stat has an average
-        if (overlayAverages[i] && overlayStats[i] < startGameStats) {
-            // makes sure string has right number of decimal places
-            std::ostringstream averageStream;
-
-            if (overlayStats[i] > endNormalStats) {
-                int totalSeconds = averages[overlayStats[i]];
-                // writes the stat
-                averageStream << totalSeconds / 60;
-                averageStream << ":";
-                int remSeconds = totalSeconds % 60;
-                if (remSeconds < 10) {
-                    averageStream << "0";
-                }
-                averageStream << remSeconds;
-            } else {
-                averageStream << std::fixed << std::setprecision(decimalPlaces);
-                averageStream << averages[overlayStats[i]];
-            }
-            canvas.DrawString(averageStrings[overlayStats[i]] + ": " +
-                averageStream.str(), fontSize, fontSize);
-        }
-        else {
-            std::ostringstream strStream;
-
-            if (overlayStats[i] > endNormalStats) {
-                int totalSeconds = statArray[overlayStats[i]];
-                // writes the stat
-                strStream << totalSeconds / 60;
-                strStream << ":";
-                int remSeconds = totalSeconds % 60;
-                if (remSeconds < 10) {
-                    strStream << "0";
-                }
-                strStream << remSeconds;
-            } else {
-                strStream << statArray[overlayStats[i]];
-            }
-            canvas.DrawString(indexStringMap[overlayStats[i]] + ": " + 
-                strStream.str(),
-                fontSize, fontSize);
-        }
-        
+        std::string renderString = statToRenderString(overlayStats[i], overlayAverages[i]);
+        int width = renderString.length() * fontSize * 10;
+        canvas.DrawString(renderString, fontSize, fontSize);
     }
 
     //cvarManager->log(std::to_string(fontSize));
+}
+
+std::string DemolitionCounter::statToRenderString(int index, bool isAverage) {
+    if (isAverage && index < startGameStats) {
+        // makes sure string has right number of decimal places
+        std::ostringstream averageStream;
+
+        if (index > endNormalStats) {
+            int totalSeconds = averages[index];
+            // writes the stat
+            averageStream << totalSeconds / 60;
+            averageStream << ":";
+            int remSeconds = totalSeconds % 60;
+            if (remSeconds < 10) {
+                averageStream << "0";
+            }
+            averageStream << remSeconds;
+        }
+        else {
+            averageStream << std::fixed << std::setprecision(decimalPlaces);
+            averageStream << averages[index];
+        }
+        return averageStrings[index] + ": " +
+            averageStream.str();
+    }
+    else {
+        std::ostringstream strStream;
+
+        if (index > endNormalStats && index < startGameStats) {
+            int totalSeconds = statArray[index];
+            // writes the stat
+            strStream << totalSeconds / 60;
+            strStream << ":";
+            int remSeconds = totalSeconds % 60;
+            if (remSeconds < 10) {
+                strStream << "0";
+            }
+            strStream << remSeconds;
+        }
+        else {
+            strStream << statArray[index];
+        }
+        return indexStringMap[index] + ": " +
+            strStream.str();
+    }
 }
 
 // Lists all stats to console
