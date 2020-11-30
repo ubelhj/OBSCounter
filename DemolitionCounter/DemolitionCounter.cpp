@@ -29,9 +29,10 @@ float xLocation;
 float yLocation;
 float xEndBackground;
 float yEndBackground;
+float scale;
 LinearColor overlayColor;
 LinearColor overlayBackgroundColor;
-std::string fileLocation = "./OBSCounter/";
+std::filesystem::path fileLocation;
 
 // enum for all stat indexes 
 // easier to refer back to stat names
@@ -272,6 +273,7 @@ float averages[startGameStats];
 // called when the plugin loads and prepares all cvars and default values
 void DemolitionCounter::onLoad()
 {
+    fileLocation = gameWrapper->GetDataFolder() / "OBSCounter";
     // tells the plugin to render the in game overlay
     gameWrapper->RegisterDrawable(
         std::bind(&DemolitionCounter::render, this, std::placeholders::_1));
@@ -283,7 +285,10 @@ void DemolitionCounter::onLoad()
     hookEvents();
 
     namespace fs = std::filesystem;
-    fs::create_directory(fileLocation);
+    fs::create_directories(fileLocation);
+    //cvarManager->log(gameWrapper->GetDataFolder().generic_string() + fileLocation);
+
+    writeAll();
 }
 
 // creates cvars and sets global variable defaults to prevent any nulls
@@ -360,6 +365,15 @@ void DemolitionCounter::setCvars() {
     yLocation = yLocVar.getFloatValue();
     yLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         yLocation = cvar.getFloatValue();
+        });
+
+    // sets cvar for counter's scale
+    auto scaleVar = cvarManager->registerCvar("counter_ingame_scale",
+        "2", "set counter scale",
+        true, true, 0.0, true, 10.0);
+    scale = scaleVar.getFloatValue();
+    scaleVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        scale = cvar.getFloatValue();
         });
 
     auto colorVar = cvarManager->registerCvar("counter_color", "#FFFFFF", "color of overlay");
@@ -625,10 +639,10 @@ bool DemolitionCounter::isPrimaryPlayer(PriWrapper receiver) {
         return false;
     }
 
-    auto receiverID = receiver.GetUniqueId();
-    auto primaryID = primaryPri.GetUniqueId();
+    auto receiverID = receiver.GetUniqueIdWrapper();
+    auto primaryID = primaryPri.GetUniqueIdWrapper();
 
-    return receiverID.ID == primaryID.ID;
+    return receiverID.GetUID() == primaryID.GetUID();
 }
 
 // called whenever a new game begins, and resets all game stats to 0
@@ -750,8 +764,8 @@ void DemolitionCounter::checkCarLocation() {
 // can only be called with a stat index and not a game stat index
 void DemolitionCounter::write(int statIndex) {
     // writes the total stat
-    std::ofstream totalFile;
-    totalFile.open(fileLocation + indexStringMap[statIndex] + ".txt");
+    std::ofstream totalFile (fileLocation / (indexStringMap[statIndex] + ".txt"));
+    cvarManager->log("wrote");
     totalFile << statArray[statIndex];
     totalFile.close();
 
@@ -759,12 +773,8 @@ void DemolitionCounter::write(int statIndex) {
     //  as that would just be games/games and always 1
     if (statIndex != games) {
         // writes average of stat per game
-        std::ofstream averageFile;
         // sets up average file location
-        std::string averageLocation = fileLocation;
-        // makes the first letter uppercase for nice looking files
-        averageLocation += averageStrings[statIndex] + ".txt";
-        averageFile.open(averageLocation);
+        std::ofstream averageFile (fileLocation / (averageStrings[statIndex] + ".txt"));
 
         // calls function to get average of a stat
         float averageStat = average(statIndex);
@@ -808,8 +818,7 @@ void DemolitionCounter::write(int statIndex) {
 
 // writes a game stat, only supposed to be used with a game stat index 
 void DemolitionCounter::writeGameStat(int statIndex) {
-    std::ofstream gameStatFile;
-    gameStatFile.open(fileLocation + indexStringMap[statIndex] + ".txt");
+    std::ofstream gameStatFile (fileLocation / (indexStringMap[statIndex] + ".txt"));
     gameStatFile << statArray[statIndex];
     gameStatFile.close();
 }
@@ -818,8 +827,7 @@ void DemolitionCounter::writeGameStat(int statIndex) {
 void DemolitionCounter::writeTimeStat(int statIndex) {
     int totalSeconds = statArray[statIndex];
     // writes the total stat
-    std::ofstream totalFile;
-    totalFile.open(fileLocation + indexStringMap[statIndex] + ".txt");
+    std::ofstream totalFile (fileLocation / (indexStringMap[statIndex] + ".txt"));
     totalFile << totalSeconds / 60;
     totalFile << ":";
     int remSeconds = totalSeconds % 60;
@@ -830,12 +838,7 @@ void DemolitionCounter::writeTimeStat(int statIndex) {
     totalFile.close();
 
     // writes average of stat per game
-    std::ofstream averageFile;
-    // sets up average file location
-    std::string averageLocation = fileLocation;
-    // makes the first letter uppercase for nice looking files
-    averageLocation += averageStrings[statIndex] + ".txt";
-    averageFile.open(averageLocation);
+    std::ofstream averageFile (fileLocation / (averageStrings[statIndex] + ".txt"));
 
     // average time is total / games
     int avgSeconds;
@@ -866,8 +869,7 @@ void DemolitionCounter::writeTimeStat(int statIndex) {
 void DemolitionCounter::writeGameTimeStat(int statIndex) {
     int totalSeconds = statArray[statIndex];
     // writes the stat
-    std::ofstream file;
-    file.open(fileLocation + indexStringMap[statIndex] + ".txt");
+    std::ofstream file (fileLocation / (indexStringMap[statIndex] + ".txt"));
     file << totalSeconds / 60;
     file << ":";
     int remSeconds = totalSeconds % 60;
@@ -893,33 +895,29 @@ void DemolitionCounter::writeAll() {
 // calculates shooting percentage (shots/goals)
 void DemolitionCounter::writeShootingPercentage() {
     // calculates current game shooting %
-    std::ofstream gameFile;
     // divides and checks for NaN
     int gameShooting = getPercentage(statArray[gameGoals], statArray[gameShots]);
-    gameFile.open(fileLocation + "gameShootingPercentage.txt");
+    std::ofstream gameFile (fileLocation / "gameShootingPercentage.txt");
     gameFile << gameShooting << "%";
     gameFile.close();
 
     // writes total session shooting
     int totalShooting = getPercentage(statArray[goals], statArray[shots]);
-    std::ofstream file;
-    file.open(fileLocation + "shootingPercentage.txt");
+    std::ofstream file (fileLocation / "shootingPercentage.txt");
     file << totalShooting << "%";
     file.close();
 }
 
 // writes K/D ratio
 void DemolitionCounter::writeKillPercentage() {
-    std::ofstream gameFile;
     float gameKD = divide(gameDemos, gameDeaths);
-    gameFile.open(fileLocation + "gameKDRatio.txt");
+    std::ofstream gameFile (fileLocation / "gameKDRatio.txt");
     gameFile << std::fixed << std::setprecision(decimalPlaces);
     gameFile << gameKD;
     gameFile.close();
 
     float totalKDRatio = divide(demos, deaths);
-    std::ofstream file;
-    file.open(fileLocation + "KDRatio.txt");
+    std::ofstream file (fileLocation / "KDRatio.txt");
     file << std::fixed << std::setprecision(decimalPlaces);
     file << totalKDRatio;
     file.close();
@@ -928,26 +926,21 @@ void DemolitionCounter::writeKillPercentage() {
 // writes missed exterm % for the session
 // total exterms / possible exterms (demos / 7) 
 void DemolitionCounter::writeMissedExterms() {
-    // calculates possible exterms (demos / 7)
-    std::ofstream totalFile;
+    // calculates possible exterms (demos / 7) 
     int possibleExterms = statArray[demos] / 7;
-    totalFile.open(fileLocation + "possibleExterminations.txt");
+    std::ofstream totalFile (fileLocation / "possibleExterminations.txt");
     totalFile << possibleExterms;
     totalFile.close();
 
     int missedExtermPercent = getPercentage(statArray[exterms], possibleExterms);
-    
-    std::ofstream file;
-    file.open(fileLocation + "missedExterminationPercent.txt");
+    std::ofstream file (fileLocation / "missedExterminationPercent.txt");
     file << missedExtermPercent << "%";
     file.close();
 }
 
 void DemolitionCounter::writeWinPercentage() {
     int winPercent = getPercentage(statArray[wins], statArray[wins] + statArray[losses]);
-
-    std::ofstream file;
-    file.open(fileLocation + "winPercent.txt");
+    std::ofstream file (fileLocation / "winPercent.txt");
     file << winPercent << "%";
     file.close();
 }
@@ -975,7 +968,8 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     //  but am unable to test on high fidelity monitors
     // if you notice an issue please let me 
     //  know by @ing me in the bakkesmod discord
-    float fontSize = ((float)screen.X / (float)1920) * 2;
+    float fontSize = //((float)screen.X / (float)1920) * 2;
+        scale;
     int xValue = int((float)screen.X * xLocation);
     int yValue = int((float)screen.Y * yLocation);
 
@@ -994,7 +988,7 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
         canvas.SetPosition(Vector2({ xValue, int((fontSize * (11 * i)) + yValue) }));
         // does averages if the user wants them and if a stat has an average
         std::string renderString = statToRenderString(overlayStats[i], overlayAverages[i]);
-        int width = renderString.length() * fontSize * 10;
+        //int width = renderString.length() * fontSize * 10;
         canvas.DrawString(renderString, fontSize, fontSize);
     }
 
