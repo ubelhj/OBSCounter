@@ -776,23 +776,36 @@ void OBSCounter::render(CanvasWrapper canvas) {
     int xValue = int((float)screen.X * xLocation);
     int yValue = int((float)screen.Y * yLocation);
 
+    Vector2F maxStringSize = { -1.0, -1.0 };
+    for (int i = 0; i < overlayLines; i++) {
+        Vector2F newStringSize = canvas.GetStringSize(overlayStrings[i], fontSize, fontSize);
+
+        if (newStringSize.X > maxStringSize.X) {
+            maxStringSize.X = newStringSize.X;
+        }
+
+        if (newStringSize.Y > maxStringSize.Y) {
+            maxStringSize.Y = newStringSize.Y;
+        }
+    }
+
+    if (enabledOverlayBackground) {
+        canvas.SetColor(overlayBackgroundColor);
+        canvas.SetPosition(Vector2({ xValue, yValue }));
+        canvas.FillBox(Vector2({ int(maxStringSize.X), int(maxStringSize.Y * overlayLines) }));
+    }
+
     // sets to user-chosen color
     //canvas.SetColor(overlayColors[0], overlayColors[1], overlayColors[2], 255);
     canvas.SetColor(overlayColor);
 
     for (int i = 0; i < overlayLines; i++) {
         // locates based on screen and font size
-        canvas.SetPosition(Vector2({ xValue, int((fontSize * (11 * i)) + yValue) }));
+        canvas.SetPosition(Vector2({ xValue, int((maxStringSize.Y * i) + yValue) }));
         // does averages if the user wants them and if a stat has an average
         //std::string renderString = statToRenderString(overlayStats[i], overlayAverages[i]);
         //int width = renderString.length() * fontSize * 10;
         canvas.DrawString(overlayStrings[i], fontSize, fontSize);
-    }
-
-    if (enabledOverlayBackground) {
-        canvas.SetColor(overlayBackgroundColor);
-        canvas.SetPosition(Vector2({ xValue, yValue }));
-        canvas.FillBox(Vector2({ int((float)screen.X * xEndBackground), int((float)screen.Y * yEndBackground) }));
     }
 
     //cvarManager->log(std::to_string(fontSize));
