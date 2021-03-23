@@ -22,9 +22,10 @@ int decimalPlaces;
 bool enabledOverlay;
 bool enabledOverlayBackground;
 const int maxOverlayLines = 5;
-int overlayNum;
+int overlayLines;
 int overlayStats[maxOverlayLines];
 bool overlayAverages[maxOverlayLines];
+std::string overlayStrings[maxOverlayLines];
 float xLocation;
 float yLocation;
 float xEndBackground;
@@ -87,9 +88,9 @@ void OBSCounter::setCvars() {
     auto overlayNumberVar = cvarManager->registerCvar(
         "counter_ingame_numStats", "5", "number of stats in in game overlay",
         true, true, 1, true, maxOverlayLines);
-    overlayNum = overlayNumberVar.getIntValue();
+    overlayLines = overlayNumberVar.getIntValue();
     overlayNumberVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        overlayNum = cvar.getIntValue();
+        overlayLines = cvar.getIntValue();
         });
 
     std::string numberStrings[] = {
@@ -587,6 +588,8 @@ void OBSCounter::write(int statIndex) {
         writeGameStat(statIndex + totalToGame);
     }
 
+    renderString(statIndex);
+
     // any extra stats needed with more computing
     // shooting % (shot or goal)
     // k/d (demo or death)
@@ -770,23 +773,23 @@ void OBSCounter::render(CanvasWrapper canvas) {
     int xValue = int((float)screen.X * xLocation);
     int yValue = int((float)screen.Y * yLocation);
 
-    if (enabledOverlayBackground) {
-        canvas.SetColor(overlayBackgroundColor);
-        canvas.SetPosition(Vector2({ xValue, yValue }));
-        canvas.FillBox(Vector2({ int((float)screen.X * xEndBackground), int((float)screen.Y * yEndBackground) }));
-    }
-
     // sets to user-chosen color
     //canvas.SetColor(overlayColors[0], overlayColors[1], overlayColors[2], 255);
     canvas.SetColor(overlayColor);
 
-    for (int i = 0; i < overlayNum; i++) {
+    for (int i = 0; i < overlayLines; i++) {
         // locates based on screen and font size
         canvas.SetPosition(Vector2({ xValue, int((fontSize * (11 * i)) + yValue) }));
         // does averages if the user wants them and if a stat has an average
-        std::string renderString = statToRenderString(overlayStats[i], overlayAverages[i]);
+        //std::string renderString = statToRenderString(overlayStats[i], overlayAverages[i]);
         //int width = renderString.length() * fontSize * 10;
-        canvas.DrawString(renderString, fontSize, fontSize);
+        canvas.DrawString(overlayStrings[i], fontSize, fontSize);
+    }
+
+    if (enabledOverlayBackground) {
+        canvas.SetColor(overlayBackgroundColor);
+        canvas.SetPosition(Vector2({ xValue, yValue }));
+        canvas.FillBox(Vector2({ int((float)screen.X * xEndBackground), int((float)screen.Y * yEndBackground) }));
     }
 
     //cvarManager->log(std::to_string(fontSize));
@@ -812,7 +815,7 @@ std::string OBSCounter::statToRenderString(int index, bool isAverage) {
             averageStream << std::fixed << std::setprecision(decimalPlaces);
             averageStream << averages[index];
         }
-        return averageStrings[index] + ": " +
+        return averageStringsRender[index] + " " +
             averageStream.str();
         // writes non-averages
     }
@@ -834,8 +837,22 @@ std::string OBSCounter::statToRenderString(int index, bool isAverage) {
         else {
             strStream << statArray[index];
         }
-        return indexStringMap[index] + ": " +
+        return indexStringMapRender[index] + " " +
             strStream.str();
+    }
+}
+
+void OBSCounter::renderAllStrings() {
+    for (int i = 0; i < overlayLines; i++) {
+        overlayStrings[i] = statToRenderString(overlayStats[i], overlayAverages[i]);
+    }
+}
+
+void OBSCounter::renderString(int statIndex) {
+    for (int i = 0; i < overlayLines; i++) {
+        if (overlayStats[i] = statIndex) {
+            overlayStrings[i] = statToRenderString(overlayStats[i], overlayAverages[i]);
+        }
     }
 }
 
