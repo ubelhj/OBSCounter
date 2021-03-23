@@ -21,9 +21,10 @@ int decimalPlaces;
 // are initialized in onLoad()
 bool enabledOverlay;
 bool enabledOverlayBackground;
+const int maxOverlayLines = 5;
 int overlayNum;
-int overlayStats[5];
-bool overlayAverages[5];
+int overlayStats[maxOverlayLines];
+bool overlayAverages[maxOverlayLines];
 float xLocation;
 float yLocation;
 float xEndBackground;
@@ -85,7 +86,7 @@ void OBSCounter::setCvars() {
     // 1-5 allowed
     auto overlayNumberVar = cvarManager->registerCvar(
         "counter_ingame_numStats", "5", "number of stats in in game overlay",
-        true, true, 1, true, 5);
+        true, true, 1, true, maxOverlayLines);
     overlayNum = overlayNumberVar.getIntValue();
     overlayNumberVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayNum = cvar.getIntValue();
@@ -99,7 +100,7 @@ void OBSCounter::setCvars() {
         "five"
     };
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < maxOverlayLines; i++) {
         std::string str = numberStrings[i];
         // sets stat in overlay
         auto overlayVar = cvarManager->registerCvar("counter_ingame_stat_" + str,
@@ -223,6 +224,30 @@ void OBSCounter::setCvars() {
 
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             statArray[i] = cvar.getIntValue(); writeTimeStat(i); });
+    }
+
+    // setters for render strings for stats
+    for (int i = 0; i < numStats; i++) {
+        std::string cvarName = "counter_set_render_string_" + indexStringMap[i];
+        std::string cvarTip = "sets " + indexStringMap[i] + " render string";
+        cvarManager->registerCvar(cvarName, indexStringMap[i], cvarTip);
+        auto cvar = cvarManager->getCvar(cvarName);
+
+        cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            indexStringMapRender[i] = cvar.getStringValue(); renderAllStrings(); });
+        
+    }
+
+    // setters for render strings for average stats
+    for (int i = 0; i < startGameStats; i++) {
+        std::string cvarName = "counter_set_render_average_string_" + indexStringMap[i];
+        std::string cvarTip = "sets " + averageStrings[i] + "average render string";
+        cvarManager->registerCvar(cvarName, averageStringsRender[i], cvarTip);
+        auto cvar = cvarManager->getCvar(cvarName);
+        statArray[i] = cvar.getIntValue();
+
+        cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            averageStringsRender[i] = cvar.getStringValue(); renderAllStrings(); });
     }
 
     // special case to make sure games update properly

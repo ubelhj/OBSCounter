@@ -158,7 +158,7 @@ std::string indexStringMap[] = {
     "gameDefenseTime"
 };
 
-std::string indexStringMapRender[] = {
+std::string indexStringMapRender[numStats] = {
     "wins",
     "losses",
     "mvps",
@@ -227,7 +227,7 @@ std::string indexStringMapRender[] = {
     "gameDefenseTime"
 };
 
-std::string averageStrings[] = {
+std::string averageStrings[startGameStats] = {
     "averageWins",
     "averageLosses",
     "averageMvps",

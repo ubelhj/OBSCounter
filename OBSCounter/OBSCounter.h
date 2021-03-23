@@ -79,6 +79,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin
 	// renders overlay
 	void render(CanvasWrapper canvas);
 
+	void renderAllStrings();
 	std::string statToRenderString(int statIndex, bool isAverage);
 
 	// prints all stat types
