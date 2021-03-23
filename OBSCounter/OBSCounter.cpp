@@ -109,6 +109,7 @@ void OBSCounter::setCvars() {
         overlayStats[i] = overlayVar.getIntValue();
         overlayVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             overlayStats[i] = cvar.getIntValue();
+            renderAllStrings();
             });
 
         // sets stat in overlay to average or not
@@ -118,6 +119,7 @@ void OBSCounter::setCvars() {
         overlayAverages[i] = overlayAvgVar.getBoolValue();
         overlayAvgVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             overlayAverages[i] = cvar.getBoolValue();
+            renderAllStrings();
             });
     }
 
@@ -657,6 +659,7 @@ void OBSCounter::writeTimeStat(int statIndex) {
     averageFile << remSeconds;
     averageFile.close();
 
+    renderString(statIndex);
 
     // writes the game version of stat
     // only writes if stat has a game version
