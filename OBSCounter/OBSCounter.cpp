@@ -1,12 +1,11 @@
 #include "pch.h"
-#include "DemolitionCounter.h"
-#include <sstream>
-#include <fstream>
-#include <filesystem>
-#include "bakkesmod/wrappers/GameObject/Stats/StatEventWrapper.h"
+#include "OBSCounter.h"
+#include "Maps.h"
 
-BAKKESMOD_PLUGIN(DemolitionCounter, "Counts demolitions in online games", 
-    plugin_version, PLUGINTYPE_THREADED)
+
+BAKKESMOD_PLUGIN(OBSCounter, "OBSCounter", plugin_version, PLUGINTYPE_FREEPLAY)
+
+std::shared_ptr<CVarManagerWrapper> _globalCvarManager;
 
 // whether the last game ended
 // I know it may seem redundant, 
@@ -34,249 +33,20 @@ LinearColor overlayColor;
 LinearColor overlayBackgroundColor;
 std::filesystem::path fileLocation;
 
-// enum for all stat indexes 
-// easier to refer back to stat names
-// total stats are from 0 to 30, game stats from 31 to end
-enum stats {
-    wins,
-    losses,
-    mvps,
-    games,
-    // end of stats without game counterpart
-    statsWithoutGame = games,
-    // stat + 27 = gameStat
-    goals,
-    demos,
-    deaths,
-    exterms,
-    aerialGoals,
-    backwardsGoals,
-    bicycleGoals,
-    longGoals,
-    turtleGoals,
-    poolShots,
-    overtimeGoals,
-    hatTricks,
-    assists,
-    playmakers,
-    saves,
-    epicSaves,
-    saviors,
-    shots,
-    centers,
-    clears,
-    firstTouchs,
-    damages,
-    ultraDamages,
-    lowFives,
-    highFives,
-    swishs,
-    bicycleHits,
-    points,
-    // last stat with normal output type
-    endNormalStats = points,
-    timePlayed,
-    offenseTime,
-    defenseTime,
-    // game stats are from 31 -> end
-    // goals + 27 = gameGoals
-    gameGoals,
-    // start of game stats and/or 1 after the end of non-game stats
-    startGameStats = gameGoals,
-    gameDemos,
-    gameDeaths,
-    gameExterms,
-    gameAerialGoals,
-    gameBackwardsGoals,
-    gameBicycleGoals,
-    gameLongGoals,
-    gameTurtleGoals,
-    gamePoolShots,
-    gameOvertimeGoals,
-    gameHatTricks,
-    gameAssists,
-    gamePlaymakers,
-    gameSaves,
-    gameEpicSaves,
-    gameSaviors,
-    gameShots,
-    gameCenters,
-    gameClears,
-    gameFirstTouchs,
-    gameDamages,
-    gameUltraDamages,
-    gameLowFives,
-    gameHighFives,
-    gameSwishs,
-    gameBicycleHits,
-    gamePoints,
-    endNormalGameStats = gamePoints,
-    gameTime,
-    gameOffenseTime,
-    gameDefenseTime,
-    // total number of stats in the stat array
-    numStats
-};
-
-// jump from a stat to its most recent game stat by adding this number (27)
-// goals + 27 = gameGoals
-constexpr int totalToGame = startGameStats - 1 - statsWithoutGame;
-
-// maps the stat indexes to their respective strings to write files
-// index to string
-std::string indexStringMap[] = {
-    "wins",
-    "losses",
-    "mvps",
-    "games",
-    "goals",
-    "demolitions",
-    "deaths",
-    "exterminations",
-    "aerialGoals",
-    "backwardsGoals",
-    "bicycleGoals",
-    "longGoals",
-    "turtleGoals",
-    "poolShots",
-    "overtimeGoals",
-    "hatTricks",
-    "assists",
-    "playmakers",
-    "saves",
-    "epicSaves",
-    "saviors",
-    "shots",
-    "centers",
-    "clears",
-    "firstTouchs",
-    "damages",
-    "ultraDamages",
-    "lowFives",
-    "highFives",
-    "swishs",
-    "bicycleHits",
-    "points",
-    "timePlayed",
-    "offenseTime",
-    "defenseTime",
-    "gameGoals",
-    "gameDemolitions",
-    "gameDeaths",
-    "gameExterminations",
-    "gameAerialGoals",
-    "gameBackwardsGoals",
-    "gameBicycleGoals",
-    "gameLongGoals",
-    "gameTurtleGoals",
-    "gamePoolShots",
-    "gameOvertimeGoals",
-    "gameHatTricks",
-    "gameAssists",
-    "gamePlaymakers",
-    "gameSaves",
-    "gameEpicSaves",
-    "gameSaviors",
-    "gameShots",
-    "gameCenters",
-    "gameClears",
-    "gameFirstTouchs",
-    "gameDamages",
-    "gameUltraDamages",
-    "gameLowFives",
-    "gameHighFives",
-    "gameSwishs",
-    "gameBicycleHits",
-    "gamePoints",
-    "gameTimePlayed",
-    "gameOffenseTime",
-    "gameDefenseTime"
-};
-
 // holds all stats
 int statArray[numStats];
-
-// holds strings for averages (doesn't include game stats)
-std::string averageStrings[] = {
-    "averageWins",
-    "averageLosses",
-    "averageMvps",
-    "averageGames",
-    "averageGoals",
-    "averageDemolitions",
-    "averageDeaths",
-    "averageExterminations",
-    "averageAerialGoals",
-    "averageBackwardsGoals",
-    "averageBicycleGoals",
-    "averageLongGoals",
-    "averageTurtleGoals",
-    "averagePoolShots",
-    "averageOvertimeGoals",
-    "averageHatTricks",
-    "averageAssists",
-    "averagePlaymakers",
-    "averageSaves",
-    "averageEpicSaves",
-    "averageSaviors",
-    "averageShots",
-    "averageCenters",
-    "averageClears",
-    "averageFirstTouchs",
-    "averageDamages",
-    "averageUltraDamages",
-    "averageLowFives",
-    "averageHighFives",
-    "averageSwishs",
-    "averageBicycleHits",
-    "averagePoints",
-    "averageTimePlayed",
-    "averageOffenseTime",
-    "averageDefenseTime"
-};
-
-const std::map<std::string, int> eventDictionary = {
-    { "Demolition", demos},
-    { "Extermination", exterms},
-    { "Goal", goals},
-    { "Win", wins},
-    { "MVP", mvps},
-    { "Aerial Goal", aerialGoals},
-    { "Backwards Goal", backwardsGoals},
-    { "Bicycle Goal", bicycleGoals},
-    { "Long Goal", longGoals},
-    { "Turtle Goal", turtleGoals},
-    { "Pool Shot", poolShots},
-    { "Overtime Goal", overtimeGoals},
-    { "Hat Trick", hatTricks},
-    { "Assist", assists},
-    { "Playmaker", playmakers},
-    { "Save", saves},
-    { "Epic Save", epicSaves},
-    { "Savior", saviors},
-    { "Shot on Goal", shots},
-    { "Center Ball", centers},
-    { "Clear Ball", clears},
-    { "First Touch", firstTouchs},
-    { "Damage", damages},
-    { "Ultra Damage", ultraDamages},
-    { "Low Five", lowFives},
-    { "High Five", highFives},
-    { "Swish Goal", swishs},
-    { "Bicycle Hit", bicycleHits}
-};
 
 // holds all averages
 // caching improves performance significantly
 float averages[startGameStats];
 
 // called when the plugin loads and prepares all cvars and default values
-void DemolitionCounter::onLoad()
+void OBSCounter::onLoad()
 {
     fileLocation = gameWrapper->GetDataFolder() / "OBSCounter";
     // tells the plugin to render the in game overlay
     gameWrapper->RegisterDrawable(
-        std::bind(&DemolitionCounter::render, this, std::placeholders::_1));
+        std::bind(&OBSCounter::render, this, std::placeholders::_1));
 
     // creates cvars and sets global variable defaults to prevent any nulls
     setCvars();
@@ -292,7 +62,7 @@ void DemolitionCounter::onLoad()
 }
 
 // creates cvars and sets global variable defaults to prevent any nulls
-void DemolitionCounter::setCvars() {
+void OBSCounter::setCvars() {
     auto decimalsVar = cvarManager->registerCvar("counter_decimals", "1",
         "set decimal places in averages (1 - 10)", true, true, 1, true, 10);
     decimalPlaces = decimalsVar.getIntValue();
@@ -435,7 +205,7 @@ void DemolitionCounter::setCvars() {
         cvarManager->registerCvar(cvarName, "0", cvarTip, true, false, 0, false, 0, false);
         auto cvar = cvarManager->getCvar(cvarName);
         statArray[i] = cvar.getIntValue();
-        
+
         if (i != games) {
             cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
                 statArray[i] = cvar.getIntValue(); write(i); });
@@ -465,31 +235,31 @@ void DemolitionCounter::setCvars() {
 }
 
 // hooks events to allow the plugin to work
-void DemolitionCounter::hookEvents() {
+void OBSCounter::hookEvents() {
     // hooked whenever a stat appears in the top right corner of rocket league
     //  (even if stat display is turned off)
     gameWrapper->HookEventWithCallerPost<ServerWrapper>(
-        "Function TAGame.GFxHUD_TA.HandleStatTickerMessage", 
-        std::bind(&DemolitionCounter::statTickerEvent, this, 
+        "Function TAGame.GFxHUD_TA.HandleStatTickerMessage",
+        std::bind(&OBSCounter::statTickerEvent, this,
             std::placeholders::_1, std::placeholders::_2));
 
     // hooked whenever the primary player earns a stat
     gameWrapper->HookEventWithCallerPost<ServerWrapper>(
         "Function TAGame.GFxHUD_TA.HandleStatEvent",
-        std::bind(&DemolitionCounter::statEvent, this,
+        std::bind(&OBSCounter::statEvent, this,
             std::placeholders::_1, std::placeholders::_2));
 
     // hooks on a starting game 
     gameWrapper->HookEventPost(
-        "Function GameEvent_Soccar_TA.WaitingForPlayers.BeginState", 
-        std::bind(&DemolitionCounter::startGame, this));
+        "Function GameEvent_Soccar_TA.WaitingForPlayers.BeginState",
+        std::bind(&OBSCounter::startGame, this));
     // hooks on a joined game in progress
     gameWrapper->HookEventPost("Function Engine.PlayerInput.InitInputSystem",
-        std::bind(&DemolitionCounter::startGame, this));
+        std::bind(&OBSCounter::startGame, this));
     // works on ended game
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.EventMatchEnded",
-        std::bind(&DemolitionCounter::endGame, this));
+        std::bind(&OBSCounter::endGame, this));
     // works on time tick
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.OnGameTimeUpdated",
@@ -508,13 +278,13 @@ struct TickerStruct {
 
 // structure of a stat event
 struct StatEventStruct {
-    uintptr_t PRI; 
-    uintptr_t StatEvent; 
+    uintptr_t PRI;
+    uintptr_t StatEvent;
     // Count always is int_max. No idea why
     uintptr_t Count;
 };
 
-void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
+void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     cvarManager->log("stat event!");
     if (!gameWrapper->IsInOnlineGame()) {
         cvarManager->log("not in online game");
@@ -548,7 +318,7 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
         cvarManager->log("missing stat points: " + statEvent.GetPoints());
         return;
     }
-    
+
     int statPoints = statEvent.GetPoints();
     cvarManager->log("points: " + std::to_string(statPoints));
     if (statPoints > 0) {
@@ -564,7 +334,7 @@ void DemolitionCounter::statEvent(ServerWrapper caller, void* args) {
     write(eventType);
 }
 
-void DemolitionCounter::statTickerEvent(ServerWrapper caller, void* args) {
+void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
     auto tArgs = (TickerStruct*)args;
     cvarManager->log("stat ticker event!");
     if (!gameWrapper->IsInOnlineGame()) {
@@ -606,7 +376,7 @@ void DemolitionCounter::statTickerEvent(ServerWrapper caller, void* args) {
 }
 
 // checks if the player who received a stat is the user's player
-bool DemolitionCounter::isPrimaryPlayer(PriWrapper receiver) {
+bool OBSCounter::isPrimaryPlayer(PriWrapper receiver) {
     // anything down this conversion line can be null, so always checks
     if (!gameWrapper->IsInOnlineGame()) {
         cvarManager->log("not in online game");
@@ -646,7 +416,7 @@ bool DemolitionCounter::isPrimaryPlayer(PriWrapper receiver) {
 }
 
 // called whenever a new game begins, and resets all game stats to 0
-void DemolitionCounter::startGame() {
+void OBSCounter::startGame() {
     cvarManager->log("started game");
     // if the last game didnt end, doesn't start game
     // can lead to issues if the user ragequits. No good workaround yet
@@ -672,7 +442,7 @@ void DemolitionCounter::startGame() {
     write(games);
 }
 
-void DemolitionCounter::endGame() {
+void OBSCounter::endGame() {
     if (!gameWrapper->IsInOnlineGame()) {
         cvarManager->log("not in online game");
         return;
@@ -712,7 +482,7 @@ void DemolitionCounter::endGame() {
 }
 
 // called every second to log car location on offense or defense
-void DemolitionCounter::checkCarLocation() {
+void OBSCounter::checkCarLocation() {
     cvarManager->log("updated time");
     if (!gameWrapper->IsInOnlineGame()) {
         cvarManager->log("not in online game");
@@ -749,7 +519,8 @@ void DemolitionCounter::checkCarLocation() {
         statArray[offenseTime]++;
         statArray[gameOffenseTime]++;
         writeTimeStat(offenseTime);
-    } else {
+    }
+    else {
         cvarManager->log("defense time");
         statArray[defenseTime]++;
         statArray[gameDefenseTime]++;
@@ -762,10 +533,10 @@ void DemolitionCounter::checkCarLocation() {
 
 // writes a stat to its files
 // can only be called with a stat index and not a game stat index
-void DemolitionCounter::write(int statIndex) {
+void OBSCounter::write(int statIndex) {
     // writes the total stat
-    std::ofstream totalFile (fileLocation / (indexStringMap[statIndex] + ".txt"));
-    cvarManager->log("wrote");
+    std::ofstream totalFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
+    //cvarManager->log("wrote");
     totalFile << statArray[statIndex];
     totalFile.close();
 
@@ -774,7 +545,7 @@ void DemolitionCounter::write(int statIndex) {
     if (statIndex != games) {
         // writes average of stat per game
         // sets up average file location
-        std::ofstream averageFile (fileLocation / (averageStrings[statIndex] + ".txt"));
+        std::ofstream averageFile(fileLocation / (averageStrings[statIndex] + ".txt"));
 
         // calls function to get average of a stat
         float averageStat = average(statIndex);
@@ -817,17 +588,17 @@ void DemolitionCounter::write(int statIndex) {
 }
 
 // writes a game stat, only supposed to be used with a game stat index 
-void DemolitionCounter::writeGameStat(int statIndex) {
-    std::ofstream gameStatFile (fileLocation / (indexStringMap[statIndex] + ".txt"));
+void OBSCounter::writeGameStat(int statIndex) {
+    std::ofstream gameStatFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
     gameStatFile << statArray[statIndex];
     gameStatFile.close();
 }
 
 // writes a time stat with special formatting minutes:seconds
-void DemolitionCounter::writeTimeStat(int statIndex) {
+void OBSCounter::writeTimeStat(int statIndex) {
     int totalSeconds = statArray[statIndex];
     // writes the total stat
-    std::ofstream totalFile (fileLocation / (indexStringMap[statIndex] + ".txt"));
+    std::ofstream totalFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
     totalFile << totalSeconds / 60;
     totalFile << ":";
     int remSeconds = totalSeconds % 60;
@@ -838,13 +609,14 @@ void DemolitionCounter::writeTimeStat(int statIndex) {
     totalFile.close();
 
     // writes average of stat per game
-    std::ofstream averageFile (fileLocation / (averageStrings[statIndex] + ".txt"));
+    std::ofstream averageFile(fileLocation / (averageStrings[statIndex] + ".txt"));
 
     // average time is total / games
     int avgSeconds;
     if (statArray[games] == 0) {
         avgSeconds = 0;
-    } else {
+    }
+    else {
         avgSeconds = totalSeconds / statArray[games];
     }
     averages[statIndex] = avgSeconds;
@@ -856,7 +628,7 @@ void DemolitionCounter::writeTimeStat(int statIndex) {
     }
     averageFile << remSeconds;
     averageFile.close();
-    
+
 
     // writes the game version of stat
     // only writes if stat has a game version
@@ -866,10 +638,10 @@ void DemolitionCounter::writeTimeStat(int statIndex) {
 }
 
 // writes only the game time stat
-void DemolitionCounter::writeGameTimeStat(int statIndex) {
+void OBSCounter::writeGameTimeStat(int statIndex) {
     int totalSeconds = statArray[statIndex];
     // writes the stat
-    std::ofstream file (fileLocation / (indexStringMap[statIndex] + ".txt"));
+    std::ofstream file(fileLocation / (indexStringMap[statIndex] + ".txt"));
     file << totalSeconds / 60;
     file << ":";
     int remSeconds = totalSeconds % 60;
@@ -881,7 +653,7 @@ void DemolitionCounter::writeGameTimeStat(int statIndex) {
 }
 
 // calls all write functions at once
-void DemolitionCounter::writeAll() {
+void OBSCounter::writeAll() {
     for (int i = 0; i <= endNormalStats; i++) {
         write(i);
     }
@@ -893,31 +665,31 @@ void DemolitionCounter::writeAll() {
 
 // special cases for extra complicated stats
 // calculates shooting percentage (shots/goals)
-void DemolitionCounter::writeShootingPercentage() {
+void OBSCounter::writeShootingPercentage() {
     // calculates current game shooting %
     // divides and checks for NaN
     int gameShooting = getPercentage(statArray[gameGoals], statArray[gameShots]);
-    std::ofstream gameFile (fileLocation / "gameShootingPercentage.txt");
+    std::ofstream gameFile(fileLocation / "gameShootingPercentage.txt");
     gameFile << gameShooting << "%";
     gameFile.close();
 
     // writes total session shooting
     int totalShooting = getPercentage(statArray[goals], statArray[shots]);
-    std::ofstream file (fileLocation / "shootingPercentage.txt");
+    std::ofstream file(fileLocation / "shootingPercentage.txt");
     file << totalShooting << "%";
     file.close();
 }
 
 // writes K/D ratio
-void DemolitionCounter::writeKillPercentage() {
+void OBSCounter::writeKillPercentage() {
     float gameKD = divide(gameDemos, gameDeaths);
-    std::ofstream gameFile (fileLocation / "gameKDRatio.txt");
+    std::ofstream gameFile(fileLocation / "gameKDRatio.txt");
     gameFile << std::fixed << std::setprecision(decimalPlaces);
     gameFile << gameKD;
     gameFile.close();
 
     float totalKDRatio = divide(demos, deaths);
-    std::ofstream file (fileLocation / "KDRatio.txt");
+    std::ofstream file(fileLocation / "KDRatio.txt");
     file << std::fixed << std::setprecision(decimalPlaces);
     file << totalKDRatio;
     file.close();
@@ -925,37 +697,37 @@ void DemolitionCounter::writeKillPercentage() {
 
 // writes missed exterm % for the session
 // total exterms / possible exterms (demos / 7) 
-void DemolitionCounter::writeMissedExterms() {
+void OBSCounter::writeMissedExterms() {
     // calculates possible exterms (demos / 7) 
     int possibleExterms = statArray[demos] / 7;
-    std::ofstream totalFile (fileLocation / "possibleExterminations.txt");
+    std::ofstream totalFile(fileLocation / "possibleExterminations.txt");
     totalFile << possibleExterms;
     totalFile.close();
 
     int missedExtermPercent = getPercentage(statArray[exterms], possibleExterms);
-    std::ofstream file (fileLocation / "missedExterminationPercent.txt");
+    std::ofstream file(fileLocation / "missedExterminationPercent.txt");
     file << missedExtermPercent << "%";
     file.close();
 }
 
-void DemolitionCounter::writeWinPercentage() {
+void OBSCounter::writeWinPercentage() {
     int winPercent = getPercentage(statArray[wins], statArray[wins] + statArray[losses]);
-    std::ofstream file (fileLocation / "winPercent.txt");
+    std::ofstream file(fileLocation / "winPercent.txt");
     file << winPercent << "%";
     file.close();
 }
 
-int DemolitionCounter::getPercentage(int numerator, int denominator) {
+int OBSCounter::getPercentage(int numerator, int denominator) {
     if (denominator == 0) {
         return 0;
     }
     else {
-       return ((float)numerator / (float) denominator) * 100;
+        return ((float)numerator / (float)denominator) * 100;
     }
 }
 
 // Renders in game overlay
-void DemolitionCounter::render(CanvasWrapper canvas) {
+void OBSCounter::render(CanvasWrapper canvas) {
     if (!enabledOverlay) {
         return;
     }
@@ -995,7 +767,7 @@ void DemolitionCounter::render(CanvasWrapper canvas) {
     //cvarManager->log(std::to_string(fontSize));
 }
 
-std::string DemolitionCounter::statToRenderString(int index, bool isAverage) {
+std::string OBSCounter::statToRenderString(int index, bool isAverage) {
     // writes averages of stats
     if (isAverage && index < startGameStats) {
         std::ostringstream averageStream;
@@ -1018,7 +790,8 @@ std::string DemolitionCounter::statToRenderString(int index, bool isAverage) {
         return averageStrings[index] + ": " +
             averageStream.str();
         // writes non-averages
-    } else {
+    }
+    else {
         std::ostringstream strStream;
 
         // writes time stats
@@ -1028,7 +801,7 @@ std::string DemolitionCounter::statToRenderString(int index, bool isAverage) {
             strStream << totalSeconds / 60;
             strStream << ":";
             int remSeconds = totalSeconds % 60;
-            if (remSeconds < 10) { 
+            if (remSeconds < 10) {
                 strStream << "0";
             }
             strStream << remSeconds;
@@ -1042,34 +815,34 @@ std::string DemolitionCounter::statToRenderString(int index, bool isAverage) {
 }
 
 // Lists all stats to console
-void DemolitionCounter::listStats() {
+void OBSCounter::listStats() {
     for (int i = 0; i < numStats; i++) {
         cvarManager->log(std::to_string(i) + ": " + indexStringMap[i]);
     }
 }
 
 // calculates average of stat and avoids NaN
-float DemolitionCounter::average(int statIndex) {
+float OBSCounter::average(int statIndex) {
     averages[statIndex] = divide(statIndex, games);
     return averages[statIndex];
 }
 
 // calculates division of two stats and avoids NaN
 // prevents a bunch of duplicated code
-float DemolitionCounter::divide(int firstStatIndex, int secondStatIndex) {
+float OBSCounter::divide(int firstStatIndex, int secondStatIndex) {
     // if second number is 0 returns 0
     if (statArray[secondStatIndex] == 0) {
         return 0.0;
     }
     // otherwise divides ints as a float
     else {
-        return (float)statArray[firstStatIndex] / 
+        return (float)statArray[firstStatIndex] /
             (float)statArray[secondStatIndex];
     }
 }
 
 // plugin is unloaded by the plugin manager, and as no state needs to be saved,
 // allows it to be removed
-void DemolitionCounter::onUnload()
+void OBSCounter::onUnload()
 {
 }

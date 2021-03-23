@@ -13,7 +13,7 @@
       <AdditionalDependencies>pluginsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>python "$(BakkesModPath)\bakkesmodsdk\bakkes_patchplugin.py" "$(TargetPath)"</Command>
+      <Command> "$(BakkesModPath)\bakkesmodsdk\bakkesmod-patch.exe" "$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />
