@@ -28,11 +28,10 @@ bool overlayAverages[maxOverlayLines];
 std::string overlayStrings[maxOverlayLines];
 float xLocation;
 float yLocation;
-float xEndBackground;
-float yEndBackground;
 float scale;
 LinearColor overlayColor;
 LinearColor overlayBackgroundColor;
+
 std::filesystem::path fileLocation;
 
 // holds all stats
@@ -91,6 +90,7 @@ void OBSCounter::setCvars() {
     overlayLines = overlayNumberVar.getIntValue();
     overlayNumberVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayLines = cvar.getIntValue();
+        renderAllStrings();
         });
 
     std::string numberStrings[] = {
@@ -161,24 +161,6 @@ void OBSCounter::setCvars() {
     enabledOverlayBackground = overlayBackgroundEnableVar.getBoolValue();
     overlayBackgroundEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         enabledOverlayBackground = cvar.getBoolValue();
-        });
-
-    // sets cvar to move counter's X location
-    auto xEndVar = cvarManager->registerCvar("counter_ingame_x_location_background",
-        "0.075", "set end location of ingame counter ba X in % of screen",
-        true, true, 0.0, true, 1.0);
-    xEndBackground = xEndVar.getFloatValue();
-    xEndVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        xEndBackground = cvar.getFloatValue();
-        });
-
-    // sets cvar to move counter's Y location
-    auto yEndVar = cvarManager->registerCvar("counter_ingame_y_location_background",
-        "0.115", "set location of ingame counter Y in % of screen",
-        true, true, 0.0, true, 1.0);
-    yEndBackground = yEndVar.getFloatValue();
-    yEndVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        yEndBackground = cvar.getFloatValue();
         });
 
     auto backColorVar = cvarManager->registerCvar("counter_color_background", "#0000008C", "color of overlay background");

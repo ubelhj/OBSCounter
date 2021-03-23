@@ -12,8 +12,6 @@ OBS Counter Plugin
 4|Counter X-location (% of screen)|counter_ingame_x_location|0.0|1.0
 4|Counter Y-location (% of screen)|counter_ingame_y_location|0.0|1.0
 4|Text scale|counter_ingame_scale|0.0|10.0
-4|Background end X-location (% of screen)|counter_ingame_x_location_background|0.0|1.0
-4|Background end Y-location (% of screen)|counter_ingame_y_location_background|0.0|1.0
 0|Press f6 to open your bakkesmod console, then hit this button to see all possible stats and their corresponding numbers|counter_list_stats
 9|You can also set each counter in the console with counter_ingame_stat_ if the slider isn't precise enough
 9|Average stats do not work with game stats
