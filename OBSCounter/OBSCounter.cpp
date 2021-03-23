@@ -60,6 +60,7 @@ void OBSCounter::onLoad()
     //cvarManager->log(gameWrapper->GetDataFolder().generic_string() + fileLocation);
 
     writeAll();
+    renderAllStrings();
 }
 
 // creates cvars and sets global variable defaults to prevent any nulls
@@ -70,6 +71,7 @@ void OBSCounter::setCvars() {
     decimalsVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         decimalPlaces = cvar.getIntValue();
         writeAll();
+        renderAllStrings();
         });
 
 
@@ -220,7 +222,6 @@ void OBSCounter::setCvars() {
 
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             indexStringMapRender[i] = cvar.getStringValue(); renderAllStrings(); });
-        
     }
 
     // setters for render strings for average stats
@@ -641,13 +642,13 @@ void OBSCounter::writeTimeStat(int statIndex) {
     averageFile << remSeconds;
     averageFile.close();
 
-    renderString(statIndex);
-
     // writes the game version of stat
     // only writes if stat has a game version
     if (statIndex > statsWithoutGame) {
         writeGameTimeStat(statIndex + totalToGame);
     }
+
+    renderString(statIndex);
 }
 
 // writes only the game time stat
@@ -848,8 +849,8 @@ void OBSCounter::renderAllStrings() {
 
 void OBSCounter::renderString(int statIndex) {
     for (int i = 0; i < overlayLines; i++) {
-        if (overlayStats[i] = statIndex) {
-            overlayStrings[i] = statToRenderString(overlayStats[i], overlayAverages[i]);
+        if (overlayStats[i] == statIndex) {
+            overlayStrings[i] = statToRenderString(statIndex, overlayAverages[i]);
         }
     }
 }
