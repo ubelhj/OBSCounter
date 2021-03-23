@@ -217,7 +217,7 @@ void OBSCounter::setCvars() {
     for (int i = 0; i < numStats; i++) {
         std::string cvarName = "counter_set_render_string_" + indexStringMap[i];
         std::string cvarTip = "sets " + indexStringMap[i] + " render string";
-        cvarManager->registerCvar(cvarName, indexStringMap[i], cvarTip);
+        cvarManager->registerCvar(cvarName, indexStringMapRender[i], cvarTip);
         auto cvar = cvarManager->getCvar(cvarName);
 
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
@@ -226,8 +226,8 @@ void OBSCounter::setCvars() {
 
     // setters for render strings for average stats
     for (int i = 0; i < startGameStats; i++) {
-        std::string cvarName = "counter_set_render_average_string_" + indexStringMap[i];
-        std::string cvarTip = "sets " + averageStrings[i] + "average render string";
+        std::string cvarName = "counter_set_render_string_" + averageStrings[i];
+        std::string cvarTip = "sets " + averageStrings[i] + " render string";
         cvarManager->registerCvar(cvarName, averageStringsRender[i], cvarTip);
         auto cvar = cvarManager->getCvar(cvarName);
         statArray[i] = cvar.getIntValue();

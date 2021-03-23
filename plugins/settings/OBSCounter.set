@@ -12,9 +12,12 @@ OBS Counter Plugin
 4|Counter X-location (% of screen)|counter_ingame_x_location|0.0|1.0
 4|Counter Y-location (% of screen)|counter_ingame_y_location|0.0|1.0
 4|Text scale|counter_ingame_scale|0.0|10.0
+8|
 0|Press f6 to open your bakkesmod console, then hit this button to see all possible stats and their corresponding numbers|counter_list_stats
 9|You can also set each counter in the console with counter_ingame_stat_ if the slider isn't precise enough
 9|Average stats do not work with game stats
+9|Modify stat names by pressing f6 and typing counter_set_render_string_statName "newStatName: "
+9|For example: to change demolitions to Demos, counter_set_render_string_demolitions "Demos: "
 5|First stat|counter_ingame_stat_one|0|65
 7|
 1|Average (stat/games)##averageone|counter_ingame_stat_one_average
@@ -30,6 +33,5 @@ OBS Counter Plugin
 5|Fifth stat|counter_ingame_stat_five|0|65
 7|
 1|Average (stat/games)##averagefive|counter_ingame_stat_five_average
-9|Time on offense/defense added thanks to a Fiverr commission by samstlaurent
-9|If you want a new feature and to support the plugin, feel free to check my fiverr or DM me on discord
-9|Plugin made by JerryTheBee#1117 - fiverr.com/share/Wbev17
+9|Time on offense/defense added thanks to a commission by samstlaurent
+9|Plugin made by JerryTheBee#1117 - DM me on discord for custom plugin commissions!
