@@ -814,8 +814,7 @@ std::string OBSCounter::statToRenderString(int index, bool isAverage) {
             averageStream << std::fixed << std::setprecision(decimalPlaces);
             averageStream << averages[index];
         }
-        return averageStringsRender[index] + " " +
-            averageStream.str();
+        return averageStringsRender[index] + averageStream.str();
         // writes non-averages
     }
     else {
@@ -836,8 +835,7 @@ std::string OBSCounter::statToRenderString(int index, bool isAverage) {
         else {
             strStream << statArray[index];
         }
-        return indexStringMapRender[index] + " " +
-            strStream.str();
+        return indexStringMapRender[index] + strStream.str();
     }
 }
 
