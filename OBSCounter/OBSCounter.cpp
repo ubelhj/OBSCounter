@@ -605,6 +605,8 @@ void OBSCounter::writeGameStat(int statIndex) {
     std::ofstream gameStatFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
     gameStatFile << statArray[statIndex];
     gameStatFile.close();
+
+    renderString(statIndex);
 }
 
 // writes a time stat with special formatting minutes:seconds
@@ -788,7 +790,7 @@ void OBSCounter::render(CanvasWrapper canvas) {
         // does averages if the user wants them and if a stat has an average
         //std::string renderString = statToRenderString(overlayStats[i], overlayAverages[i]);
         //int width = renderString.length() * fontSize * 10;
-        canvas.DrawString(overlayStrings[i], fontSize, fontSize);
+        canvas.DrawString(overlayStrings[i], fontSize, fontSize, false);
     }
 
     //cvarManager->log(std::to_string(fontSize));
