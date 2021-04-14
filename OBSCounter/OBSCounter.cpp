@@ -304,8 +304,7 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     auto tArgs = (StatEventStruct*)args;
 
     auto statEvent = StatEventWrapper(tArgs->StatEvent);
-    auto label = statEvent.GetLabel();
-    auto eventStr = label.ToString();
+    std::string eventString = statEvent.GetEventName();
 
     // PRI is always main player for this event
     /*auto pri = PriWrapper(tArgs->PRI);
@@ -315,17 +314,17 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     /*auto count = tArgs->Count;
     cvarManager->log("count: " + std::to_string(count));*/
 
-    auto eventTypePtr = eventDictionary.find(eventStr);
+    auto eventTypePtr = eventDictionary.find(eventString);
 
     int eventType;
 
     if (eventTypePtr != eventDictionary.end()) {
         eventType = eventTypePtr->second;
-        cvarManager->log("event type: " + eventStr);
+        cvarManager->log("event type: " + eventString);
         cvarManager->log("event num: " + std::to_string(eventType));
     }
     else {
-        cvarManager->log("missing stat: " + eventStr);
+        cvarManager->log("missing stat: " + eventString);
         cvarManager->log("missing stat points: " + statEvent.GetPoints());
         return;
     }
@@ -359,19 +358,19 @@ void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
     auto statEvent = StatEventWrapper(tArgs->StatEvent);
     // name of the stat as shown in rocket league 
     //  (Demolition, Extermination, etc.)
-    auto label = statEvent.GetLabel();
+    auto eventString = statEvent.GetEventName();
 
-    auto eventTypePtr = eventDictionary.find(label.ToString());
+    auto eventTypePtr = eventDictionary.find(eventString);
 
     int eventType;
 
     if (eventTypePtr != eventDictionary.end()) {
         eventType = eventTypePtr->second;
-        cvarManager->log("event type: " + label.ToString());
+        cvarManager->log("event type: " + eventString);
         cvarManager->log("event num: " + std::to_string(eventType));
     }
     else {
-        cvarManager->log("missing stat: " + label.ToString());
+        cvarManager->log("missing stat: " + eventString);
         cvarManager->log("missing stat points: " + statEvent.GetPoints());
         return;
     }
