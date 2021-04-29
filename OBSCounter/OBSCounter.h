@@ -1,7 +1,7 @@
 #pragma once
 
+
 #include "bakkesmod/plugin/bakkesmodplugin.h"
-#include "bakkesmod/plugin/pluginwindow.h"
 
 #include "version.h"
 #include <sstream>
@@ -9,6 +9,9 @@
 #include "bakkesmod/wrappers/GameObject/Stats/StatEventWrapper.h"
 constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_MINOR) "." stringify(VERSION_PATCH) "." stringify(VERSION_BUILD);
 
+#define nl(x) SettingsFile << std::string(x) << '\n'
+#define blank SettingsFile << '\n'
+#define cv(x) std::string(x)
 
 class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin
 {
@@ -85,5 +88,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin
 
 	// prints all stat types
 	void listStats();
+
+	void GenerateSettingsFile();
 };
 

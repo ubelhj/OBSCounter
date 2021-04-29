@@ -296,9 +296,9 @@ struct StatEventStruct {
 };
 
 void OBSCounter::statEvent(ServerWrapper caller, void* args) {
-    cvarManager->log("stat event!");
+    //cvarManager->log("stat event!");
     if (!gameWrapper->IsInOnlineGame()) {
-        cvarManager->log("not in online game");
+        //cvarManager->log("not in online game");
         return;
     }
     auto tArgs = (StatEventStruct*)args;
@@ -346,9 +346,9 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
 
 void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
     auto tArgs = (TickerStruct*)args;
-    cvarManager->log("stat ticker event!");
+    //cvarManager->log("stat ticker event!");
     if (!gameWrapper->IsInOnlineGame()) {
-        cvarManager->log("not in online game");
+        //cvarManager->log("not in online game");
         return;
     }
 
@@ -493,23 +493,27 @@ void OBSCounter::endGame() {
 
 // called every second to log car location on offense or defense
 void OBSCounter::checkCarLocation() {
-    cvarManager->log("updated time");
+    //cvarManager->log("updated time");
     if (!gameWrapper->IsInOnlineGame()) {
-        cvarManager->log("not in online game");
+       // cvarManager->log("not in online game");
         return;
     }
 
     ServerWrapper sw = gameWrapper->GetOnlineGame();
 
     if (sw.IsNull()) {
-        cvarManager->log("null server");
+        //cvarManager->log("null server");
         return;
     }
 
     auto car = gameWrapper->GetLocalCar();
 
     if (car.IsNull()) {
-        cvarManager->log("null car");
+        //cvarManager->log("null car");
+        return;
+    }
+
+    if (car.GetCollisionComponent().IsNull()) {
         return;
     }
 
@@ -525,13 +529,13 @@ void OBSCounter::checkCarLocation() {
     }
 
     if (loc.Y > 0) {
-        cvarManager->log("offense time");
+        //cvarManager->log("offense time");
         statArray[offenseTime]++;
         statArray[gameOffenseTime]++;
         writeTimeStat(offenseTime);
     }
     else {
-        cvarManager->log("defense time");
+        //cvarManager->log("defense time");
         statArray[defenseTime]++;
         statArray[gameDefenseTime]++;
         writeTimeStat(defenseTime);
@@ -885,4 +889,51 @@ float OBSCounter::divide(int firstStatIndex, int secondStatIndex) {
 // allows it to be removed
 void OBSCounter::onUnload()
 {
+}
+
+void OBSCounter::GenerateSettingsFile()
+{
+    std::ofstream SettingsFile(gameWrapper->GetBakkesModPath() / "plugins" / "settings" / "OBSCounter.set");
+
+    nl("OBS Counter Plugin");
+    nl("9|Counts your stats as you play. Note this only works in online matches (private / casual / comp / tournament)");
+    nl("5|Averages decimal places|counter_decimals|1|10");
+    nl("0|Add a game (if the game tracking gets out of sync)|counter_add_game");
+    nl("8|");
+    nl("9|In game overlay");
+    nl("1|Enable in game overlay|counter_enable_ingame");
+    nl("1|Enable overlay background|counter_enable_background");
+    nl("13|Color Selector|counter_color");
+    nl("7|");
+    nl("13|Background Color Selector|counter_color_background");
+    nl("5|Number of stats to display|counter_ingame_numStats|1|5");
+    nl("4|Counter X-location (% of screen)|counter_ingame_x_location|0.0|1.0");
+    nl("4|Counter Y-location (% of screen)|counter_ingame_y_location|0.0|1.0");
+    nl("4|Text scale|counter_ingame_scale|0.0|10.0");
+    nl("8|");
+    nl("0|Press f6 to open your bakkesmod console, then hit this button to see all possible stats and their corresponding numbers|counter_list_stats");
+    nl("9|You can also set each counter in the console with counter_ingame_stat_ if the slider isn't precise enough");
+    nl("9|Average stats do not work with game stats");
+    nl("9|Modify stat names by pressing f6 and typing counter_set_render_string_statName \"newStatName: \"");
+    nl("9|For example: to change demolitions to Demos, counter_set_render_string_demolitions \"Demos: \"");
+    nl("5|First stat|counter_ingame_stat_one|0|65");
+    nl("7|");
+    nl("1|Average (stat/games)##averageone|counter_ingame_stat_one_average");
+    nl("5|Second stat|counter_ingame_stat_two|0|65");
+    nl("7|");
+    nl("1|Average (stat/games)##averagetwo|counter_ingame_stat_two_average");
+    nl("5|Third stat|counter_ingame_stat_three|0|65");
+    nl("7|");
+    nl("1|Average (stat/games)##averagethree|counter_ingame_stat_three_average");
+    nl("5|Fourth stat|counter_ingame_stat_four|0|65");
+    nl("7|");
+    nl("1|Average (stat/games)##averagefour|counter_ingame_stat_four_average");
+    nl("5|Fifth stat|counter_ingame_stat_five|0|65");
+    nl("7|");
+    nl("1|Average (stat/games)##averagefive|counter_ingame_stat_five_average");
+    nl("9|Time on offense/defense added thanks to a commission by samstlaurent");
+    nl("9|Plugin made by JerryTheBee#1117 - DM me on discord for custom plugin commissions!");
+
+    SettingsFile.close();
+    cvarManager->executeCommand("cl_settings_refreshplugins");
 }
