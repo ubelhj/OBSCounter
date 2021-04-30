@@ -61,6 +61,7 @@ void OBSCounter::onLoad()
 
     writeAll();
     renderAllStrings();
+    GenerateSettingsFile();
 }
 
 // creates cvars and sets global variable defaults to prevent any nulls
@@ -242,7 +243,7 @@ void OBSCounter::setCvars() {
     cvarManager->getCvar("counter_set_games").addOnValueChanged(
         [this](std::string, CVarWrapper cvar) {
             statArray[games] = cvar.getIntValue() - 1; endedGame = true;
-            startGame(); endedGame = true; });;
+            startGame(); endedGame = true; });
 }
 
 // hooks events to allow the plugin to work
