@@ -2,7 +2,6 @@
 #include "OBSCounter.h"
 #include "Maps.h"
 
-
 BAKKESMOD_PLUGIN(OBSCounter, "OBSCounter", plugin_version, PLUGINTYPE_FREEPLAY)
 
 std::shared_ptr<CVarManagerWrapper> _globalCvarManager;
@@ -95,21 +94,13 @@ void OBSCounter::setCvars() {
         renderAllStrings();
         });
 
-    std::string numberStrings[] = {
-        "one",
-        "two",
-        "three",
-        "four",
-        "five"
-    };
-
     for (int i = 0; i < defaultMaxOverlayLines; i++) {
         overlayStrings.push_back("");
 
-        std::string str = numberStrings[i];
+        std::string str = std::to_string(i);
         // sets stat in overlay
         auto overlayVar = cvarManager->registerCvar("counter_ingame_stat_" + str,
-            std::to_string(i), "stat " + str + " in overlay", true, true, 0, true, numStats - 1);
+            str, "stat " + str + " in overlay", true, true, 0, true, numStats - 1);
         overlayStats.push_back(overlayVar.getIntValue());
         overlayVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             overlayStats[i] = cvar.getIntValue();

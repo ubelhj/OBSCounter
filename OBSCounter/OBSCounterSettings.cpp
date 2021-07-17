@@ -1,6 +1,75 @@
 #include "pch.h"
 #include "OBSCounter.h"
 
+std::string indexStringMap2[] = {
+    "wins",
+    "losses",
+    "mvps",
+    "games",
+    "goals",
+    "demolitions",
+    "deaths",
+    "exterminations",
+    "aerialGoals",
+    "backwardsGoals",
+    "bicycleGoals",
+    "longGoals",
+    "turtleGoals",
+    "poolShots",
+    "overtimeGoals",
+    "hatTricks",
+    "assists",
+    "playmakers",
+    "saves",
+    "epicSaves",
+    "saviors",
+    "shots",
+    "centers",
+    "clears",
+    "firstTouchs",
+    "damages",
+    "ultraDamages",
+    "lowFives",
+    "highFives",
+    "swishs",
+    "bicycleHits",
+    "points",
+    "timePlayed",
+    "offenseTime",
+    "defenseTime",
+    "gameGoals",
+    "gameDemolitions",
+    "gameDeaths",
+    "gameExterminations",
+    "gameAerialGoals",
+    "gameBackwardsGoals",
+    "gameBicycleGoals",
+    "gameLongGoals",
+    "gameTurtleGoals",
+    "gamePoolShots",
+    "gameOvertimeGoals",
+    "gameHatTricks",
+    "gameAssists",
+    "gamePlaymakers",
+    "gameSaves",
+    "gameEpicSaves",
+    "gameSaviors",
+    "gameShots",
+    "gameCenters",
+    "gameClears",
+    "gameFirstTouchs",
+    "gameDamages",
+    "gameUltraDamages",
+    "gameLowFives",
+    "gameHighFives",
+    "gameSwishs",
+    "gameBicycleHits",
+    "gamePoints",
+    "gameTimePlayed",
+    "gameOffenseTime",
+    "gameDefenseTime"
+};
+
 std::string OBSCounter::GetPluginName() {
 	return "OBSCounter";
 }
@@ -10,14 +79,26 @@ void OBSCounter::SetImGuiContext(uintptr_t ctx) {
 }
 
 void OBSCounter::RenderSettings() {
-	ImGui::TextUnformatted("OBSCounter plugin settings");
-
     enableSettings();
 
     if (ImGui::CollapsingHeader("Color And Style", ImGuiTreeNodeFlags_None))
     {
         colorSettings();
         locationAndScaleSettings();
+    }
+
+    ImGui::TextUnformatted("Displayed stats");
+
+    CVarWrapper numStatsVar = cvarManager->getCvar("counter_ingame_numStats");
+
+    if (!numStatsVar) {
+        return;
+    }
+
+    int numStatsShown = numStatsVar.getIntValue();
+
+    for (int i = 0; i < numStatsShown; i++) {
+        statSettings(i);
     }
 }
 
@@ -36,6 +117,18 @@ void OBSCounter::enableSettings() {
 }
 
 void OBSCounter::colorSettings() {
+    CVarWrapper enablebgVar = cvarManager->getCvar("counter_enable_background");
+
+    if (!enablebgVar) {
+        return;
+    }
+
+    bool enabledbg = enablebgVar.getBoolValue();
+
+    if (ImGui::Checkbox("Enable Background", &enabledbg)) {
+        enablebgVar.setValue(enabledbg);
+    }
+
     CVarWrapper textColorVar = cvarManager->getCvar("counter_color");
 
     if (!textColorVar) {
@@ -77,21 +170,8 @@ void OBSCounter::colorSettings() {
         ImGui::EndPopup();
     }
 
-    CVarWrapper enablebgVar = cvarManager->getCvar("counter_enable_background");
-
-    if (!enablebgVar) {
-        return;
-    }
-
-    bool enabledbg = enablebgVar.getBoolValue();
-
-    if (ImGui::Checkbox("Enable Background", &enabledbg)) {
-        enablebgVar.setValue(enabledbg);
-    }
-
-    //ImGui::SameLine();
-
     if (enabledbg) {
+        ImGui::SameLine();
 
         CVarWrapper bgColorVar = cvarManager->getCvar("counter_color_background");
 
@@ -148,5 +228,27 @@ void OBSCounter::locationAndScaleSettings() {
     float yLoc = yLocCvar.getFloatValue();
     if (ImGui::SliderFloat("Y Location", &yLoc, 0.0, 1.0)) {
         yLocCvar.setValue(yLoc);
+    }
+    CVarWrapper textScaleCvar = cvarManager->getCvar("counter_ingame_scale");
+    if (!textScaleCvar) { return; }
+    float textScale = textScaleCvar.getFloatValue();
+    if (ImGui::SliderFloat("Text Scale", &textScale, 0.0, 10.0)) {
+        textScaleCvar.setValue(textScale);
+    }
+    CVarWrapper decimalsCvar = cvarManager->getCvar("counter_decimals");
+    if (!decimalsCvar) { return; }
+    int decimals = decimalsCvar.getIntValue();
+    if (ImGui::SliderInt("Counter Decimals", &decimals, 1, 10)) {
+        decimalsCvar.setValue(decimals);
+    }
+}
+
+void OBSCounter::statSettings(int renderIndex) {
+    CVarWrapper statIndexCvar = cvarManager->getCvar("counter_ingame_stat_" + std::to_string(renderIndex));
+    if (!statIndexCvar) { return; }
+    int statIndex = statIndexCvar.getIntValue();
+
+    if (ImGui::CollapsingHeader(indexStringMap2[statIndex].c_str())) {
+        ImGui::TextUnformatted("stuff here");
     }
 }

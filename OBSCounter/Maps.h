@@ -1,4 +1,3 @@
-#pragma once
 #include "pch.h"
 
 // enum for all stat indexes 

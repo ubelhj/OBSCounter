@@ -91,6 +91,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 	void colorSettings();
 	void enableSettings();
 	void locationAndScaleSettings();
+	void statSettings(int renderIndex);
 
 	// prints all stat types
 	void listStats();
