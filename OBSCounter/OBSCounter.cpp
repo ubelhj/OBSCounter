@@ -23,9 +23,9 @@ bool enabledOverlay;
 bool enabledOverlayBackground;
 const int maxOverlayLines = 5;
 int overlayLines;
-int overlayStats[maxOverlayLines];
-bool overlayAverages[maxOverlayLines];
-std::string overlayStrings[maxOverlayLines];
+std::vector<int> overlayStats;
+std::vector<bool> overlayAverages;
+std::vector<std::string> overlayStrings;
 float xLocation;
 float yLocation;
 float scale;
@@ -104,11 +104,13 @@ void OBSCounter::setCvars() {
     };
 
     for (int i = 0; i < maxOverlayLines; i++) {
+        overlayStrings.push_back("");
+
         std::string str = numberStrings[i];
         // sets stat in overlay
         auto overlayVar = cvarManager->registerCvar("counter_ingame_stat_" + str,
             std::to_string(i), "stat " + str + " in overlay", true, true, 0, true, numStats - 1);
-        overlayStats[i] = overlayVar.getIntValue();
+        overlayStats.push_back(overlayVar.getIntValue());
         overlayVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             overlayStats[i] = cvar.getIntValue();
             renderAllStrings();
@@ -118,7 +120,7 @@ void OBSCounter::setCvars() {
         auto overlayAvgVar = cvarManager->registerCvar(
             "counter_ingame_stat_" + str + "_average", "0",
             "Toggles average of stat " + str + " in overlay", true, true, 0, true, 1);
-        overlayAverages[i] = overlayAvgVar.getBoolValue();
+        overlayAverages.push_back(overlayAvgVar.getBoolValue());
         overlayAvgVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             overlayAverages[i] = cvar.getBoolValue();
             renderAllStrings();
