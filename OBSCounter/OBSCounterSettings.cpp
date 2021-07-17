@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "OBSCounter.h"
 
-std::string indexStringMap2[] = {
+const char * indexStringMap2[] = {
     "wins",
     "losses",
     "mvps",
@@ -248,7 +248,30 @@ void OBSCounter::statSettings(int renderIndex) {
     if (!statIndexCvar) { return; }
     int statIndex = statIndexCvar.getIntValue();
 
-    if (ImGui::CollapsingHeader(indexStringMap2[statIndex].c_str())) {
-        ImGui::TextUnformatted("stuff here");
+    const char* statString = indexStringMap2[statIndex];
+
+    std::string headerName("Stat " + std::to_string(renderIndex));
+
+    if (ImGui::CollapsingHeader(headerName.c_str())) {
+        ImGui::TextUnformatted("select stat");
+
+        static int item_current_idx = 0; // Here we store our selection data as an index.
+        std::string listBoxName("##Select stat" + std::to_string(renderIndex));
+        if (ImGui::ListBoxHeader(listBoxName.c_str()))
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(indexStringMap2); n++)
+            {
+                const bool is_selected = (item_current_idx == n);
+                if (ImGui::Selectable(indexStringMap2[n], is_selected)) {
+                    item_current_idx = n;
+                    statIndexCvar.setValue(n);
+                }
+
+                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::ListBoxFooter();
+        }
     }
 }
