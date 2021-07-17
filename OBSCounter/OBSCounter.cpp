@@ -21,7 +21,7 @@ int decimalPlaces;
 // are initialized in onLoad()
 bool enabledOverlay;
 bool enabledOverlayBackground;
-const int maxOverlayLines = 5;
+const int defaultMaxOverlayLines = 5;
 int overlayLines;
 std::vector<int> overlayStats;
 std::vector<bool> overlayAverages;
@@ -88,7 +88,7 @@ void OBSCounter::setCvars() {
     // 1-5 allowed
     auto overlayNumberVar = cvarManager->registerCvar(
         "counter_ingame_numStats", "5", "number of stats in in game overlay",
-        true, true, 1, true, maxOverlayLines);
+        true, true, 1, true, defaultMaxOverlayLines);
     overlayLines = overlayNumberVar.getIntValue();
     overlayNumberVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayLines = cvar.getIntValue();
@@ -103,7 +103,7 @@ void OBSCounter::setCvars() {
         "five"
     };
 
-    for (int i = 0; i < maxOverlayLines; i++) {
+    for (int i = 0; i < defaultMaxOverlayLines; i++) {
         overlayStrings.push_back("");
 
         std::string str = numberStrings[i];

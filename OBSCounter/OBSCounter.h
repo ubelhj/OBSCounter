@@ -83,9 +83,14 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 	void renderAllStrings();
 	std::string statToRenderString(int statIndex, bool isAverage);
 
+	// Plugin settings interface
 	void RenderSettings() override;
 	std::string GetPluginName() override;
 	void SetImGuiContext(uintptr_t ctx) override;
+
+	void colorSettings();
+	void enableSettings();
+	void locationAndScaleSettings();
 
 	// prints all stat types
 	void listStats();
