@@ -9,6 +9,8 @@
 #include <functional>
 #include <memory>
 
+#include "imgui/imgui.h"
+
 #include "fmt/core.h"
 #include "fmt/ranges.h"
 

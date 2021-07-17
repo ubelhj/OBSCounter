@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{68b06f6d-3771-4df1-b8ef-d3c21557e9c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OBSCounter.cpp">
@@ -25,6 +28,42 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fmt\src\os.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imguivariouscontrols.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_additions.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_impl_dx11.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_impl_win32.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_rangeslider.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_searchablecombo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_timeline.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="IMGUI\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="OBSCounterSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -40,6 +79,45 @@
     </ClInclude>
     <ClInclude Include="Maps.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imguivariouscontrols.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui_additions.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui_impl_dx11.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui_impl_win32.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui_rangeslider.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui_searchablecombo.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imgui_timeline.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="IMGUI\imstb_truetype.h">
+      <Filter>ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

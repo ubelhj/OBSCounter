@@ -61,7 +61,6 @@ void OBSCounter::onLoad()
 
     writeAll();
     renderAllStrings();
-    GenerateSettingsFile();
 }
 
 // creates cvars and sets global variable defaults to prevent any nulls
@@ -892,6 +891,7 @@ void OBSCounter::onUnload()
 {
 }
 
+/*
 void OBSCounter::GenerateSettingsFile()
 {
     std::ofstream SettingsFile(gameWrapper->GetBakkesModPath() / "plugins" / "settings" / "OBSCounter.set");
@@ -937,4 +937,4 @@ void OBSCounter::GenerateSettingsFile()
 
     SettingsFile.close();
     cvarManager->executeCommand("cl_settings_refreshplugins");
-}
+}*/

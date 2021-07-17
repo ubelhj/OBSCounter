@@ -96,6 +96,18 @@
   <ItemGroup>
     <ClCompile Include="fmt\src\format.cc" />
     <ClCompile Include="fmt\src\os.cc" />
+    <ClCompile Include="IMGUI\imgui.cpp" />
+    <ClCompile Include="IMGUI\imguivariouscontrols.cpp" />
+    <ClCompile Include="IMGUI\imgui_additions.cpp" />
+    <ClCompile Include="IMGUI\imgui_demo.cpp" />
+    <ClCompile Include="IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="IMGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="IMGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="IMGUI\imgui_rangeslider.cpp" />
+    <ClCompile Include="IMGUI\imgui_searchablecombo.cpp" />
+    <ClCompile Include="IMGUI\imgui_timeline.cpp" />
+    <ClCompile Include="IMGUI\imgui_widgets.cpp" />
+    <ClCompile Include="OBSCounterSettings.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -103,6 +115,19 @@
     <ClCompile Include="OBSCounter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IMGUI\imconfig.h" />
+    <ClInclude Include="IMGUI\imgui.h" />
+    <ClInclude Include="IMGUI\imguivariouscontrols.h" />
+    <ClInclude Include="IMGUI\imgui_additions.h" />
+    <ClInclude Include="IMGUI\imgui_impl_dx11.h" />
+    <ClInclude Include="IMGUI\imgui_impl_win32.h" />
+    <ClInclude Include="IMGUI\imgui_internal.h" />
+    <ClInclude Include="IMGUI\imgui_rangeslider.h" />
+    <ClInclude Include="IMGUI\imgui_searchablecombo.h" />
+    <ClInclude Include="IMGUI\imgui_timeline.h" />
+    <ClInclude Include="IMGUI\imstb_rectpack.h" />
+    <ClInclude Include="IMGUI\imstb_textedit.h" />
+    <ClInclude Include="IMGUI\imstb_truetype.h" />
     <ClInclude Include="Maps.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="OBSCounter.h" />
