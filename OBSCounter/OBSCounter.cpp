@@ -109,7 +109,7 @@ void OBSCounter::setCvars() {
 
         // sets stat in overlay to average or not
         auto overlayAvgVar = cvarManager->registerCvar(
-            "counter_ingame_stat_" + str + "_average", "0",
+            "counter_ingame_stat_average_" + str, "0",
             "Toggles average of stat " + str + " in overlay", true, true, 0, true, 1);
         overlayAverages.push_back(overlayAvgVar.getBoolValue());
         overlayAvgVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {

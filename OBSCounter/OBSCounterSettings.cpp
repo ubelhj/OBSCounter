@@ -244,19 +244,21 @@ void OBSCounter::locationAndScaleSettings() {
 }
 
 void OBSCounter::statSettings(int renderIndex) {
-    CVarWrapper statIndexCvar = cvarManager->getCvar("counter_ingame_stat_" + std::to_string(renderIndex));
+    std::string renderIndexStr = std::to_string(renderIndex);
+
+    CVarWrapper statIndexCvar = cvarManager->getCvar("counter_ingame_stat_" + renderIndexStr);
     if (!statIndexCvar) { return; }
     int statIndex = statIndexCvar.getIntValue();
 
     const char* statString = indexStringMap2[statIndex];
 
-    std::string headerName("Stat " + std::to_string(renderIndex));
+    std::string headerName("Stat " + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
         ImGui::TextUnformatted("select stat");
 
         static int item_current_idx = 0; // Here we store our selection data as an index.
-        std::string listBoxName("##Select stat" + std::to_string(renderIndex));
+        std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str()))
         {
             for (int n = 0; n < IM_ARRAYSIZE(indexStringMap2); n++)
@@ -272,6 +274,18 @@ void OBSCounter::statSettings(int renderIndex) {
                     ImGui::SetItemDefaultFocus();
             }
             ImGui::ListBoxFooter();
+        }
+
+        ImGui::SameLine();
+
+        CVarWrapper overlayAverageCvar = cvarManager->getCvar("counter_ingame_stat_average_" + renderIndexStr);
+        if (!overlayAverageCvar) { return; }
+        bool overlayAverage = overlayAverageCvar.getBoolValue();
+
+        std::string checkboxLabel = "Average##stat" + renderIndexStr;
+
+        if (ImGui::Checkbox(checkboxLabel.c_str(), &overlayAverage)) {
+            overlayAverageCvar.setValue(overlayAverage);
         }
     }
 }
