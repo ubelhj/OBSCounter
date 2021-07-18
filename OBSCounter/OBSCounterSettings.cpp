@@ -217,8 +217,7 @@ void OBSCounter::statSettings(int renderIndex) {
         if (ImGui::Checkbox(checkboxGameLabel.c_str(), &overlayGame)) {
             if (overlayGame) {
                 overlayStateCvar.setValue(RENDERSTATE_GAME);
-            }
-            else {
+            } else {
                 overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
             }
         }
@@ -257,14 +256,21 @@ void OBSCounter::statSettings(int renderIndex) {
 
         std::string statRenderName = "";
 
-        if (overlayState == RENDERSTATE_DEFAULT) {
+        switch (overlayState) {
+        case RENDERSTATE_DEFAULT:
             statRenderName = indexStringMap[statIndex];
-        } else if (overlayState == RENDERSTATE_AVERAGE) {
+            break;
+        case RENDERSTATE_AVERAGE:
             statRenderName = averageStrings[statIndex];
-        } else if (overlayState == RENDERSTATE_GAME) {
+            break;
+        case RENDERSTATE_GAME:
             statRenderName = indexStringMapGame[statIndex];
-        } else if (overlayState == RENDERSTATE_OTHER) {
+            break;
+        case RENDERSTATE_OTHER:
             statRenderName = indexStringMapOther[statIndex];
+            break;
+        default:
+            break;
         }
         
         CVarWrapper overlayStatStringCvar = cvarManager->getCvar("counter_set_render_string_" + statRenderName);

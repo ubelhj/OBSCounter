@@ -345,6 +345,36 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     if (eventType > statsWithoutGame) {
         statArrayGame[eventType]++;
     }
+
+    // any extra stats needed with more computing
+    // shooting % (shot or goal)
+    // k/d (demo or death)
+    // missed exterm % (demo or exterm)
+    // wins / losses (win or loss)
+    switch (eventType) {
+    case shots:
+    case goals:
+        writeShootingPercentage();
+        break;
+    case demos:
+        writeKillPercentage();
+    case exterms:
+        writeMissedExterms();
+        break;
+    case deaths:
+        writeKillPercentage();
+        break;
+    case wins:
+    case losses:
+        writeWinPercentage();
+        break;
+    case saves:
+    case epicSaves:
+        statArray[totalSaves]++;
+        write(totalSaves);
+        break;
+    }
+
     write(eventType);
 }
 
@@ -576,30 +606,6 @@ void OBSCounter::write(int statIndex) {
     // only writes if stat has a game version
     if (statIndex > statsWithoutGame) {
         writeGameStat(statIndex);
-    }
-
-    // any extra stats needed with more computing
-    // shooting % (shot or goal)
-    // k/d (demo or death)
-    // missed exterm % (demo or exterm)
-    // wins / losses (win or loss)
-    switch (statIndex) {
-    case shots:
-    case goals:
-        writeShootingPercentage();
-        break;
-    case demos:
-        writeKillPercentage();
-    case exterms:
-        writeMissedExterms();
-        break;
-    case deaths:
-        writeKillPercentage();
-        break;
-    case wins:
-    case losses:
-        writeWinPercentage();
-        break;
     }
 }
 
