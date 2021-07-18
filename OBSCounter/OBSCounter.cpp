@@ -578,8 +578,6 @@ void OBSCounter::write(int statIndex) {
         writeGameStat(statIndex);
     }
 
-    renderString(statIndex);
-
     // any extra stats needed with more computing
     // shooting % (shot or goal)
     // k/d (demo or death)
@@ -610,8 +608,6 @@ void OBSCounter::writeGameStat(int statIndex) {
     std::ofstream gameStatFile(fileLocation / (indexStringMapGame[statIndex] + ".txt"));
     gameStatFile << statArray[statIndex];
     gameStatFile.close();
-
-    renderString(statIndex);
 }
 
 // writes a time stat with special formatting minutes:seconds
@@ -654,8 +650,6 @@ void OBSCounter::writeTimeStat(int statIndex) {
     if (statIndex > statsWithoutGame) {
         writeGameTimeStat(statIndex);
     }
-
-    renderString(statIndex);
 }
 
 // writes only the game time stat
@@ -752,6 +746,8 @@ void OBSCounter::render(CanvasWrapper canvas) {
     if (!enabledOverlay) {
         return;
     }
+
+    renderAllStrings();
 
     Vector2 screen = canvas.GetSize();
 
@@ -855,14 +851,6 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 void OBSCounter::renderAllStrings() {
     for (int i = 0; i < overlayStrings.size(); i++) {
         overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
-    }
-}
-
-void OBSCounter::renderString(int statIndex) {
-    for (int i = 0; i < overlayStrings.size(); i++) {
-        if (overlayStats[i] == statIndex) {
-            overlayStrings[i] = statToRenderString(statIndex, overlayStates[i]);
-        }
     }
 }
 

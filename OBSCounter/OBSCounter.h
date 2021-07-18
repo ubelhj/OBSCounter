@@ -76,7 +76,6 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 	// renders overlay
 	void render(CanvasWrapper canvas);
 
-	void renderString(int statIndex);
 	void renderAllStrings();
 	std::string statToRenderString(int statIndex, int state);
 

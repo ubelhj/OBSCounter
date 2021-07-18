@@ -224,7 +224,6 @@ void OBSCounter::statSettings(int renderIndex) {
             else {
                 overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
             }
-
         }
 
         std::string listBoxName("##Select stat" + renderIndexStr);
