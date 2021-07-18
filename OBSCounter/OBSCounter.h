@@ -97,6 +97,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 		RENDERSTATE_DEFAULT,
 		RENDERSTATE_AVERAGE,
 		RENDERSTATE_GAME,
+		RENDERSTATE_OTHER,
 		RENDERSTATE_END
 	};
 };

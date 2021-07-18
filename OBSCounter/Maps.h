@@ -274,7 +274,7 @@ static std::string averageStrings[numStats] = {
     "averageDefenseTime"
 };
 
-static std::string averageStringsRender[] = {
+static std::string averageStringsRender[numStats] = {
     "AverageWins: ",
     "AverageLosses: ",
     "AverageMvps: ",
@@ -341,4 +341,45 @@ static const std::map<std::string, int> eventDictionary = {
     { "HighFive", highFives},
     { "HoopsSwishGoal", swishs},
     { "BicycleHit", bicycleHits}
+};
+
+static enum otherStats {
+    shootingPercentage,
+    gameShootingPercentage,
+    kDRatio,
+    gameKDRatio,
+    possibleExterminations,
+    missedExterminationPercent,
+    winPercentage,
+    numOtherStats
+};
+
+static std::string indexStringMapOther[numOtherStats] = {
+    "shootingPercentage",
+    "gameShootingPercentage",
+    "kDRatio",
+    "gameKDRatio",
+    "possibleExterminations",
+    "missedExterminationPercent",
+    "winPercentage"
+};
+
+static const char* indexStringMapOtherChar[numOtherStats] = {
+    "shootingPercentage",
+    "gameShootingPercentage",
+    "kDRatio",
+    "gameKDRatio",
+    "possibleExterminations",
+    "missedExterminationPercent",
+    "winPercentage"
+};
+
+static std::string indexStringMapRenderOther[numOtherStats] = {
+    "shootingPercentage: ",
+    "gameShootingPercentage: ",
+    "kDRatio: ",
+    "gameKDRatio: ",
+    "possibleExterminations: ",
+    "missedExterminationPercent: ",
+    "winPercentage: "
 };

@@ -36,6 +36,7 @@ std::filesystem::path fileLocation;
 // holds all stats
 int statArray[numStats];
 int statArrayGame[numStats];
+std::string statArrayOther[numOtherStats];
 
 // holds all averages
 // caching improves performance significantly
@@ -679,30 +680,44 @@ void OBSCounter::writeShootingPercentage() {
     // calculates current game shooting %
     // divides and checks for NaN
     int gameShooting = getPercentage(statArrayGame[goals], statArrayGame[shots]);
+    std::stringstream gameShootingStream;
+    gameShootingStream << gameShooting << "%";
+    std::string gameShootingStr = gameShootingStream.str();
     std::ofstream gameFile(fileLocation / "gameShootingPercentage.txt");
-    gameFile << gameShooting << "%";
+    gameFile << gameShootingStr;
     gameFile.close();
+    statArrayOther[gameShootingPercentage] = gameShootingStr;
 
     // writes total session shooting
     int totalShooting = getPercentage(statArray[goals], statArray[shots]);
+    std::stringstream totalShootingStream;
+    totalShootingStream << totalShooting << "%";
+    std::string totalShootingStr = totalShootingStream.str();
     std::ofstream file(fileLocation / "shootingPercentage.txt");
-    file << totalShooting << "%";
+    file << totalShootingStr;
     file.close();
+    statArrayOther[shootingPercentage] = totalShootingStr;
 }
 
 // writes K/D ratio
 void OBSCounter::writeKillPercentage() {
     float gameKD = divide(statArrayGame[demos], statArrayGame[deaths]);
+    std::stringstream gameStream;
+    gameStream << std::fixed << std::setprecision(decimalPlaces) << gameKD;
+    std::string gameStr = gameStream.str();
     std::ofstream gameFile(fileLocation / "gameKDRatio.txt");
-    gameFile << std::fixed << std::setprecision(decimalPlaces);
-    gameFile << gameKD;
+    gameFile << gameStr;
     gameFile.close();
+    statArrayOther[gameKDRatio] = gameStr;
 
     float totalKDRatio = divide(statArray[demos], statArray[deaths]);
+    std::stringstream totalStream;
+    totalStream << std::fixed << std::setprecision(decimalPlaces) << totalKDRatio;
+    std::string totalStr = totalStream.str();
     std::ofstream file(fileLocation / "KDRatio.txt");
-    file << std::fixed << std::setprecision(decimalPlaces);
-    file << totalKDRatio;
+    file << totalStr;
     file.close();
+    statArrayOther[kDRatio] = totalStr;
 }
 
 // writes missed exterm % for the session
@@ -710,21 +725,33 @@ void OBSCounter::writeKillPercentage() {
 void OBSCounter::writeMissedExterms() {
     // calculates possible exterms (demos / 7) 
     int possibleExterms = statArray[demos] / 7;
+    std::stringstream totalStream;
+    totalStream << possibleExterms;
+    std::string totalStr = totalStream.str();
     std::ofstream totalFile(fileLocation / "possibleExterminations.txt");
-    totalFile << possibleExterms;
+    totalFile << totalStr;
     totalFile.close();
+    statArrayOther[possibleExterminations] = totalStr;
 
     int missedExtermPercent = getPercentage(statArray[exterms], possibleExterms);
+    std::stringstream percentStream;
+    percentStream << missedExtermPercent << "%";
+    std::string percentStr = percentStream.str();
     std::ofstream file(fileLocation / "missedExterminationPercent.txt");
-    file << missedExtermPercent << "%";
+    file << percentStr;
     file.close();
+    statArrayOther[missedExterminationPercent] = percentStr;
 }
 
 void OBSCounter::writeWinPercentage() {
     int winPercent = getPercentage(statArray[wins], statArray[wins] + statArray[losses]);
+    std::stringstream percentStream;
+    percentStream << winPercent << "%";
+    std::string percentStr = percentStream.str();
     std::ofstream file(fileLocation / "winPercent.txt");
-    file << winPercent << "%";
+    file << percentStr;
     file.close();
+    statArrayOther[winPercentage] = percentStr;
 }
 
 int OBSCounter::getPercentage(int numerator, int denominator) {
@@ -840,6 +867,12 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         }
 
         return indexStringMapRenderGame[index] + strStream.str();
+    } else if (state == RENDERSTATE_OTHER) {
+        if (index >= numOtherStats) {
+            return indexStringMapRenderOther[0] + statArrayOther[0];
+        }else {
+            return indexStringMapRenderOther[index] + statArrayOther[index];
+        }
     }
 }
 
@@ -881,51 +914,3 @@ float OBSCounter::divide(int firstStat, int secondStat) {
 void OBSCounter::onUnload()
 {
 }
-
-/*
-void OBSCounter::GenerateSettingsFile()
-{
-    std::ofstream SettingsFile(gameWrapper->GetBakkesModPath() / "plugins" / "settings" / "OBSCounter.set");
-
-    nl("OBS Counter Plugin");
-    nl("9|Counts your stats as you play. Note this only works in online matches (private / casual / comp / tournament)");
-    nl("5|Averages decimal places|counter_decimals|1|10");
-    nl("0|Add a game (if the game tracking gets out of sync)|counter_add_game");
-    nl("8|");
-    nl("9|In game overlay");
-    nl("1|Enable in game overlay|counter_enable_ingame");
-    nl("1|Enable overlay background|counter_enable_background");
-    nl("13|Color Selector|counter_color");
-    nl("7|");
-    nl("13|Background Color Selector|counter_color_background");
-    nl("5|Number of stats to display|counter_ingame_numStats|1|5");
-    nl("4|Counter X-location (% of screen)|counter_ingame_x_location|0.0|1.0");
-    nl("4|Counter Y-location (% of screen)|counter_ingame_y_location|0.0|1.0");
-    nl("4|Text scale|counter_ingame_scale|0.0|10.0");
-    nl("8|");
-    nl("0|Press f6 to open your bakkesmod console, then hit this button to see all possible stats and their corresponding numbers|counter_list_stats");
-    nl("9|You can also set each counter in the console with counter_ingame_stat_ if the slider isn't precise enough");
-    nl("9|Average stats do not work with game stats");
-    nl("9|Modify stat names by pressing f6 and typing counter_set_render_string_statName \"newStatName: \"");
-    nl("9|For example: to change demolitions to Demos, counter_set_render_string_demolitions \"Demos: \"");
-    nl("5|First stat|counter_ingame_stat_one|0|65");
-    nl("7|");
-    nl("1|Average (stat/games)##averageone|counter_ingame_stat_one_average");
-    nl("5|Second stat|counter_ingame_stat_two|0|65");
-    nl("7|");
-    nl("1|Average (stat/games)##averagetwo|counter_ingame_stat_two_average");
-    nl("5|Third stat|counter_ingame_stat_three|0|65");
-    nl("7|");
-    nl("1|Average (stat/games)##averagethree|counter_ingame_stat_three_average");
-    nl("5|Fourth stat|counter_ingame_stat_four|0|65");
-    nl("7|");
-    nl("1|Average (stat/games)##averagefour|counter_ingame_stat_four_average");
-    nl("5|Fifth stat|counter_ingame_stat_five|0|65");
-    nl("7|");
-    nl("1|Average (stat/games)##averagefive|counter_ingame_stat_five_average");
-    nl("9|Time on offense/defense added thanks to a commission by samstlaurent");
-    nl("9|Plugin made by JerryTheBee#1117 - DM me on discord for custom plugin commissions!");
-
-    SettingsFile.close();
-    cvarManager->executeCommand("cl_settings_refreshplugins");
-}*/

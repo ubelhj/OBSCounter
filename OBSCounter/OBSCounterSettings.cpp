@@ -226,11 +226,27 @@ void OBSCounter::statSettings(int renderIndex) {
             }
         }
 
+        ImGui::SameLine();
+
+        bool overlayOther = overlayState == RENDERSTATE_OTHER;
+
+        std::string checkboxOtherLabel = "Other##stat" + renderIndexStr;
+
+        if (ImGui::Checkbox(checkboxOtherLabel.c_str(), &overlayOther)) {
+            if (overlayOther) {
+                overlayStateCvar.setValue(RENDERSTATE_OTHER);
+            } else {
+                overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
+            }
+        }
+
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
-            for (int n = 0; n < IM_ARRAYSIZE(indexStringMapChar); n++) {
+            int maxSize = overlayOther ? numOtherStats : numStats;
+            for (int n = 0; n < maxSize; n++) {
                 const bool is_selected = (statIndex == n);
-                if (ImGui::Selectable(indexStringMapChar[n], is_selected)) {
+                
+                if (ImGui::Selectable(overlayOther ? indexStringMapOtherChar[n] : indexStringMapChar[n], is_selected)) {
                     statIndexCvar.setValue(n);
                 }
 
@@ -238,6 +254,7 @@ void OBSCounter::statSettings(int renderIndex) {
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
             }
+            
             ImGui::ListBoxFooter();
         }
 
