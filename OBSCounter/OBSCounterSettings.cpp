@@ -196,9 +196,6 @@ void OBSCounter::statSettings(int renderIndex) {
     std::string headerName("Stat " + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
-        std::string statTopString = "Selected: " + indexStringMap[statIndex];
-        ImGui::TextUnformatted(statTopString.c_str());
-
         CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
         if (!overlayStateCvar) { return; }
         int overlayState = overlayStateCvar.getIntValue();
@@ -266,6 +263,8 @@ void OBSCounter::statSettings(int renderIndex) {
             statRenderName = averageStrings[statIndex];
         } else if (overlayState == RENDERSTATE_GAME) {
             statRenderName = indexStringMapGame[statIndex];
+        } else if (overlayState == RENDERSTATE_OTHER) {
+            statRenderName = indexStringMapOther[statIndex];
         }
         
         CVarWrapper overlayStatStringCvar = cvarManager->getCvar("counter_set_render_string_" + statRenderName);
