@@ -74,7 +74,6 @@ void OBSCounter::setCvars() {
         renderAllStrings();
         });
 
-
     // in-game overlay cvars
     // enables or disables overlay
     auto overlayEnableVar = cvarManager->registerCvar("counter_enable_ingame",
@@ -843,13 +842,13 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 }
 
 void OBSCounter::renderAllStrings() {
-    for (int i = 0; i < overlayLines; i++) {
+    for (int i = 0; i < overlayStrings.size(); i++) {
         overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
     }
 }
 
 void OBSCounter::renderString(int statIndex) {
-    for (int i = 0; i < overlayLines; i++) {
+    for (int i = 0; i < overlayStrings.size(); i++) {
         if (overlayStats[i] == statIndex) {
             overlayStrings[i] = statToRenderString(statIndex, overlayStates[i]);
         }

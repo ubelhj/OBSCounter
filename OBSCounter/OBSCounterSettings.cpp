@@ -69,6 +69,8 @@ void OBSCounter::RenderSettings() {
     for (int i = 0; i < numStatsShown; i++) {
         statSettings(i);
     }
+
+    addRemoveStatSettings();
 }
 
 void OBSCounter::enableSettings() {
@@ -270,5 +272,21 @@ void OBSCounter::statSettings(int renderIndex) {
             }
             ImGui::ListBoxFooter();
         }
+    }
+}
+
+void OBSCounter::addRemoveStatSettings() {
+    CVarWrapper overlayNumCvar = cvarManager->getCvar("counter_ingame_numStats");
+    if (!overlayNumCvar) { return; }
+    int overlayNumStats = overlayNumCvar.getIntValue();
+
+    if (ImGui::Button("Add Stat")) {
+        overlayNumCvar.setValue(overlayNumStats + 1);
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Remove Stat")) {
+        overlayNumCvar.setValue(overlayNumStats - 1);
     }
 }
