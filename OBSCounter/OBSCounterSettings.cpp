@@ -40,7 +40,7 @@ const char * indexStringMap2[] = {
 };
 
 std::string OBSCounter::GetPluginName() {
-	return "OBSCounter";
+	return "OBS Counter Plugin";
 }
 
 void OBSCounter::SetImGuiContext(uintptr_t ctx) {
@@ -224,28 +224,7 @@ void OBSCounter::statSettings(int renderIndex) {
     std::string headerName("Stat " + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
-        ImGui::TextUnformatted("select stat");
-
-        static int item_current_idx = 0; // Here we store our selection data as an index.
-        std::string listBoxName("##Select stat" + renderIndexStr);
-        if (ImGui::ListBoxHeader(listBoxName.c_str()))
-        {
-            for (int n = 0; n < IM_ARRAYSIZE(indexStringMap2); n++)
-            {
-                const bool is_selected = (item_current_idx == n);
-                if (ImGui::Selectable(indexStringMap2[n], is_selected)) {
-                    item_current_idx = n;
-                    statIndexCvar.setValue(n);
-                }
-
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();
-            }
-            ImGui::ListBoxFooter();
-        }
-
-        ImGui::SameLine();
+        ImGui::TextUnformatted("Select Stat");
 
         CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
         if (!overlayStateCvar) { return; }
@@ -268,10 +247,28 @@ void OBSCounter::statSettings(int renderIndex) {
         if (ImGui::Checkbox(checkboxGameLabel.c_str(), &overlayGame)) {
             if (overlayGame) {
                 overlayStateCvar.setValue(RENDERSTATE_GAME);
-            } else {
+            }
+            else {
                 overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
             }
-            
+
+        }
+
+        static int item_current_idx = 0; // Here we store our selection data as an index.
+        std::string listBoxName("##Select stat" + renderIndexStr);
+        if (ImGui::ListBoxHeader(listBoxName.c_str())) {
+            for (int n = 0; n < IM_ARRAYSIZE(indexStringMap2); n++) {
+                const bool is_selected = (item_current_idx == n);
+                if (ImGui::Selectable(indexStringMap2[n], is_selected)) {
+                    item_current_idx = n;
+                    statIndexCvar.setValue(n);
+                }
+
+                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::ListBoxFooter();
         }
     }
 }

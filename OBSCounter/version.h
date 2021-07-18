@@ -2,7 +2,7 @@
 #define VERSION_MAJOR 2
 #define VERSION_MINOR 0
 #define VERSION_PATCH 0
-#define VERSION_BUILD 87
+#define VERSION_BUILD 89
 
 #define stringify(a) stringify_(a)
 #define stringify_(a) #a
