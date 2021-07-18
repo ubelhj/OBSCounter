@@ -136,9 +136,6 @@
   <ItemGroup>
     <ResourceCompile Include="OBSCounter.rc" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\plugins\settings\OBSCounter.set" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -179,7 +179,7 @@ void OBSCounter::locationAndScaleSettings() {
     CVarWrapper decimalsCvar = cvarManager->getCvar("counter_decimals");
     if (!decimalsCvar) { return; }
     int decimals = decimalsCvar.getIntValue();
-    if (ImGui::SliderInt("Counter Decimals", &decimals, 1, 10)) {
+    if (ImGui::SliderInt("Decimals for averages", &decimals, 1, 5)) {
         decimalsCvar.setValue(decimals);
     }
 }
@@ -227,13 +227,11 @@ void OBSCounter::statSettings(int renderIndex) {
 
         }
 
-        static int item_current_idx = 0; // Here we store our selection data as an index.
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
             for (int n = 0; n < IM_ARRAYSIZE(indexStringMapChar); n++) {
-                const bool is_selected = (item_current_idx == n);
+                const bool is_selected = (statIndex == n);
                 if (ImGui::Selectable(indexStringMapChar[n], is_selected)) {
-                    item_current_idx = n;
                     statIndexCvar.setValue(n);
                 }
 
