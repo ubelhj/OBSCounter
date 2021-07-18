@@ -55,6 +55,24 @@ void OBSCounter::enableSettings() {
     if (ImGui::Checkbox("Enable overlay", &enabled)) {
         enableVar.setValue(enabled);
     }
+
+    if (ImGui::Button("Add a Game")) {
+        cvarManager->executeCommand("counter_add_game");
+    }
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Adds a game and resets gameStats, useful if games tracking gets out of sync");
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Reset")) {
+        cvarManager->executeCommand("counter_set_games 0");
+    }
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Resets all stats, including games to 0");
+    }
 }
 
 void OBSCounter::colorSettings() {
