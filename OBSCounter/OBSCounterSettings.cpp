@@ -36,38 +36,7 @@ const char * indexStringMap2[] = {
     "points",
     "timePlayed",
     "offenseTime",
-    "defenseTime",
-    "gameGoals",
-    "gameDemolitions",
-    "gameDeaths",
-    "gameExterminations",
-    "gameAerialGoals",
-    "gameBackwardsGoals",
-    "gameBicycleGoals",
-    "gameLongGoals",
-    "gameTurtleGoals",
-    "gamePoolShots",
-    "gameOvertimeGoals",
-    "gameHatTricks",
-    "gameAssists",
-    "gamePlaymakers",
-    "gameSaves",
-    "gameEpicSaves",
-    "gameSaviors",
-    "gameShots",
-    "gameCenters",
-    "gameClears",
-    "gameFirstTouchs",
-    "gameDamages",
-    "gameUltraDamages",
-    "gameLowFives",
-    "gameHighFives",
-    "gameSwishs",
-    "gameBicycleHits",
-    "gamePoints",
-    "gameTimePlayed",
-    "gameOffenseTime",
-    "gameDefenseTime"
+    "defenseTime"
 };
 
 std::string OBSCounter::GetPluginName() {
@@ -278,14 +247,31 @@ void OBSCounter::statSettings(int renderIndex) {
 
         ImGui::SameLine();
 
-        CVarWrapper overlayAverageCvar = cvarManager->getCvar("counter_ingame_stat_average_" + renderIndexStr);
-        if (!overlayAverageCvar) { return; }
-        bool overlayAverage = overlayAverageCvar.getBoolValue();
+        CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
+        if (!overlayStateCvar) { return; }
+        int overlayState = overlayStateCvar.getIntValue();
 
-        std::string checkboxLabel = "Average##stat" + renderIndexStr;
+        bool overlayAverage = overlayState == RENDERSTATE_AVERAGE;
 
-        if (ImGui::Checkbox(checkboxLabel.c_str(), &overlayAverage)) {
-            overlayAverageCvar.setValue(overlayAverage);
+        std::string checkboxAverageLabel = "Average##stat" + renderIndexStr;
+
+        if (ImGui::Checkbox(checkboxAverageLabel.c_str(), &overlayAverage)) {
+            overlayStateCvar.setValue(overlayAverage & RENDERSTATE_AVERAGE);
+        }
+
+        ImGui::SameLine();
+
+        bool overlayGame = overlayState == RENDERSTATE_GAME;
+
+        std::string checkboxGameLabel = "Game##stat" + renderIndexStr;
+
+        if (ImGui::Checkbox(checkboxGameLabel.c_str(), &overlayGame)) {
+            if (overlayGame) {
+                overlayStateCvar.setValue(RENDERSTATE_GAME);
+            } else {
+                overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
+            }
+            
         }
     }
 }

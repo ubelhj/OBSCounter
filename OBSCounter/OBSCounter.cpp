@@ -23,7 +23,7 @@ bool enabledOverlayBackground;
 const int defaultMaxOverlayLines = 5;
 int overlayLines;
 std::vector<int> overlayStats;
-std::vector<bool> overlayAverages;
+std::vector<int> overlayStates;
 std::vector<std::string> overlayStrings;
 float xLocation;
 float yLocation;
@@ -35,10 +35,11 @@ std::filesystem::path fileLocation;
 
 // holds all stats
 int statArray[numStats];
+int statArrayGame[numStats];
 
 // holds all averages
 // caching improves performance significantly
-float averages[startGameStats];
+float averages[numStats];
 
 // called when the plugin loads and prepares all cvars and default values
 void OBSCounter::onLoad()
@@ -108,12 +109,12 @@ void OBSCounter::setCvars() {
             });
 
         // sets stat in overlay to average or not
-        auto overlayAvgVar = cvarManager->registerCvar(
-            "counter_ingame_stat_average_" + str, "0",
-            "Toggles average of stat " + str + " in overlay", true, true, 0, true, 1);
-        overlayAverages.push_back(overlayAvgVar.getBoolValue());
-        overlayAvgVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            overlayAverages[i] = cvar.getBoolValue();
+        auto overlayStateVar = cvarManager->registerCvar(
+            "counter_ingame_stat_render_state_" + str, "0",
+            "Sets render state of stat " + str + " in overlay", true, true, 0, true, RENDERSTATE_END - 1);
+        overlayStates.push_back(RENDERSTATE_DEFAULT);
+        overlayStateVar.addOnValueChanged([this, i, str](std::string, CVarWrapper cvar) {
+            overlayStates[i] = cvar.getIntValue();
             renderAllStrings();
             });
     }
@@ -195,7 +196,7 @@ void OBSCounter::setCvars() {
 
     // creates setters for the default start value for each stat
     // also writes these new values to files
-    for (int i = endNormalStats + 1; i < startGameStats; i++) {
+    for (int i = endNormalStats + 1; i < numStats; i++) {
         std::string cvarName = "counter_set_" + indexStringMap[i];
         std::string cvarTip = "sets " + indexStringMap[i] + " value";
         cvarManager->registerCvar(cvarName, "0", cvarTip, true, false, 0, false, 0, false);
@@ -218,7 +219,7 @@ void OBSCounter::setCvars() {
     }
 
     // setters for render strings for average stats
-    for (int i = 0; i < startGameStats; i++) {
+    for (int i = 0; i < numStats; i++) {
         std::string cvarName = "counter_set_render_string_" + averageStrings[i];
         std::string cvarTip = "sets " + averageStrings[i] + " render string";
         cvarManager->registerCvar(cvarName, averageStringsRender[i], cvarTip);
@@ -326,13 +327,13 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     cvarManager->log("points: " + std::to_string(statPoints));
     if (statPoints > 0) {
         statArray[points] += statPoints;
-        statArray[gamePoints] += statPoints;
+        statArrayGame[points] += statPoints;
         write(points);
     }
     statArray[eventType]++;
     // adds 1 to the game stat equivalent if applicable
     if (eventType > statsWithoutGame) {
-        statArray[eventType + totalToGame]++;
+        statArrayGame[eventType]++;
     }
     write(eventType);
 }
@@ -372,7 +373,7 @@ void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
     if (eventType == demos && isPrimaryPlayer(victim)) {
         cvarManager->log("player died");
         statArray[deaths]++;
-        statArray[gameDeaths]++;
+        statArrayGame[deaths]++;
         write(deaths);
         return;
     }
@@ -432,13 +433,13 @@ void OBSCounter::startGame() {
     statArray[games]++;
 
     // resets all game stats to 0 and writes each one
-    for (int i = startGameStats; i < numStats; i++) {
-        statArray[i] = 0;
+    for (int i = 0; i < numStats; i++) {
+        statArrayGame[i] = 0;
         writeGameStat(i);
     }
 
     // writes all the averages
-    for (int i = 0; i < startGameStats; i++) {
+    for (int i = 0; i < numStats; i++) {
         average(i);
     }
 
@@ -522,19 +523,17 @@ void OBSCounter::checkCarLocation() {
     }
 
     if (loc.Y > 0) {
-        //cvarManager->log("offense time");
         statArray[offenseTime]++;
-        statArray[gameOffenseTime]++;
+        statArrayGame[offenseTime]++;
         writeTimeStat(offenseTime);
     }
     else {
-        //cvarManager->log("defense time");
         statArray[defenseTime]++;
-        statArray[gameDefenseTime]++;
+        statArrayGame[defenseTime]++;
         writeTimeStat(defenseTime);
     }
     statArray[timePlayed]++;
-    statArray[gameTime]++;
+    statArrayGame[timePlayed]++;
     writeTimeStat(timePlayed);
 }
 
@@ -566,7 +565,7 @@ void OBSCounter::write(int statIndex) {
     // writes the game version of stat
     // only writes if stat has a game version
     if (statIndex > statsWithoutGame) {
-        writeGameStat(statIndex + totalToGame);
+        writeGameStat(statIndex);
     }
 
     renderString(statIndex);
@@ -598,7 +597,7 @@ void OBSCounter::write(int statIndex) {
 
 // writes a game stat, only supposed to be used with a game stat index 
 void OBSCounter::writeGameStat(int statIndex) {
-    std::ofstream gameStatFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
+    std::ofstream gameStatFile(fileLocation / (indexStringMapGame[statIndex] + ".txt"));
     gameStatFile << statArray[statIndex];
     gameStatFile.close();
 
@@ -643,7 +642,7 @@ void OBSCounter::writeTimeStat(int statIndex) {
     // writes the game version of stat
     // only writes if stat has a game version
     if (statIndex > statsWithoutGame) {
-        writeGameTimeStat(statIndex + totalToGame);
+        writeGameTimeStat(statIndex);
     }
 
     renderString(statIndex);
@@ -651,9 +650,9 @@ void OBSCounter::writeTimeStat(int statIndex) {
 
 // writes only the game time stat
 void OBSCounter::writeGameTimeStat(int statIndex) {
-    int totalSeconds = statArray[statIndex];
+    int totalSeconds = statArrayGame[statIndex];
     // writes the stat
-    std::ofstream file(fileLocation / (indexStringMap[statIndex] + ".txt"));
+    std::ofstream file(fileLocation / (indexStringMapGame[statIndex] + ".txt"));
     file << totalSeconds / 60;
     file << ":";
     int remSeconds = totalSeconds % 60;
@@ -670,7 +669,7 @@ void OBSCounter::writeAll() {
         write(i);
     }
 
-    for (int i = endNormalStats + 1; i < startGameStats; i++) {
+    for (int i = endNormalStats + 1; i < numStats; i++) {
         writeTimeStat(i);
     }
 }
@@ -680,7 +679,7 @@ void OBSCounter::writeAll() {
 void OBSCounter::writeShootingPercentage() {
     // calculates current game shooting %
     // divides and checks for NaN
-    int gameShooting = getPercentage(statArray[gameGoals], statArray[gameShots]);
+    int gameShooting = getPercentage(statArrayGame[goals], statArrayGame[shots]);
     std::ofstream gameFile(fileLocation / "gameShootingPercentage.txt");
     gameFile << gameShooting << "%";
     gameFile.close();
@@ -694,13 +693,13 @@ void OBSCounter::writeShootingPercentage() {
 
 // writes K/D ratio
 void OBSCounter::writeKillPercentage() {
-    float gameKD = divide(gameDemos, gameDeaths);
+    float gameKD = divide(statArrayGame[demos], statArrayGame[deaths]);
     std::ofstream gameFile(fileLocation / "gameKDRatio.txt");
     gameFile << std::fixed << std::setprecision(decimalPlaces);
     gameFile << gameKD;
     gameFile.close();
 
-    float totalKDRatio = divide(demos, deaths);
+    float totalKDRatio = divide(statArray[demos], statArray[deaths]);
     std::ofstream file(fileLocation / "KDRatio.txt");
     file << std::fixed << std::setprecision(decimalPlaces);
     file << totalKDRatio;
@@ -746,14 +745,7 @@ void OBSCounter::render(CanvasWrapper canvas) {
 
     Vector2 screen = canvas.GetSize();
 
-    // in 1080p font size is 2
-    // y value of 2 size text is approx 20
-    // scaling has no documentation so I think this works 
-    //  but am unable to test on high fidelity monitors
-    // if you notice an issue please let me 
-    //  know by @ing me in the bakkesmod discord
-    float fontSize = //((float)screen.X / (float)1920) * 2;
-        scale;
+    float fontSize = scale;
     int xValue = int((float)screen.X * xLocation);
     int yValue = int((float)screen.Y * yLocation);
 
@@ -777,24 +769,40 @@ void OBSCounter::render(CanvasWrapper canvas) {
     }
 
     // sets to user-chosen color
-    //canvas.SetColor(overlayColors[0], overlayColors[1], overlayColors[2], 255);
     canvas.SetColor(overlayColor);
 
     for (int i = 0; i < overlayLines; i++) {
         // locates based on screen and font size
         canvas.SetPosition(Vector2({ xValue, int((maxStringSize.Y * i) + yValue) }));
-        // does averages if the user wants them and if a stat has an average
-        //std::string renderString = statToRenderString(overlayStats[i], overlayAverages[i]);
-        //int width = renderString.length() * fontSize * 10;
         canvas.DrawString(overlayStrings[i], fontSize, fontSize, false);
     }
-
-    //cvarManager->log(std::to_string(fontSize));
 }
 
-std::string OBSCounter::statToRenderString(int index, bool isAverage) {
-    // writes averages of stats
-    if (isAverage && index < startGameStats) {
+std::string OBSCounter::statToRenderString(int index, int state) {
+    if (state >= RENDERSTATE_END || index >= numStats) {
+        return "INVALID STATE";
+    }
+
+    if (state == RENDERSTATE_DEFAULT) {
+        std::ostringstream strStream;
+
+        // writes time stats
+        if (index > endNormalStats) {
+            int totalSeconds = statArray[index];
+            // writes the stat
+            strStream << totalSeconds / 60;
+            strStream << ":";
+            int remSeconds = totalSeconds % 60;
+            if (remSeconds < 10) {
+                strStream << "0";
+            }
+            strStream << remSeconds;
+        } else {
+            strStream << statArray[index];
+        }
+
+        return indexStringMapRender[index] + strStream.str();
+    } else if (state == RENDERSTATE_AVERAGE) {
         std::ostringstream averageStream;
 
         if (index > endNormalStats) {
@@ -807,20 +815,17 @@ std::string OBSCounter::statToRenderString(int index, bool isAverage) {
                 averageStream << "0";
             }
             averageStream << remSeconds;
-        }
-        else {
+        } else {
             averageStream << std::fixed << std::setprecision(decimalPlaces);
             averageStream << averages[index];
         }
         return averageStringsRender[index] + averageStream.str();
-        // writes non-averages
-    }
-    else {
+    } else if (state == RENDERSTATE_GAME) {
         std::ostringstream strStream;
 
         // writes time stats
-        if ((index > endNormalStats && index < startGameStats) || index > endNormalGameStats) {
-            int totalSeconds = statArray[index];
+        if (index > endNormalStats) {
+            int totalSeconds = statArrayGame[index];
             // writes the stat
             strStream << totalSeconds / 60;
             strStream << ":";
@@ -829,24 +834,24 @@ std::string OBSCounter::statToRenderString(int index, bool isAverage) {
                 strStream << "0";
             }
             strStream << remSeconds;
+        } else {
+            strStream << statArrayGame[index];
         }
-        else {
-            strStream << statArray[index];
-        }
-        return indexStringMapRender[index] + strStream.str();
+
+        return indexStringMapRenderGame[index] + strStream.str();
     }
 }
 
 void OBSCounter::renderAllStrings() {
     for (int i = 0; i < overlayLines; i++) {
-        overlayStrings[i] = statToRenderString(overlayStats[i], overlayAverages[i]);
+        overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
     }
 }
 
 void OBSCounter::renderString(int statIndex) {
     for (int i = 0; i < overlayLines; i++) {
         if (overlayStats[i] == statIndex) {
-            overlayStrings[i] = statToRenderString(statIndex, overlayAverages[i]);
+            overlayStrings[i] = statToRenderString(statIndex, overlayStates[i]);
         }
     }
 }
@@ -860,21 +865,21 @@ void OBSCounter::listStats() {
 
 // calculates average of stat and avoids NaN
 float OBSCounter::average(int statIndex) {
-    averages[statIndex] = divide(statIndex, games);
+    averages[statIndex] = divide(statArray[statIndex], statArray[games]);
     return averages[statIndex];
 }
 
 // calculates division of two stats and avoids NaN
 // prevents a bunch of duplicated code
-float OBSCounter::divide(int firstStatIndex, int secondStatIndex) {
+float OBSCounter::divide(int firstStat, int secondStat) {
     // if second number is 0 returns 0
-    if (statArray[secondStatIndex] == 0) {
+    if (secondStat == 0) {
         return 0.0;
     }
     // otherwise divides ints as a float
     else {
-        return (float)statArray[firstStatIndex] /
-            (float)statArray[secondStatIndex];
+        return (float)firstStat /
+            (float)secondStat;
     }
 }
 

@@ -44,49 +44,13 @@ enum stats {
     timePlayed,
     offenseTime,
     defenseTime,
-    // game stats are from 31 -> end
-    // goals + 27 = gameGoals
-    gameGoals,
-    // start of game stats and/or 1 after the end of non-game stats
-    startGameStats = gameGoals,
-    gameDemos,
-    gameDeaths,
-    gameExterms,
-    gameAerialGoals,
-    gameBackwardsGoals,
-    gameBicycleGoals,
-    gameLongGoals,
-    gameTurtleGoals,
-    gamePoolShots,
-    gameOvertimeGoals,
-    gameHatTricks,
-    gameAssists,
-    gamePlaymakers,
-    gameSaves,
-    gameEpicSaves,
-    gameSaviors,
-    gameShots,
-    gameCenters,
-    gameClears,
-    gameFirstTouchs,
-    gameDamages,
-    gameUltraDamages,
-    gameLowFives,
-    gameHighFives,
-    gameSwishs,
-    gameBicycleHits,
-    gamePoints,
-    endNormalGameStats = gamePoints,
-    gameTime,
-    gameOffenseTime,
-    gameDefenseTime,
     // total number of stats in the stat array
     numStats
 };
 
 // jump from a stat to its most recent game stat by adding this number (27)
 // goals + 27 = gameGoals
-constexpr int totalToGame = startGameStats - 1 - statsWithoutGame;
+//constexpr int totalToGame = startGameStats - 1 - statsWithoutGame;
 
 std::string indexStringMap[] = {
     "wins",
@@ -124,6 +88,13 @@ std::string indexStringMap[] = {
     "timePlayed",
     "offenseTime",
     "defenseTime",
+};
+
+std::string indexStringMapGame[] = {
+    "gameWins",
+    "gameLosses",
+    "gameMvps",
+    "gameGames",
     "gameGoals",
     "gameDemolitions",
     "gameDeaths",
@@ -192,7 +163,14 @@ std::string indexStringMapRender[numStats] = {
     "Points: ",
     "TimePlayed: ",
     "OffenseTime: ",
-    "DefenseTime: ",
+    "DefenseTime: "
+};
+
+std::string indexStringMapRenderGame[numStats] = {
+    "GameWins: ",
+    "GameLosses: ",
+    "GameMvps: ",
+    "GameGames: ",
     "GameGoals: ",
     "GameDemolitions: ",
     "GameDeaths: ",
@@ -226,7 +204,7 @@ std::string indexStringMapRender[numStats] = {
     "GameDefenseTime: "
 };
 
-std::string averageStrings[startGameStats] = {
+std::string averageStrings[numStats] = {
     "averageWins",
     "averageLosses",
     "averageMvps",

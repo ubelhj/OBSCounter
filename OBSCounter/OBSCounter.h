@@ -81,7 +81,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 
 	void renderString(int statIndex);
 	void renderAllStrings();
-	std::string statToRenderString(int statIndex, bool isAverage);
+	std::string statToRenderString(int statIndex, int state);
 
 	// Plugin settings interface
 	void RenderSettings() override;
@@ -95,5 +95,12 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 
 	// prints all stat types
 	void listStats();
+
+	enum stringRenderStates {
+		RENDERSTATE_DEFAULT,
+		RENDERSTATE_AVERAGE,
+		RENDERSTATE_GAME,
+		RENDERSTATE_END
+	};
 };
 
