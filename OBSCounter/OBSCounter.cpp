@@ -371,6 +371,7 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     case saves:
     case epicSaves:
         statArray[totalSaves]++;
+        statArrayGame[totalSaves]++;
         write(totalSaves);
         break;
     }
@@ -682,6 +683,11 @@ void OBSCounter::writeAll() {
     for (int i = endNormalStats + 1; i < numStats; i++) {
         writeTimeStat(i);
     }
+
+    writeShootingPercentage();
+    writeKillPercentage();
+    writeMissedExterms();
+    writeWinPercentage();
 }
 
 // special cases for extra complicated stats
