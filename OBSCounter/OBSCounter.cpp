@@ -60,7 +60,6 @@ void OBSCounter::onLoad()
     //cvarManager->log(gameWrapper->GetDataFolder().generic_string() + fileLocation);
 
     writeAll();
-    renderAllStrings();
 }
 
 // creates cvars and sets global variable defaults to prevent any nulls
@@ -71,7 +70,6 @@ void OBSCounter::setCvars() {
     decimalsVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         decimalPlaces = cvar.getIntValue();
         writeAll();
-        renderAllStrings();
         });
 
     // in-game overlay cvars
@@ -91,7 +89,6 @@ void OBSCounter::setCvars() {
     overlayLines = overlayNumberVar.getIntValue();
     overlayNumberVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         overlayLines = cvar.getIntValue();
-        renderAllStrings();
         });
 
     for (int i = 0; i < defaultMaxOverlayLines; i++) {
@@ -104,7 +101,6 @@ void OBSCounter::setCvars() {
         overlayStats.push_back(overlayVar.getIntValue());
         overlayVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             overlayStats[i] = cvar.getIntValue();
-            renderAllStrings();
             });
 
         // sets stat in overlay to average or not
@@ -114,7 +110,6 @@ void OBSCounter::setCvars() {
         overlayStates.push_back(RENDERSTATE_DEFAULT);
         overlayStateVar.addOnValueChanged([this, i, str](std::string, CVarWrapper cvar) {
             overlayStates[i] = cvar.getIntValue();
-            renderAllStrings();
             });
     }
 
@@ -214,7 +209,7 @@ void OBSCounter::setCvars() {
         auto cvar = cvarManager->getCvar(cvarName);
 
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            indexStringMapRender[i] = cvar.getStringValue(); renderAllStrings(); });
+            indexStringMapRender[i] = cvar.getStringValue(); });
     }
 
     // setters for render strings for average stats
@@ -226,7 +221,7 @@ void OBSCounter::setCvars() {
         statArray[i] = cvar.getIntValue();
 
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            averageStringsRender[i] = cvar.getStringValue(); renderAllStrings(); });
+            averageStringsRender[i] = cvar.getStringValue(); });
     }
 
     // setters for render strings for game stats
@@ -237,7 +232,7 @@ void OBSCounter::setCvars() {
         auto cvar = cvarManager->getCvar(cvarName);
 
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            indexStringMapRenderGame[i] = cvar.getStringValue(); renderAllStrings(); });
+            indexStringMapRenderGame[i] = cvar.getStringValue(); });
     }
 
     // special case to make sure games update properly
