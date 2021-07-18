@@ -20,7 +20,7 @@ int decimalPlaces;
 // are initialized in onLoad()
 bool enabledOverlay;
 bool enabledOverlayBackground;
-const int defaultMaxOverlayLines = 5;
+const int defaultMaxOverlayLines = 10;
 int overlayLines;
 std::vector<int> overlayStats;
 std::vector<int> overlayStates;

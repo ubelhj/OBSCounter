@@ -19,6 +19,8 @@ void OBSCounter::RenderSettings() {
         locationAndScaleSettings();
     }
 
+    ImGui::Separator();
+
     ImGui::TextUnformatted("Displayed stats");
 
     CVarWrapper numStatsVar = cvarManager->getCvar("counter_ingame_numStats");
@@ -34,6 +36,11 @@ void OBSCounter::RenderSettings() {
     }
 
     addRemoveStatSettings();
+
+    ImGui::Separator();
+
+    ImGui::TextUnformatted("Time on offense/defense added thanks to a commission by samstlaurent");
+    ImGui::TextUnformatted("Plugin made by JerryTheBee#1117 - DM me on discord for custom plugin commissions!");
 }
 
 void OBSCounter::enableSettings() {
@@ -273,4 +280,8 @@ void OBSCounter::addRemoveStatSettings() {
     if (ImGui::Button("Remove Stat")) {
         overlayNumCvar.setValue(overlayNumStats - 1);
     }
+
+    ImGui::SameLine();
+
+    ImGui::TextUnformatted("Maximum 10 Stats");
 }
