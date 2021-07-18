@@ -12,9 +12,6 @@ constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_M
 
 class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::Plugin::PluginSettingsWindow
 {
-
-	//std::shared_ptr<bool> enabled;
-
 	//Boilerplate
 	virtual void onLoad();
 	virtual void onUnload();

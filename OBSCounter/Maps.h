@@ -1,9 +1,7 @@
-#include "pch.h"
-
 // enum for all stat indexes 
 // easier to refer back to stat names
 // total stats are from 0 to 30, game stats from 31 to end
-enum stats {
+static enum stats {
     wins,
     losses,
     mvps,
@@ -48,11 +46,7 @@ enum stats {
     numStats
 };
 
-// jump from a stat to its most recent game stat by adding this number (27)
-// goals + 27 = gameGoals
-//constexpr int totalToGame = startGameStats - 1 - statsWithoutGame;
-
-std::string indexStringMap[] = {
+static std::string indexStringMap[] = {
     "wins",
     "losses",
     "mvps",
@@ -90,7 +84,45 @@ std::string indexStringMap[] = {
     "defenseTime",
 };
 
-std::string indexStringMapGame[] = {
+static const char* indexStringMapChar[] = {
+    "wins",
+    "losses",
+    "mvps",
+    "games",
+    "goals",
+    "demolitions",
+    "deaths",
+    "exterminations",
+    "aerialGoals",
+    "backwardsGoals",
+    "bicycleGoals",
+    "longGoals",
+    "turtleGoals",
+    "poolShots",
+    "overtimeGoals",
+    "hatTricks",
+    "assists",
+    "playmakers",
+    "saves",
+    "epicSaves",
+    "saviors",
+    "shots",
+    "centers",
+    "clears",
+    "firstTouchs",
+    "damages",
+    "ultraDamages",
+    "lowFives",
+    "highFives",
+    "swishs",
+    "bicycleHits",
+    "points",
+    "timePlayed",
+    "offenseTime",
+    "defenseTime"
+};
+
+static std::string indexStringMapGame[] = {
     "gameWins",
     "gameLosses",
     "gameMvps",
@@ -128,7 +160,7 @@ std::string indexStringMapGame[] = {
     "gameDefenseTime"
 };
 
-std::string indexStringMapRender[numStats] = {
+static std::string indexStringMapRender[numStats] = {
     "Wins: ",
     "Losses: ",
     "Mvps: ",
@@ -166,7 +198,7 @@ std::string indexStringMapRender[numStats] = {
     "DefenseTime: "
 };
 
-std::string indexStringMapRenderGame[numStats] = {
+static std::string indexStringMapRenderGame[numStats] = {
     "GameWins: ",
     "GameLosses: ",
     "GameMvps: ",
@@ -204,7 +236,7 @@ std::string indexStringMapRenderGame[numStats] = {
     "GameDefenseTime: "
 };
 
-std::string averageStrings[numStats] = {
+static std::string averageStrings[numStats] = {
     "averageWins",
     "averageLosses",
     "averageMvps",
@@ -242,7 +274,7 @@ std::string averageStrings[numStats] = {
     "averageDefenseTime"
 };
 
-std::string averageStringsRender[] = {
+static std::string averageStringsRender[] = {
     "AverageWins: ",
     "AverageLosses: ",
     "AverageMvps: ",
@@ -280,7 +312,7 @@ std::string averageStringsRender[] = {
     "AverageDefenseTime: "
 };
 
-const std::map<std::string, int> eventDictionary = {
+static const std::map<std::string, int> eventDictionary = {
     { "Demolish", demos},
     { "Demolition", exterms},
     { "Goal", goals},

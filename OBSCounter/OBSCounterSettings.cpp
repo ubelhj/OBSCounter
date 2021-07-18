@@ -1,43 +1,6 @@
 #include "pch.h"
 #include "OBSCounter.h"
-
-const char * indexStringMap2[] = {
-    "wins",
-    "losses",
-    "mvps",
-    "games",
-    "goals",
-    "demolitions",
-    "deaths",
-    "exterminations",
-    "aerialGoals",
-    "backwardsGoals",
-    "bicycleGoals",
-    "longGoals",
-    "turtleGoals",
-    "poolShots",
-    "overtimeGoals",
-    "hatTricks",
-    "assists",
-    "playmakers",
-    "saves",
-    "epicSaves",
-    "saviors",
-    "shots",
-    "centers",
-    "clears",
-    "firstTouchs",
-    "damages",
-    "ultraDamages",
-    "lowFives",
-    "highFives",
-    "swishs",
-    "bicycleHits",
-    "points",
-    "timePlayed",
-    "offenseTime",
-    "defenseTime"
-};
+#include "Maps.h"
 
 std::string OBSCounter::GetPluginName() {
 	return "OBS Counter Plugin";
@@ -221,12 +184,13 @@ void OBSCounter::statSettings(int renderIndex) {
     if (!statIndexCvar) { return; }
     int statIndex = statIndexCvar.getIntValue();
 
-    const char* statString = indexStringMap2[statIndex];
+    const char* statString = indexStringMapChar[statIndex];
 
     std::string headerName("Stat " + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
-        ImGui::TextUnformatted("Select Stat");
+        std::string statTopString = "Selected: " + indexStringMap[statIndex];
+        ImGui::TextUnformatted(statTopString.c_str());
 
         CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
         if (!overlayStateCvar) { return; }
@@ -259,9 +223,9 @@ void OBSCounter::statSettings(int renderIndex) {
         static int item_current_idx = 0; // Here we store our selection data as an index.
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
-            for (int n = 0; n < IM_ARRAYSIZE(indexStringMap2); n++) {
+            for (int n = 0; n < IM_ARRAYSIZE(indexStringMapChar); n++) {
                 const bool is_selected = (item_current_idx == n);
-                if (ImGui::Selectable(indexStringMap2[n], is_selected)) {
+                if (ImGui::Selectable(indexStringMapChar[n], is_selected)) {
                     item_current_idx = n;
                     statIndexCvar.setValue(n);
                 }
@@ -271,6 +235,26 @@ void OBSCounter::statSettings(int renderIndex) {
                     ImGui::SetItemDefaultFocus();
             }
             ImGui::ListBoxFooter();
+        }
+
+        std::string statRenderName = "";
+
+        if (overlayState == RENDERSTATE_DEFAULT) {
+            statRenderName = indexStringMap[statIndex];
+        } else if (overlayState == RENDERSTATE_AVERAGE) {
+            statRenderName = averageStrings[statIndex];
+        } else if (overlayState == RENDERSTATE_GAME) {
+            statRenderName = indexStringMapGame[statIndex];
+        }
+        
+        CVarWrapper overlayStatStringCvar = cvarManager->getCvar("counter_set_render_string_" + statRenderName);
+        if (!overlayStatStringCvar) { return; }
+        std::string overlayStatString = overlayStatStringCvar.getStringValue();
+
+        char buffer[255] = "";
+
+        if (ImGui::InputTextWithHint("Set New Render String", overlayStatString.c_str(), buffer, 255)) {
+            overlayStatStringCvar.setValue(buffer);
         }
     }
 }
