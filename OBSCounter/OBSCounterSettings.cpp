@@ -67,7 +67,7 @@ void OBSCounter::enableSettings() {
     ImGui::SameLine();
 
     if (ImGui::Button("Reset")) {
-        cvarManager->executeCommand("counter_set_games 0");
+        cvarManager->executeCommand("counter_reset");
     }
 
     if (ImGui::IsItemHovered()) {

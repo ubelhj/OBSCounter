@@ -174,6 +174,17 @@ void OBSCounter::setCvars() {
             endedGame = true;
         }, "Add a game to stats to fix any sync issues", PERMISSION_ALL);
 
+    // resets all stats
+    cvarManager->registerNotifier("counter_reset",
+        [this](std::vector<std::string> params) {
+            for (int i = 0; i < numStats; i++) {
+                statArray[numStats] = 0;
+                statArrayGame[numStats] = 0;
+            }
+
+            writeAll();
+        }, "Resets all stats", PERMISSION_ALL);
+
     // creates setters for the default start value for each stat
     // also writes these new values to files
     for (int i = 0; i <= endNormalStats; i++) {
@@ -473,18 +484,12 @@ void OBSCounter::startGame() {
 
     statArray[games]++;
 
-    // resets all game stats to 0 and writes each one
+    // resets all game stats to 0 
     for (int i = 0; i < numStats; i++) {
         statArrayGame[i] = 0;
-        writeGameStat(i);
     }
 
-    // writes all the averages
-    for (int i = 0; i < numStats; i++) {
-        average(i);
-    }
-
-    write(games);
+    writeAll();
 }
 
 void OBSCounter::endGame() {
