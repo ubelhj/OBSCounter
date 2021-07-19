@@ -301,6 +301,10 @@ void OBSCounter::statSettings(int renderIndex) {
             overlayStatStringCvar.setValue(buffer);
         }
     }
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(statString);
+    }
 }
 
 void OBSCounter::addRemoveStatSettings() {
