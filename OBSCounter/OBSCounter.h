@@ -2,6 +2,7 @@
 
 
 #include "bakkesmod/plugin/bakkesmodplugin.h"
+#include "bakkesmod/plugin/PluginSettingsWindow.h"
 
 #include "version.h"
 #include <sstream>
@@ -9,86 +10,92 @@
 #include "bakkesmod/wrappers/GameObject/Stats/StatEventWrapper.h"
 constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_MINOR) "." stringify(VERSION_PATCH) "." stringify(VERSION_BUILD);
 
-#define nl(x) SettingsFile << std::string(x) << '\n'
-#define blank SettingsFile << '\n'
-#define cv(x) std::string(x)
-
-class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin
+class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::Plugin::PluginSettingsWindow
 {
+    //Boilerplate
+    virtual void onLoad();
+    virtual void onUnload();
 
-	//std::shared_ptr<bool> enabled;
+    // sets cvars to modify counters 
+    void setCvars();
 
-	//Boilerplate
-	virtual void onLoad();
-	virtual void onUnload();
+    // hooks events for stats
+    void hookEvents();
 
-	// sets cvars to modify counters 
-	void setCvars();
+    // fires when a stat happens
+    void statEvent(ServerWrapper caller, void* args);
 
-	// hooks events for stats
-	void hookEvents();
+    // fires when the stat ticker is updated
+    void statTickerEvent(ServerWrapper caller, void* args);
 
-	// fires when a stat happens
-	void statEvent(ServerWrapper caller, void* args);
+    // checks if the plyer that received a stat is the main player
+    bool isPrimaryPlayer(PriWrapper receiver);
 
-	// fires when the stat ticker is updated
-	void statTickerEvent(ServerWrapper caller, void* args);
+    // called when a new game starts, resets game stats
+    void startGame();
 
-	// checks if the plyer that received a stat is the main player
-	bool isPrimaryPlayer(PriWrapper receiver);
+    // called at the end of a game
+    void endGame();
 
-	// called when a new game starts, resets game stats
-	void startGame();
+    // called each second to write to player location stats
+    void checkCarLocation();
 
-	// called at the end of a game
-	void endGame();
+    // writes the .txt files
 
-	// called each second to write to player location stats
-	void checkCarLocation();
-
-	// writes the .txt files
-
-	// writes all at once
-	void writeAll();
-	// writes a specific stat
-	void write(int statIndex);
-	// writes a game stat only
-	void writeGameStat(int statIndex);
-	// writes time stats
-	void writeTimeStat(int statIndex);
-	// writes a game stat only but formats for time
-	void writeGameTimeStat(int statIndex);
-	// calculates an average of a stat
-	float average(int statValue);
-	// divides two stats and prevents NaN
-	float divide(int firstStatIndex, int secondStatIndex);
+    // writes all at once
+    void writeAll();
+    // writes a specific stat
+    void write(int statIndex);
+    // writes a game stat only
+    void writeGameStat(int statIndex);
+    // writes time stats
+    void writeTimeStat(int statIndex);
+    // writes a game stat only but formats for time
+    void writeGameTimeStat(int statIndex);
+    // calculates an average of a stat
+    float average(int statValue);
+    // divides two stats and prevents NaN
+    float divide(int firstStatIndex, int secondStatIndex);
 
 
-	// extra stats beyond basic ones
-	// writes shooting percentage on a shot or a goal
-	void writeShootingPercentage();
+    // extra stats beyond basic ones
+    // writes shooting percentage on a shot or a goal
+    void writeShootingPercentage();
+    // writes K/D ratio
+    void writeKillPercentage();
+    // writes missed exterms
+    void writeMissedExterms();
+    // writes win percentage
+    void writeWinPercentage();
 
-	// writes K/D ratio
-	void writeKillPercentage();
+    int getPercentage(int numerator, int denominator);
 
-	// writes missed exterms
-	void writeMissedExterms();
+    // renders overlay
+    void render(CanvasWrapper canvas);
 
-	// writes win percentage
-	void writeWinPercentage();
+    void renderAllStrings();
+    std::string statToRenderString(int statIndex, int state);
 
-	int getPercentage(int numerator, int denominator);
+    // Plugin settings interface
+    void RenderSettings() override;
+    std::string GetPluginName() override;
+    void SetImGuiContext(uintptr_t ctx) override;
 
-	// renders overlay
-	void render(CanvasWrapper canvas);
+    void colorSettings();
+    void enableSettings();
+    void locationAndScaleSettings();
+    void statSettings(int renderIndex);
+    void addRemoveStatSettings();
 
-	void renderString(int statIndex);
-	void renderAllStrings();
-	std::string statToRenderString(int statIndex, bool isAverage);
+    // prints all stat types
+    void listStats();
 
-	// prints all stat types
-	void listStats();
-
-	void GenerateSettingsFile();
+    enum stringRenderStates {
+        RENDERSTATE_DEFAULT,
+        RENDERSTATE_AVERAGE,
+        RENDERSTATE_GAME,
+        RENDERSTATE_OTHER,
+        RENDERSTATE_END
+    };
 };
 
