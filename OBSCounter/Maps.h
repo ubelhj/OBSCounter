@@ -383,11 +383,11 @@ static const char* indexStringMapOtherChar[numOtherStats] = {
 };
 
 static std::string indexStringMapRenderOther[numOtherStats] = {
-    "shootingPercentage: ",
-    "gameShootingPercentage: ",
-    "kDRatio: ",
-    "gameKDRatio: ",
-    "possibleExterminations: ",
-    "missedExterminationPercent: ",
-    "winPercentage: "
+    "Shooting Percentage: ",
+    "Game Shooting Percentage: ",
+    "KD Ratio: ",
+    "Game KD Ratio: ",
+    "Possible Exterminations: ",
+    "Missed Extermination Percent: ",
+    "Win Percentage: "
 };

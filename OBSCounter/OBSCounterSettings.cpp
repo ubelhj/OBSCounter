@@ -237,49 +237,50 @@ void OBSCounter::statSettings(int renderIndex) {
     std::string headerName("Stat " + statRenderName + "###statheader" + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
-        bool overlayAverage = overlayState == RENDERSTATE_AVERAGE;
+        std::string checkboxDefaultLabel = "Default##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxDefaultLabel.c_str(), &overlayState, RENDERSTATE_DEFAULT)) {
+            overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
+        }
+        ImGui::SameLine();
 
         std::string checkboxAverageLabel = "Average##stat" + renderIndexStr;
-
-        if (ImGui::Checkbox(checkboxAverageLabel.c_str(), &overlayAverage)) {
-            overlayStateCvar.setValue(overlayAverage & RENDERSTATE_AVERAGE);
+        if (ImGui::RadioButton(checkboxAverageLabel.c_str(), &overlayState, RENDERSTATE_AVERAGE)) {
+            overlayStateCvar.setValue(RENDERSTATE_AVERAGE);
         }
-
         ImGui::SameLine();
 
-        bool overlayGame = overlayState == RENDERSTATE_GAME;
 
         std::string checkboxGameLabel = "Game##stat" + renderIndexStr;
-
-        if (ImGui::Checkbox(checkboxGameLabel.c_str(), &overlayGame)) {
-            if (overlayGame) {
-                overlayStateCvar.setValue(RENDERSTATE_GAME);
-            } else {
-                overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
-            }
+        if (ImGui::RadioButton(checkboxGameLabel.c_str(), &overlayState, RENDERSTATE_GAME)) {
+            overlayStateCvar.setValue(RENDERSTATE_GAME);
         }
-
         ImGui::SameLine();
 
-        bool overlayOther = overlayState == RENDERSTATE_OTHER;
-
         std::string checkboxOtherLabel = "Other##stat" + renderIndexStr;
-
-        if (ImGui::Checkbox(checkboxOtherLabel.c_str(), &overlayOther)) {
-            if (overlayOther) {
-                overlayStateCvar.setValue(RENDERSTATE_OTHER);
-            } else {
-                overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
-            }
+        if (ImGui::RadioButton(checkboxOtherLabel.c_str(), &overlayState, RENDERSTATE_OTHER)) {
+            overlayStateCvar.setValue(RENDERSTATE_OTHER);
         }
 
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
-            int maxSize = overlayOther ? numOtherStats : numStats;
+            int maxSize = 0;
+            const char** statStrings = nullptr;
+
+            switch (overlayState) {
+            case RENDERSTATE_OTHER:
+                maxSize = numOtherStats;
+                statStrings = indexStringMapOtherChar;
+                break;
+            default:
+                maxSize = numStats;
+                statStrings = indexStringMapChar;
+                break;
+            }
+
             for (int n = 0; n < maxSize; n++) {
                 const bool is_selected = (statIndex == n);
                 
-                if (ImGui::Selectable(overlayOther ? indexStringMapOtherChar[n] : indexStringMapChar[n], is_selected)) {
+                if (ImGui::Selectable(statStrings[n], is_selected)) {
                     statIndexCvar.setValue(n);
                 }
 
