@@ -178,8 +178,8 @@ void OBSCounter::setCvars() {
     cvarManager->registerNotifier("counter_reset",
         [this](std::vector<std::string> params) {
             for (int i = 0; i < numStats; i++) {
-                statArray[numStats] = 0;
-                statArrayGame[numStats] = 0;
+                statArray[i] = 0;
+                statArrayGame[i] = 0;
             }
 
             writeAll();
