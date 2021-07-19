@@ -211,13 +211,32 @@ void OBSCounter::statSettings(int renderIndex) {
 
     const char* statString = indexStringMapChar[statIndex];
 
-    std::string headerName("Stat " + renderIndexStr);
+    CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
+    if (!overlayStateCvar) { return; }
+    int overlayState = overlayStateCvar.getIntValue();
+
+    std::string statRenderName = "";
+
+    switch (overlayState) {
+    case RENDERSTATE_DEFAULT:
+        statRenderName = indexStringMap[statIndex];
+        break;
+    case RENDERSTATE_AVERAGE:
+        statRenderName = averageStrings[statIndex];
+        break;
+    case RENDERSTATE_GAME:
+        statRenderName = indexStringMapGame[statIndex];
+        break;
+    case RENDERSTATE_OTHER:
+        statRenderName = indexStringMapOther[statIndex];
+        break;
+    default:
+        break;
+    }
+
+    std::string headerName("Stat " + statRenderName + "###statheader" + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
-        CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
-        if (!overlayStateCvar) { return; }
-        int overlayState = overlayStateCvar.getIntValue();
-
         bool overlayAverage = overlayState == RENDERSTATE_AVERAGE;
 
         std::string checkboxAverageLabel = "Average##stat" + renderIndexStr;
@@ -271,25 +290,6 @@ void OBSCounter::statSettings(int renderIndex) {
             
             ImGui::ListBoxFooter();
         }
-
-        std::string statRenderName = "";
-
-        switch (overlayState) {
-        case RENDERSTATE_DEFAULT:
-            statRenderName = indexStringMap[statIndex];
-            break;
-        case RENDERSTATE_AVERAGE:
-            statRenderName = averageStrings[statIndex];
-            break;
-        case RENDERSTATE_GAME:
-            statRenderName = indexStringMapGame[statIndex];
-            break;
-        case RENDERSTATE_OTHER:
-            statRenderName = indexStringMapOther[statIndex];
-            break;
-        default:
-            break;
-        }
         
         CVarWrapper overlayStatStringCvar = cvarManager->getCvar("counter_set_render_string_" + statRenderName);
         if (!overlayStatStringCvar) { return; }
@@ -300,10 +300,6 @@ void OBSCounter::statSettings(int renderIndex) {
         if (ImGui::InputTextWithHint("Set New Render String", overlayStatString.c_str(), buffer, 255)) {
             overlayStatStringCvar.setValue(buffer);
         }
-    }
-
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip(statString);
     }
 }
 
