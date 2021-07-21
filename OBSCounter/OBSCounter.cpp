@@ -529,6 +529,24 @@ void OBSCounter::endGame() {
         write(losses);
     }
 
+    PriWrapper pri = primary.GetPRI();
+
+    if (!pri) {
+        cvarManager->log("null player pri");
+        return;
+    }
+
+    int truePoints = pri.GetMatchScore();
+
+    int diff = truePoints - statArrayGame[points];
+
+    // accounts for too many or too little points
+    if (diff != 0) {
+        statArray[points] += diff;
+        statArrayGame[points] += diff;
+        write(points);
+    }
+
     endedGame = true;
 }
 
@@ -567,7 +585,7 @@ void OBSCounter::checkCarLocation() {
 
         int diff = truePoints - statArrayGame[points];
 
-        // accounts for too many or two little points
+        // accounts for too many or too little points
         if (diff != 0) {
             statArray[points] += diff;
             statArrayGame[points] += diff;
