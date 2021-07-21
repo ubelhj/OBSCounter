@@ -38,8 +38,9 @@ static enum stats {
     bicycleHits,
     points,
     totalSaves,
+    ownGoals,
     // last stat with normal output type
-    endNormalStats = totalSaves,
+    endNormalStats = ownGoals,
     timePlayed,
     offenseTime,
     defenseTime,
@@ -81,9 +82,10 @@ static std::string indexStringMap[numStats] = {
     "bicycleHits",
     "points",
     "totalSaves",
+    "ownGoals",
     "timePlayed",
     "offenseTime",
-    "defenseTime",
+    "defenseTime"
 };
 
 static const char* indexStringMapChar[numStats] = {
@@ -120,6 +122,7 @@ static const char* indexStringMapChar[numStats] = {
     "bicycleHits",
     "points",
     "totalSaves",
+    "ownGoals",
     "timePlayed",
     "offenseTime",
     "defenseTime"
@@ -159,6 +162,7 @@ static std::string indexStringMapGame[numStats] = {
     "gameBicycleHits",
     "gamePoints",
     "gameTotalSaves",
+    "gameOwnGoals",
     "gameTimePlayed",
     "gameOffenseTime",
     "gameDefenseTime"
@@ -198,6 +202,7 @@ static std::string indexStringMapRender[numStats] = {
     "Bicycle Hits: ",
     "Points: ",
     "Total Saves: ",
+    "Own Goals: ",
     "Time Played: ",
     "Offense Time: ",
     "Defense Time: "
@@ -237,6 +242,7 @@ static std::string indexStringMapRenderGame[numStats] = {
     "Game Bicycle Hits: ",
     "Game Points: ",
     "Game Total Saves: ",
+    "Game Own Goals: ",
     "Game Time Played: ",
     "Game Offense Time: ",
     "Game Defense Time: "
@@ -276,6 +282,7 @@ static std::string averageStrings[numStats] = {
     "averageBicycleHits",
     "averagePoints",
     "averageTotalSaves",
+    "averageOwnGoals",
     "averageTimePlayed",
     "averageOffenseTime",
     "averageDefenseTime"
@@ -315,6 +322,7 @@ static std::string averageStringsRender[numStats] = {
     "Average Bicycle Hits: ",
     "Average Points: ",
     "Average Total Saves: ",
+    "Average Own Goals: ",
     "Average Time Played: ",
     "Average Offense Time: ",
     "Average Defense Time: "
@@ -348,7 +356,8 @@ static const std::map<std::string, int> eventDictionary = {
     { "LowFive", lowFives},
     { "HighFive", highFives},
     { "HoopsSwishGoal", swishs},
-    { "BicycleHit", bicycleHits}
+    { "BicycleHit", bicycleHits},
+    { "OwnGoal", ownGoals}
 };
 
 static enum otherStats {

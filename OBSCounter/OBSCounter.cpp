@@ -340,7 +340,7 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     }
     else {
         cvarManager->log("missing stat: " + eventString);
-        cvarManager->log("missing stat points: " + statEvent.GetPoints());
+        cvarManager->log("missing stat points: " + std::to_string(statEvent.GetPoints()));
         return;
     }
 
@@ -427,6 +427,7 @@ void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
         statArray[deaths]++;
         statArrayGame[deaths]++;
         write(deaths);
+        writeKillPercentage();
         return;
     }
 }
@@ -532,6 +533,7 @@ void OBSCounter::endGame() {
 }
 
 // called every second to log car location on offense or defense
+// also makes sure points are synced
 void OBSCounter::checkCarLocation() {
     //cvarManager->log("updated time");
     if (!gameWrapper->IsInOnlineGame()) {
@@ -555,6 +557,22 @@ void OBSCounter::checkCarLocation() {
 
     if (car.GetCollisionComponent().IsNull()) {
         return;
+    }
+
+    PriWrapper pri = car.GetPRI();
+
+    if (pri) {
+        // checks that points are accurate
+        int truePoints = pri.GetMatchScore();
+
+        int diff = truePoints - statArrayGame[points];
+
+        // accounts for too many or two little points
+        if (diff != 0) {
+            statArray[points] += diff;
+            statArrayGame[points] += diff;
+            write(points);
+        }
     }
 
     auto loc = car.GetLocation();
@@ -584,7 +602,7 @@ void OBSCounter::checkCarLocation() {
 }
 
 // writes a stat to its files
-// can only be called with a stat index and not a game stat index
+// also writes its game and average stats
 void OBSCounter::write(int statIndex) {
     // writes the total stat
     std::ofstream totalFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
