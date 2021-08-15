@@ -107,8 +107,8 @@ void OBSCounter::setCvars() {
         // sets stat in overlay to average or not
         auto overlayStateVar = cvarManager->registerCvar(
             "counter_ingame_stat_render_state_" + str, "0",
-            "Sets render state of stat " + str + " in overlay", true, true, 0, true, RENDERSTATE_END - 1);
-        overlayStates.push_back(RENDERSTATE_DEFAULT);
+            "Sets render state of stat " + str + " in overlay", true, true, 0, true, STAT_END - 1);
+        overlayStates.push_back(STAT_DEFAULT);
         overlayStateVar.addOnValueChanged([this, i, str](std::string, CVarWrapper cvar) {
             overlayStates[i] = cvar.getIntValue();
             });
@@ -647,14 +647,30 @@ void OBSCounter::write(int statIndex) {
     // writes the game version of stat
     // only writes if stat has a game version
     if (statIndex > statsWithoutGame) {
-        writeGameStat(statIndex);
+        writeSpecific(statIndex, STAT_GAME);
     }
 }
 
-// writes a game stat, only supposed to be used with a game stat index 
-void OBSCounter::writeGameStat(int statIndex) {
-    std::ofstream gameStatFile(fileLocation / (indexStringMapGame[statIndex] + ".txt"));
-    gameStatFile << statArray[statIndex];
+// writes a single stat
+void OBSCounter::writeSpecific(int statIndex, int statType) {
+    std::string statLocation = "";
+    int statValue = 0;
+
+    switch (statType) {
+    case STAT_DEFAULT: 
+        statLocation = indexStringMap[statIndex];
+        statValue = statArray[statIndex];
+        break;
+    case STAT_GAME:
+        statLocation = indexStringMapGame[statIndex];
+        statValue = statArrayGame[statIndex];
+        break;
+    default:
+        break;
+    }
+
+    std::ofstream gameStatFile(fileLocation / (statLocation + ".txt"));
+    gameStatFile << statValue;
     gameStatFile.close();
 }
 
@@ -864,11 +880,11 @@ void OBSCounter::render(CanvasWrapper canvas) {
 }
 
 std::string OBSCounter::statToRenderString(int index, int state) {
-    if (state >= RENDERSTATE_END || index >= numStats) {
+    if (state >= STAT_END || index >= numStats) {
         return "INVALID STATE";
     }
 
-    if (state == RENDERSTATE_DEFAULT) {
+    if (state == STAT_DEFAULT) {
         std::ostringstream strStream;
 
         // writes time stats
@@ -887,7 +903,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         }
 
         return indexStringMapRender[index] + strStream.str();
-    } else if (state == RENDERSTATE_AVERAGE) {
+    } else if (state == STAT_AVERAGE) {
         std::ostringstream averageStream;
 
         if (index > endNormalStats) {
@@ -905,7 +921,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
             averageStream << averages[index];
         }
         return averageStringsRender[index] + averageStream.str();
-    } else if (state == RENDERSTATE_GAME) {
+    } else if (state == STAT_GAME) {
         std::ostringstream strStream;
 
         // writes time stats
@@ -924,7 +940,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         }
 
         return indexStringMapRenderGame[index] + strStream.str();
-    } else if (state == RENDERSTATE_OTHER) {
+    } else if (state == STAT_OTHER) {
         if (index >= numOtherStats) {
             return indexStringMapRenderOther[0] + statArrayOther[0];
         }else {

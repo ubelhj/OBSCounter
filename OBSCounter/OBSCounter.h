@@ -46,8 +46,8 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void writeAll();
     // writes a specific stat
     void write(int statIndex);
-    // writes a game stat only
-    void writeGameStat(int statIndex);
+    // writes a specific type of stat
+    void writeSpecific(int statIndex, int statType);
     // writes time stats
     void writeTimeStat(int statIndex);
     // writes a game stat only but formats for time
@@ -90,12 +90,12 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     // prints all stat types
     void listStats();
 
-    enum stringRenderStates {
-        RENDERSTATE_DEFAULT,
-        RENDERSTATE_AVERAGE,
-        RENDERSTATE_GAME,
-        RENDERSTATE_OTHER,
-        RENDERSTATE_END
+    enum stringStates {
+        STAT_DEFAULT,
+        STAT_AVERAGE,
+        STAT_GAME,
+        STAT_OTHER,
+        STAT_END
     };
 };
 

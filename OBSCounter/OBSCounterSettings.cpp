@@ -218,16 +218,16 @@ void OBSCounter::statSettings(int renderIndex) {
     std::string statRenderName = "";
 
     switch (overlayState) {
-    case RENDERSTATE_DEFAULT:
+    case STAT_DEFAULT:
         statRenderName = indexStringMap[statIndex];
         break;
-    case RENDERSTATE_AVERAGE:
+    case STAT_AVERAGE:
         statRenderName = averageStrings[statIndex];
         break;
-    case RENDERSTATE_GAME:
+    case STAT_GAME:
         statRenderName = indexStringMapGame[statIndex];
         break;
-    case RENDERSTATE_OTHER:
+    case STAT_OTHER:
         statRenderName = indexStringMapOther[statIndex];
         break;
     default:
@@ -238,27 +238,27 @@ void OBSCounter::statSettings(int renderIndex) {
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
         std::string checkboxDefaultLabel = "Default##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxDefaultLabel.c_str(), &overlayState, RENDERSTATE_DEFAULT)) {
-            overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
+        if (ImGui::RadioButton(checkboxDefaultLabel.c_str(), &overlayState, STAT_DEFAULT)) {
+            overlayStateCvar.setValue(STAT_DEFAULT);
         }
         ImGui::SameLine();
 
         std::string checkboxAverageLabel = "Average##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxAverageLabel.c_str(), &overlayState, RENDERSTATE_AVERAGE)) {
-            overlayStateCvar.setValue(RENDERSTATE_AVERAGE);
+        if (ImGui::RadioButton(checkboxAverageLabel.c_str(), &overlayState, STAT_AVERAGE)) {
+            overlayStateCvar.setValue(STAT_AVERAGE);
         }
         ImGui::SameLine();
 
 
         std::string checkboxGameLabel = "Game##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxGameLabel.c_str(), &overlayState, RENDERSTATE_GAME)) {
-            overlayStateCvar.setValue(RENDERSTATE_GAME);
+        if (ImGui::RadioButton(checkboxGameLabel.c_str(), &overlayState, STAT_GAME)) {
+            overlayStateCvar.setValue(STAT_GAME);
         }
         ImGui::SameLine();
 
         std::string checkboxOtherLabel = "Other##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxOtherLabel.c_str(), &overlayState, RENDERSTATE_OTHER)) {
-            overlayStateCvar.setValue(RENDERSTATE_OTHER);
+        if (ImGui::RadioButton(checkboxOtherLabel.c_str(), &overlayState, STAT_OTHER)) {
+            overlayStateCvar.setValue(STAT_OTHER);
         }
 
         std::string listBoxName("##Select stat" + renderIndexStr);
@@ -267,7 +267,7 @@ void OBSCounter::statSettings(int renderIndex) {
             const char** statStrings = nullptr;
 
             switch (overlayState) {
-            case RENDERSTATE_OTHER:
+            case STAT_OTHER:
                 maxSize = numOtherStats;
                 statStrings = indexStringMapOtherChar;
                 break;
