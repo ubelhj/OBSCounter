@@ -55,7 +55,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     // calculates an average of a stat
     float average(int statValue);
     // divides two stats and prevents NaN
-    float divide(int firstStatIndex, int secondStatIndex);
+    float divide(int firstStat, int secondStat);
 
 
     // extra stats beyond basic ones
