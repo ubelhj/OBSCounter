@@ -52,6 +52,8 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void writeTimeStat(int statIndex);
     // writes a game stat only but formats for time
     void writeGameTimeStat(int statIndex);
+    // writes career stats
+    void writeCareerStats();
     // calculates an average of a stat
     float average(int statValue);
     // divides two stats and prevents NaN
@@ -87,15 +89,18 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void statSettings(int renderIndex);
     void addRemoveStatSettings();
 
-    // prints all stat types
-    void listStats();
-
-    enum stringStates {
+    enum statStates {
         STAT_DEFAULT,
         STAT_AVERAGE,
         STAT_GAME,
         STAT_OTHER,
+        STAT_CAREER_TOTAL,
         STAT_END
     };
+
+    int careerStatTotal[NUMCAREERSTATS];
+    int careerStatPrivate[NUMCAREERSTATS];
+    int careerStatRanked[NUMCAREERSTATS];
+    int careerStatCasual[NUMCAREERSTATS];
 };
 

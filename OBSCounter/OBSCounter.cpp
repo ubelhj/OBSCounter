@@ -45,6 +45,8 @@ float averages[numStats];
 // called when the plugin loads and prepares all cvars and default values
 void OBSCounter::onLoad()
 {
+    _globalCvarManager = cvarManager;
+
     fileLocation = gameWrapper->GetDataFolder() / "OBSCounter";
     // tells the plugin to render the in game overlay
     gameWrapper->RegisterDrawable(
@@ -163,7 +165,7 @@ void OBSCounter::setCvars() {
     // lists all the stats and their numbers to use in the in game counter
     cvarManager->registerNotifier("counter_list_stats",
         [this](std::vector<std::string> params) {
-            listStats();
+            writeCareerStats();
         }, "List all different stat types", PERMISSION_ALL);
 
     // adds 1 to games to fix any errors in game tracking
@@ -745,6 +747,7 @@ void OBSCounter::writeAll() {
     writeKillPercentage();
     writeMissedExterms();
     writeWinPercentage();
+    //writeCareerStats();
 }
 
 // special cases for extra complicated stats
@@ -952,13 +955,6 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 void OBSCounter::renderAllStrings() {
     for (int i = 0; i < overlayStrings.size(); i++) {
         overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
-    }
-}
-
-// Lists all stats to console
-void OBSCounter::listStats() {
-    for (int i = 0; i < numStats; i++) {
-        cvarManager->log(std::to_string(i) + ": " + indexStringMap[i]);
     }
 }
 
