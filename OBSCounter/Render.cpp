@@ -67,8 +67,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
                 strStream << "0";
             }
             strStream << remSeconds;
-        }
-        else {
+        } else {
             strStream << statArray[index];
         }
 
@@ -87,8 +86,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
                 strStream << "0";
             }
             strStream << remSeconds;
-        }
-        else {
+        } else {
             strStream << std::fixed << std::setprecision(decimalPlaces);
             strStream << averages[index];
         }
@@ -108,8 +106,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
                 strStream << "0";
             }
             strStream << remSeconds;
-        }
-        else {
+        } else {
             strStream << statArrayGame[index];
         }
 
@@ -117,8 +114,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
     case STAT_OTHER:
         if (index >= numOtherStats) {
             return indexStringMapRenderOther[0] + statArrayOther[0];
-        }
-        else {
+        } else {
             return indexStringMapRenderOther[index] + statArrayOther[index];
         }
     case STAT_CAREER_TOTAL:
@@ -133,6 +129,11 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 
 void OBSCounter::renderAllStrings() {
     for (int i = 0; i < overlayStrings.size(); i++) {
-        overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
+
+        if (overlayStates[i] > STAT_OTHER) {
+            overlayStrings[i] = statToRenderString(overlayStatsCareer[i], overlayStates[i]);
+        } else {
+            overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
+        }
     }
 }

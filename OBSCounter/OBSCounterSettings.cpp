@@ -208,29 +208,37 @@ void OBSCounter::statSettings(int renderIndex) {
     if (!statIndexCvar) { return; }
     int statIndex = statIndexCvar.getIntValue();
 
-    const char* statString = indexStringMapChar[statIndex];
+    CVarWrapper statIndexCareerCvar = cvarManager->getCvar("counter_ingame_stat_career_" + renderIndexStr);
+    if (!statIndexCareerCvar) { return; }
+    int statIndexCareer = statIndexCareerCvar.getIntValue();
 
     CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
     if (!overlayStateCvar) { return; }
     int overlayState = overlayStateCvar.getIntValue();
 
     std::string statRenderName = "";
+    const char* statString;
 
     switch (overlayState) {
     case STAT_DEFAULT:
         statRenderName = indexStringMap[statIndex];
+        statString = indexStringMapChar[statIndex];
         break;
     case STAT_AVERAGE:
         statRenderName = averageStrings[statIndex];
+        statString = indexStringMapChar[statIndex];
         break;
     case STAT_GAME:
         statRenderName = indexStringMapGame[statIndex];
+        statString = indexStringMapChar[statIndex];
         break;
     case STAT_OTHER:
         statRenderName = indexStringMapOther[statIndex];
+        statString = indexStringMapChar[statIndex];
         break;
     case STAT_CAREER_TOTAL:
-        statRenderName = "Total" + indexStringMapCareer[statIndex];
+        statRenderName = "total" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
         break;
     default:
         break;
@@ -272,6 +280,8 @@ void OBSCounter::statSettings(int renderIndex) {
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
             int maxSize = 0;
             const char** statStrings = nullptr;
+            int indexUsed = statIndex;
+            CVarWrapper cvarIndexUsed = statIndexCvar;
 
             switch (overlayState) {
             case STAT_OTHER:
@@ -281,6 +291,8 @@ void OBSCounter::statSettings(int renderIndex) {
             case STAT_CAREER_TOTAL:
                 maxSize = NUMCAREERSTATS;
                 statStrings = indexStringMapCareerChar;
+                indexUsed = statIndexCareer;
+                cvarIndexUsed = statIndexCareerCvar;
                 break;
             default:
                 maxSize = numStats;
@@ -289,10 +301,10 @@ void OBSCounter::statSettings(int renderIndex) {
             }
 
             for (int n = 0; n < maxSize; n++) {
-                const bool is_selected = (statIndex == n);
+                const bool is_selected = (indexUsed == n);
                 
                 if (ImGui::Selectable(statStrings[n], is_selected)) {
-                    statIndexCvar.setValue(n);
+                    cvarIndexUsed.setValue(n);
                 }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)

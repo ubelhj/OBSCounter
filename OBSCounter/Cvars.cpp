@@ -42,20 +42,20 @@ void OBSCounter::setCvars() {
             overlayStats[i] = cvar.getIntValue();
             });
 
+        // sets stat in overlay
+        auto overlayVarCareer = cvarManager->registerCvar("counter_ingame_stat_career_" + str,
+            str, "stat " + str + " in overlay", true, true, 0);
+        overlayStatsCareer.push_back(overlayVarCareer.getIntValue());
+        overlayVarCareer.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            overlayStatsCareer[i] = cvar.getIntValue();
+            });
+
         // sets overlay stat state
         auto overlayStateVar = cvarManager->registerCvar(
             "counter_ingame_stat_render_state_" + str, "0",
             "Sets render state of stat " + str + " in overlay", true, true, 0, true, STAT_END - 1);
         overlayStates.push_back(STAT_DEFAULT);
         overlayStateVar.addOnValueChanged([this, i, str](std::string, CVarWrapper cvar) {
-            if (overlayStats[i] > numStats) {
-                CVarWrapper statIndexCvar = cvarManager->getCvar("counter_ingame_stat_" + str);
-
-                if (statIndexCvar) {
-                    statIndexCvar.setValue(0);
-                }
-            }
-
             overlayStates[i] = cvar.getIntValue();
             });
     }

@@ -123,6 +123,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     const int defaultMaxOverlayLines = 10;
     int overlayLines;
     std::vector<int> overlayStats;
+    std::vector<int> overlayStatsCareer;
     std::vector<int> overlayStates;
     std::vector<std::string> overlayStrings;
     float xLocation;
