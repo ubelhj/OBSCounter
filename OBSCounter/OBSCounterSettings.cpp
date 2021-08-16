@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "OBSCounter.h"
-#include "Maps.h"
 
 std::string OBSCounter::GetPluginName() {
     return "OBS Counter Plugin";
@@ -230,6 +229,9 @@ void OBSCounter::statSettings(int renderIndex) {
     case STAT_OTHER:
         statRenderName = indexStringMapOther[statIndex];
         break;
+    case STAT_CAREER_TOTAL:
+        statRenderName = "Total" + indexStringMapCareer[statIndex];
+        break;
     default:
         break;
     }
@@ -261,6 +263,11 @@ void OBSCounter::statSettings(int renderIndex) {
             overlayStateCvar.setValue(STAT_OTHER);
         }
 
+        std::string checkboxCareerTotalLabel = "Career Total##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerTotalLabel.c_str(), &overlayState, STAT_CAREER_TOTAL)) {
+            overlayStateCvar.setValue(STAT_CAREER_TOTAL);
+        }
+
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
             int maxSize = 0;
@@ -270,6 +277,10 @@ void OBSCounter::statSettings(int renderIndex) {
             case STAT_OTHER:
                 maxSize = numOtherStats;
                 statStrings = indexStringMapOtherChar;
+                break;
+            case STAT_CAREER_TOTAL:
+                maxSize = NUMCAREERSTATS;
+                statStrings = indexStringMapCareerChar;
                 break;
             default:
                 maxSize = numStats;

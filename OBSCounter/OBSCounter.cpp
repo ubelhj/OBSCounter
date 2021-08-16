@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "OBSCounter.h"
-#include "Maps.h"
 
 BAKKESMOD_PLUGIN(OBSCounter, "OBSCounter", plugin_version, PLUGINTYPE_FREEPLAY)
 
@@ -31,8 +30,6 @@ float scale;
 LinearColor overlayColor;
 LinearColor overlayBackgroundColor;
 
-std::filesystem::path fileLocation;
-
 // holds all stats
 int statArray[numStats];
 int statArrayGame[numStats];
@@ -58,8 +55,8 @@ void OBSCounter::onLoad()
     // hooks the events for the plugin to work
     hookEvents();
 
-    namespace fs = std::filesystem;
-    fs::create_directories(fileLocation);
+    std::filesystem::create_directories(fileLocation);
+    std::filesystem::create_directories(fileLocation / "Career");
     //cvarManager->log(gameWrapper->GetDataFolder().generic_string() + fileLocation);
 
     writeAll();
@@ -100,18 +97,26 @@ void OBSCounter::setCvars() {
         std::string str = std::to_string(i);
         // sets stat in overlay
         auto overlayVar = cvarManager->registerCvar("counter_ingame_stat_" + str,
-            str, "stat " + str + " in overlay", true, true, 0, true, numStats - 1);
+            str, "stat " + str + " in overlay", true, true, 0);
         overlayStats.push_back(overlayVar.getIntValue());
         overlayVar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             overlayStats[i] = cvar.getIntValue();
             });
 
-        // sets stat in overlay to average or not
+        // sets overlay stat state
         auto overlayStateVar = cvarManager->registerCvar(
             "counter_ingame_stat_render_state_" + str, "0",
             "Sets render state of stat " + str + " in overlay", true, true, 0, true, STAT_END - 1);
         overlayStates.push_back(STAT_DEFAULT);
         overlayStateVar.addOnValueChanged([this, i, str](std::string, CVarWrapper cvar) {
+            if (overlayStats[i] > numStats) {
+                CVarWrapper statIndexCvar = cvarManager->getCvar("counter_ingame_stat_" + str);
+
+                if (statIndexCvar) {
+                    statIndexCvar.setValue(0);
+                }
+            }
+
             overlayStates[i] = cvar.getIntValue();
             });
     }
@@ -251,6 +256,17 @@ void OBSCounter::setCvars() {
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             indexStringMapRenderOther[i] = cvar.getStringValue(); 
         });
+    }
+
+    for (int i = 0; i < NUMCAREERSTATS; i++) {
+        // setters for render strings for other stats
+        std::string cvarNameTotal = "counter_set_render_string_Total" + indexStringMapCareer[i];
+        std::string cvarTipTotal = "sets Total" + indexStringMapCareer[i] + " render string";
+        cvarManager->registerCvar(cvarNameTotal, indexStringMapRenderCareerTotal[i], cvarTipTotal);
+        auto cvar = cvarManager->getCvar(cvarNameTotal);
+        cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            indexStringMapRenderCareerTotal[i] = cvar.getStringValue();
+            });
     }
 
     // special case to make sure games update properly
@@ -747,7 +763,7 @@ void OBSCounter::writeAll() {
     writeKillPercentage();
     writeMissedExterms();
     writeWinPercentage();
-    //writeCareerStats();
+    writeCareerStats();
 }
 
 // special cases for extra complicated stats
@@ -883,13 +899,17 @@ void OBSCounter::render(CanvasWrapper canvas) {
 }
 
 std::string OBSCounter::statToRenderString(int index, int state) {
-    if (state >= STAT_END || index >= numStats) {
+    if (state >= STAT_END) {
         return "INVALID STATE";
     }
 
-    if (state == STAT_DEFAULT) {
-        std::ostringstream strStream;
+    std::ostringstream strStream;
 
+    switch (state) {
+    case STAT_DEFAULT:
+        if (index >= numStats) {
+            return "INVALID STATE";
+        }
         // writes time stats
         if (index > endNormalStats) {
             int totalSeconds = statArray[index];
@@ -901,32 +921,36 @@ std::string OBSCounter::statToRenderString(int index, int state) {
                 strStream << "0";
             }
             strStream << remSeconds;
-        } else {
+        }
+        else {
             strStream << statArray[index];
         }
 
         return indexStringMapRender[index] + strStream.str();
-    } else if (state == STAT_AVERAGE) {
-        std::ostringstream averageStream;
-
+    case STAT_AVERAGE:
+        if (index >= numStats) {
+            return "INVALID STATE";
+        }
         if (index > endNormalStats) {
             int totalSeconds = averages[index];
             // writes the stat
-            averageStream << totalSeconds / 60;
-            averageStream << ":";
+            strStream << totalSeconds / 60;
+            strStream << ":";
             int remSeconds = totalSeconds % 60;
             if (remSeconds < 10) {
-                averageStream << "0";
+                strStream << "0";
             }
-            averageStream << remSeconds;
-        } else {
-            averageStream << std::fixed << std::setprecision(decimalPlaces);
-            averageStream << averages[index];
+            strStream << remSeconds;
         }
-        return averageStringsRender[index] + averageStream.str();
-    } else if (state == STAT_GAME) {
-        std::ostringstream strStream;
-
+        else {
+            strStream << std::fixed << std::setprecision(decimalPlaces);
+            strStream << averages[index];
+        }
+        return averageStringsRender[index] + strStream.str();
+    case STAT_GAME:
+        if (index >= numStats) {
+            return "INVALID STATE";
+        }
         // writes time stats
         if (index > endNormalStats) {
             int totalSeconds = statArrayGame[index];
@@ -938,17 +962,26 @@ std::string OBSCounter::statToRenderString(int index, int state) {
                 strStream << "0";
             }
             strStream << remSeconds;
-        } else {
+        }
+        else {
             strStream << statArrayGame[index];
         }
 
         return indexStringMapRenderGame[index] + strStream.str();
-    } else if (state == STAT_OTHER) {
+    case STAT_OTHER:
         if (index >= numOtherStats) {
             return indexStringMapRenderOther[0] + statArrayOther[0];
-        }else {
+        }
+        else {
             return indexStringMapRenderOther[index] + statArrayOther[index];
         }
+    case STAT_CAREER_TOTAL:
+        if (index >= NUMCAREERSTATS) {
+            return "INVALID STATE";
+        }
+        strStream << careerStatTotal[index];
+
+        return indexStringMapRenderCareerTotal[index] + strStream.str();
     }
 }
 

@@ -3,6 +3,7 @@
 
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/PluginSettingsWindow.h"
+#include "Maps.h"
 
 #include "version.h"
 #include <sstream>
@@ -102,5 +103,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     int careerStatPrivate[NUMCAREERSTATS];
     int careerStatRanked[NUMCAREERSTATS];
     int careerStatCasual[NUMCAREERSTATS];
+
+    std::filesystem::path fileLocation;
 };
 

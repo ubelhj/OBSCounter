@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "OBSCounter.h"
-#include "Maps.h"
 
 // calls all write functions at once
 void OBSCounter::writeCareerStats() {
@@ -24,6 +23,23 @@ void OBSCounter::writeCareerStats() {
         careerStatRanked[i] = careerValue.ranked;
         careerStatCasual[i] = careerValue.unranked;
         careerStatTotal[i] = careerValue.private_ + careerValue.ranked + careerValue.unranked;
+
+        // writes the private stat
+        std::ofstream privateFile(fileLocation / "Career" / ("Private" + indexStringMapCareer[i] + ".txt"));
+        privateFile << careerStatPrivate[i];
+        privateFile.close();
+        // writes the ranked stat
+        std::ofstream rankedFile(fileLocation / "Career" / ("Ranked" + indexStringMapCareer[i] + ".txt"));
+        rankedFile << careerStatRanked[i];
+        rankedFile.close();
+        // writes the casual stat
+        std::ofstream casualFile(fileLocation / "Career" / ("Casual" + indexStringMapCareer[i] + ".txt"));
+        casualFile << careerStatCasual[i];
+        casualFile.close();
+        // writes the total stat
+        std::ofstream totalFile(fileLocation / "Career" / ("Total" + indexStringMapCareer[i] + ".txt"));
+        totalFile << careerStatTotal[i];
+        totalFile.close();
 
         i++;
     }
