@@ -470,4 +470,6 @@ static const char * indexStringMapCareerChar[NUMCAREERSTATS] = {
 };
 
 extern std::string indexStringMapRenderCareerTotal[NUMCAREERSTATS];
-
+extern std::string indexStringMapRenderCareerPrivate[NUMCAREERSTATS];
+extern std::string indexStringMapRenderCareerCasual[NUMCAREERSTATS];
+extern std::string indexStringMapRenderCareerRanked[NUMCAREERSTATS];

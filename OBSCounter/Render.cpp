@@ -124,6 +124,29 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         strStream << careerStatTotal[index];
 
         return indexStringMapRenderCareerTotal[index] + strStream.str();
+    case STAT_CAREER_PRIVATE:
+        if (index >= NUMCAREERSTATS) {
+            return "INVALID STATE";
+        }
+        strStream << careerStatPrivate[index];
+
+        return indexStringMapRenderCareerPrivate[index] + strStream.str();
+    case STAT_CAREER_RANKED:
+        if (index >= NUMCAREERSTATS) {
+            return "INVALID STATE";
+        }
+        strStream << careerStatRanked[index];
+
+        return indexStringMapRenderCareerRanked[index] + strStream.str();
+    case STAT_CAREER_CASUAL:
+        if (index >= NUMCAREERSTATS) {
+            return "INVALID STATE";
+        }
+        strStream << careerStatCasual[index];
+
+        return indexStringMapRenderCareerCasual[index] + strStream.str();
+    default:
+        return "INVALID STATE";
     }
 }
 

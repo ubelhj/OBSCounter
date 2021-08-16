@@ -240,6 +240,18 @@ void OBSCounter::statSettings(int renderIndex) {
         statRenderName = "total" + indexStringMapCareer[statIndexCareer];
         statString = indexStringMapCareerChar[statIndexCareer];
         break;
+    case STAT_CAREER_PRIVATE:
+        statRenderName = "private" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
+    case STAT_CAREER_RANKED:
+        statRenderName = "ranked" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
+    case STAT_CAREER_CASUAL:
+        statRenderName = "casual" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
     default:
         break;
     }
@@ -275,6 +287,21 @@ void OBSCounter::statSettings(int renderIndex) {
         if (ImGui::RadioButton(checkboxCareerTotalLabel.c_str(), &overlayState, STAT_CAREER_TOTAL)) {
             overlayStateCvar.setValue(STAT_CAREER_TOTAL);
         }
+        ImGui::SameLine();
+        std::string checkboxCareerPrivateLabel = "Career Private##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerPrivateLabel.c_str(), &overlayState, STAT_CAREER_PRIVATE)) {
+            overlayStateCvar.setValue(STAT_CAREER_PRIVATE);
+        }
+        ImGui::SameLine();
+        std::string checkboxCareerRankedLabel = "Career Ranked##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerRankedLabel.c_str(), &overlayState, STAT_CAREER_RANKED)) {
+            overlayStateCvar.setValue(STAT_CAREER_RANKED);
+        }
+        ImGui::SameLine();
+        std::string checkboxCareerCasualLabel = "Career Casual##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerCasualLabel.c_str(), &overlayState, STAT_CAREER_CASUAL)) {
+            overlayStateCvar.setValue(STAT_CAREER_CASUAL);
+        }
 
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
@@ -289,6 +316,9 @@ void OBSCounter::statSettings(int renderIndex) {
                 statStrings = indexStringMapOtherChar;
                 break;
             case STAT_CAREER_TOTAL:
+            case STAT_CAREER_PRIVATE:
+            case STAT_CAREER_RANKED:
+            case STAT_CAREER_CASUAL:
                 maxSize = NUMCAREERSTATS;
                 statStrings = indexStringMapCareerChar;
                 indexUsed = statIndexCareer;

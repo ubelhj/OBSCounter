@@ -96,6 +96,9 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
         STAT_GAME,
         STAT_OTHER,
         STAT_CAREER_TOTAL,
+        STAT_CAREER_PRIVATE,
+        STAT_CAREER_RANKED,
+        STAT_CAREER_CASUAL,
         STAT_END
     };
 
@@ -107,12 +110,12 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     std::filesystem::path fileLocation;
 
     // whether the last game ended
-// I know it may seem redundant, 
-//  but it allows game tracking to work with casual games
-// in casual you can join games in progress which makes the programming 
-//  to deal with it a bit complicated. 
-// leaving a game before it ends can mess with this boolean and 
-//  game tracking but I haven't found a good workaround yet.
+    // I know it may seem redundant, 
+    //  but it allows game tracking to work with casual games
+    // in casual you can join games in progress which makes the programming 
+    //  to deal with it a bit complicated. 
+    // leaving a game before it ends can mess with this boolean and 
+    //  game tracking but I haven't found a good workaround yet.
     bool endedGame = true;
     int decimalPlaces;
 
