@@ -351,8 +351,27 @@ void OBSCounter::statSettings(int renderIndex) {
 
         char buffer[255] = "";
 
-        if (ImGui::InputTextWithHint("Set New Render String", overlayStatString.c_str(), buffer, 255)) {
+        std::string renderStringLabel = "Set New Render String##" + renderIndexStr;
+        if (ImGui::InputTextWithHint(renderStringLabel.c_str(), overlayStatString.c_str(), buffer, 255)) {
             overlayStatStringCvar.setValue(buffer);
+        }
+
+        if (overlayState == STAT_CAREER_TOTAL) {
+            CVarWrapper offsetCvar = cvarManager->getCvar("counter_career_offset_" + indexStringMapCareer[statIndexCareer]);
+            if (!offsetCvar) { return; }
+            int offset = offsetCvar.getIntValue();
+
+            std::string offsetLabel = "Add offset to total##" + renderIndexStr;
+
+            if (ImGui::InputInt(offsetLabel.c_str(), &offset)) {
+                gameWrapper->Execute([this, offset, offsetCvar](...) mutable {
+                    offsetCvar.setValue(offset);
+                    });
+            }
+
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Use this to add career stats from other platforms if you want");
+            }
         }
     }
 }
