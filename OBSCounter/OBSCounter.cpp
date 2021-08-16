@@ -58,6 +58,10 @@ void OBSCounter::hookEvents() {
     gameWrapper->HookEventPost(
         "Function TAGame.GameEvent_Soccar_TA.OnGameTimeUpdated",
         [this](auto) { checkCarLocation(); });
+    // hooks opening main menu
+    gameWrapper->HookEventPost(
+        "Function TAGame.GFxData_MainMenu_TA.MainMenuAdded",
+        [this](...) { writeCareerStats(); });
 }
 
 int OBSCounter::getPercentage(int numerator, int denominator) {
