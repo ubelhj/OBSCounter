@@ -322,7 +322,6 @@ void OBSCounter::statSettings(int renderIndex) {
         char buffer[255] = "";
 
         if (ImGui::InputTextWithHint("Set New Render String", overlayStatString.c_str(), buffer, 255)) {
-            LOG(overlayStatStringCvar.getCVarName());
             overlayStatStringCvar.setValue(buffer);
         }
     }
