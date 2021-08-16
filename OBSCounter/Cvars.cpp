@@ -199,7 +199,7 @@ void OBSCounter::setCvars() {
 
     for (int i = 0; i < NUMCAREERSTATS; i++) {
         // setters for render strings for other stats
-        std::string cvarNameTotal = "counter_set_render_string_Total" + indexStringMapCareer[i];
+        std::string cvarNameTotal = "counter_set_render_string_total" + indexStringMapCareer[i];
         std::string cvarTipTotal = "sets Total" + indexStringMapCareer[i] + " render string";
         cvarManager->registerCvar(cvarNameTotal, indexStringMapRenderCareerTotal[i], cvarTipTotal);
         auto cvar = cvarManager->getCvar(cvarNameTotal);

@@ -46,8 +46,7 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
         eventType = eventTypePtr->second;
         cvarManager->log("event type: " + eventString);
         cvarManager->log("event num: " + std::to_string(eventType));
-    }
-    else {
+    } else {
         cvarManager->log("missing stat: " + eventString);
         cvarManager->log("missing stat points: " + std::to_string(statEvent.GetPoints()));
         return;

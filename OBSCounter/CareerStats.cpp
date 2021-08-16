@@ -5,18 +5,16 @@
 void OBSCounter::writeCareerStats() {
     auto careerStats = CareerStatsWrapper::GetStatValues();
 
-    bool validStats = true;
-    if (careerStats.size() != NUMCAREERSTATS) {
-        LOG("bad career stats values. DM JerryTheBee");
-        validStats = false;
-    }
-
-    int i = 0;
     for (CareerStatsWrapper::StatValue careerValue : careerStats) {
-        //cvarManager->log(careerValue.stat_name);
-        if (!validStats) {
-            LOG("{} private {}, ranked {}, casual {}", 
-                careerValue.stat_name, careerValue.private_, careerValue.ranked, careerValue.unranked);
+        auto eventTypePtr = eventDictionaryCareer.find(careerValue.stat_name);
+
+        int i;
+
+        if (eventTypePtr != eventDictionaryCareer.end()) {
+            i = eventTypePtr->second;
+        } else {
+            cvarManager->log("missing stat: " + careerValue.stat_name);
+            continue;
         }
 
         careerStatPrivate[i] = careerValue.private_;
