@@ -105,5 +105,39 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     int careerStatCasual[NUMCAREERSTATS];
 
     std::filesystem::path fileLocation;
+
+    // whether the last game ended
+// I know it may seem redundant, 
+//  but it allows game tracking to work with casual games
+// in casual you can join games in progress which makes the programming 
+//  to deal with it a bit complicated. 
+// leaving a game before it ends can mess with this boolean and 
+//  game tracking but I haven't found a good workaround yet.
+    bool endedGame = true;
+    int decimalPlaces;
+
+    // global vars to control overlay
+    // are initialized in onLoad()
+    bool enabledOverlay;
+    bool enabledOverlayBackground;
+    const int defaultMaxOverlayLines = 10;
+    int overlayLines;
+    std::vector<int> overlayStats;
+    std::vector<int> overlayStates;
+    std::vector<std::string> overlayStrings;
+    float xLocation;
+    float yLocation;
+    float scale;
+    LinearColor overlayColor;
+    LinearColor overlayBackgroundColor;
+
+    // holds all stats
+    int statArray[numStats];
+    int statArrayGame[numStats];
+    std::string statArrayOther[numOtherStats];
+
+    // holds all averages
+    // caching improves performance significantly
+    float averages[numStats];
 };
 

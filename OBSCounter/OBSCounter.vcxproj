@@ -95,6 +95,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CareerStats.cpp" />
+    <ClCompile Include="Cvars.cpp" />
+    <ClCompile Include="EventHooks.cpp" />
     <ClCompile Include="fmt\src\format.cc" />
     <ClCompile Include="fmt\src\os.cc" />
     <ClCompile Include="IMGUI\imgui.cpp" />
@@ -114,6 +116,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="OBSCounter.cpp" />
+    <ClCompile Include="Render.cpp" />
+    <ClCompile Include="WriteFiles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMGUI\imconfig.h" />
