@@ -225,6 +225,15 @@ void OBSCounter::setCvars() {
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
                 indexStringMapRenderCareerCasual[i] = cvar.getStringValue();
             });
+
+        // allows user to set an offset to count stats from other platforms
+        std::string cvarNameOffset = "counter_career_offset_" + indexStringMapCareer[i];
+        std::string cvarTipOffset = "sets career total offset for" + indexStringMapCareer[i];
+        cvarManager->registerCvar(cvarNameOffset, "0", cvarTipOffset)
+            .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+                careerStatTotalOffset[i] = cvar.getIntValue();
+                writeCareerStats();
+                });
     }
 
     // special case to make sure games update properly

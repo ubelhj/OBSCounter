@@ -20,7 +20,7 @@ void OBSCounter::writeCareerStats() {
         careerStatPrivate[i] = careerValue.private_;
         careerStatRanked[i] = careerValue.ranked;
         careerStatCasual[i] = careerValue.unranked;
-        careerStatTotal[i] = careerValue.private_ + careerValue.ranked + careerValue.unranked;
+        careerStatTotal[i] = careerValue.private_ + careerValue.ranked + careerValue.unranked + careerStatTotalOffset[i];
 
         // writes the private stat
         std::ofstream privateFile(fileLocation / "Career" / ("Private" + indexStringMapCareer[i] + ".txt"));

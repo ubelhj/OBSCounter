@@ -103,6 +103,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     };
 
     int careerStatTotal[NUMCAREERSTATS];
+    int careerStatTotalOffset[NUMCAREERSTATS];
     int careerStatPrivate[NUMCAREERSTATS];
     int careerStatRanked[NUMCAREERSTATS];
     int careerStatCasual[NUMCAREERSTATS];
