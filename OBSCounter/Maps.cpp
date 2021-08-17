@@ -175,7 +175,8 @@ std::string indexStringMapRenderCareerTotal[NUMCAREERSTATS] = {
     "Career Total Hoops Swish Goals: ",
     "Career Total Ball Hits: ",
     "Career Total High Fives: ",
-    "Career Total Boost Pickups: "
+    "Career Total Boost Pickups: ",
+    "Career Total Games: "
 };
 
 std::string indexStringMapRenderCareerPrivate[NUMCAREERSTATS] = {
@@ -222,7 +223,8 @@ std::string indexStringMapRenderCareerPrivate[NUMCAREERSTATS] = {
     "Career Private Hoops Swish Goals: ",
     "Career Private Ball Hits: ",
     "Career Private High Fives: ",
-    "Career Private Boost Pickups: "
+    "Career Private Boost Pickups: ",
+    "Career Private Games: "
 };
 
 std::string indexStringMapRenderCareerCasual[NUMCAREERSTATS] = {
@@ -269,7 +271,8 @@ std::string indexStringMapRenderCareerCasual[NUMCAREERSTATS] = {
     "Career Casual Hoops Swish Goals: ",
     "Career Casual Ball Hits: ",
     "Career Casual High Fives: ",
-    "Career Casual Boost Pickups: "
+    "Career Casual Boost Pickups: ",
+    "Career Casual Games: "
 };
 
 std::string indexStringMapRenderCareerRanked[NUMCAREERSTATS] = {
@@ -316,7 +319,8 @@ std::string indexStringMapRenderCareerRanked[NUMCAREERSTATS] = {
     "Career Ranked Hoops Swish Goals: ",
     "Career Ranked Ball Hits: ",
     "Career Ranked High Fives: ",
-    "Career Ranked Boost Pickups: "
+    "Career Ranked Boost Pickups: ",
+    "Career Ranked Games: "
 };
 
 std::string indexStringMapRenderCareerAverage[NUMCAREERSTATS] = {
@@ -363,5 +367,6 @@ std::string indexStringMapRenderCareerAverage[NUMCAREERSTATS] = {
     "Career Average Hoops Swish Goals: ",
     "Career Average Ball Hits: ",
     "Career Average High Fives: ",
-    "Career Average Boost Pickups: "
+    "Career Average Boost Pickups: ",
+    "Career Average Games: "
 };

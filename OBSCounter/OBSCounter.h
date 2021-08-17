@@ -55,8 +55,14 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void writeGameTimeStat(int statIndex);
     // writes career stats
     void writeCareerStats();
+    // helper to above 
+    void writeCareerStatsWrapped();
+    // writes to a file
+    void writeFile(std::filesystem::path path, int value);
+    // writes an average to a file
+    void writeFileAverage(std::filesystem::path path, float value);
     // calculates an average of a stat
-    float average(int statValue);
+    float average(int statIndex);
     // divides two stats and prevents NaN
     float divide(int firstStat, int secondStat);
 

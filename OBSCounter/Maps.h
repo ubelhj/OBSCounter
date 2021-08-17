@@ -279,8 +279,6 @@ static const char* indexStringMapOtherChar[numOtherStats] = {
 
 extern std::string indexStringMapRenderOther[numOtherStats];
 
-static const int NUMCAREERSTATS = 44;
-
 static enum careerStats {
     FirstTouch,
     Shot,
@@ -325,7 +323,9 @@ static enum careerStats {
     HoopsSwishGoal,
     BallHit,
     HighFive,
-    BoostPickups
+    BoostPickups,
+    Game,
+    NUMCAREERSTATS
 };
 
 static const std::map<std::string, int> eventDictionaryCareer = {
@@ -419,7 +419,8 @@ static std::string indexStringMapCareer[NUMCAREERSTATS] = {
     "CareerHoopsSwishGoals",
     "CareerBallHits",
     "CareerHighFives",
-    "CareerBoostPickups"
+    "CareerBoostPickups",
+    "CareerGames"
 };
 
 static const char * indexStringMapCareerChar[NUMCAREERSTATS] = {
@@ -466,7 +467,8 @@ static const char * indexStringMapCareerChar[NUMCAREERSTATS] = {
     "Hoops Swish Goals",
     "Ball Hits",
     "High Fives",
-    "Boost Pickups"
+    "Boost Pickups",
+    "Games"
 };
 
 extern std::string indexStringMapRenderCareerTotal[NUMCAREERSTATS];

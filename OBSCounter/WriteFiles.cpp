@@ -5,25 +5,13 @@
 // also writes its game and average stats
 void OBSCounter::write(int statIndex) {
     // writes the total stat
-    std::ofstream totalFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
-    //cvarManager->log("wrote");
-    totalFile << statArray[statIndex];
-    totalFile.close();
+    writeFile(fileLocation / (indexStringMap[statIndex] + ".txt"), statArray[statIndex]);
 
     // doesn't write averageGames, 
     //  as that would just be games/games and always 1
     if (statIndex != games) {
         // writes average of stat per game
-        // sets up average file location
-        std::ofstream averageFile(fileLocation / (averageStrings[statIndex] + ".txt"));
-
-        // calls function to get average of a stat
-        float averageStat = average(statIndex);
-
-        // sets number of decimal places based on user input
-        averageFile << std::fixed << std::setprecision(decimalPlaces);
-        averageFile << averageStat;
-        averageFile.close();
+        writeFileAverage(fileLocation / (averageStrings[statIndex] + ".txt"), average(statIndex));
     }
 
     // writes the game version of stat
@@ -35,7 +23,7 @@ void OBSCounter::write(int statIndex) {
 
 // writes a single stat
 void OBSCounter::writeSpecific(int statIndex, int statType) {
-    std::string statLocation = "";
+    std::string statLocation = "ERR";
     int statValue = 0;
 
     switch (statType) {
@@ -51,9 +39,7 @@ void OBSCounter::writeSpecific(int statIndex, int statType) {
         break;
     }
 
-    std::ofstream gameStatFile(fileLocation / (statLocation + ".txt"));
-    gameStatFile << statValue;
-    gameStatFile.close();
+    writeFile(fileLocation / (statLocation + ".txt"), statValue);
 }
 
 // writes a time stat with special formatting minutes:seconds
@@ -208,4 +194,17 @@ void OBSCounter::writeWinPercentage() {
     file << percentStr;
     file.close();
     statArrayOther[winPercentage] = percentStr;
+}
+
+void OBSCounter::writeFile(std::filesystem::path path, int value) {
+    std::ofstream file(path);
+    file << value;
+    file.close();
+}
+
+void OBSCounter::writeFileAverage(std::filesystem::path path, float value) {
+    std::ofstream file(path);
+    file << std::fixed << std::setprecision(decimalPlaces);
+    file << value;
+    file.close();
 }
