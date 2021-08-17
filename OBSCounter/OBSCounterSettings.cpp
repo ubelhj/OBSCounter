@@ -252,6 +252,10 @@ void OBSCounter::statSettings(int renderIndex) {
         statRenderName = "casual" + indexStringMapCareer[statIndexCareer];
         statString = indexStringMapCareerChar[statIndexCareer];
         break;
+    case STAT_CAREER_AVERAGE:
+        statRenderName = "average" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
     default:
         break;
     }
@@ -259,20 +263,20 @@ void OBSCounter::statSettings(int renderIndex) {
     std::string headerName("Stat " + statRenderName + "###statheader" + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
-        std::string checkboxDefaultLabel = "Default##stat" + renderIndexStr;
+        std::string checkboxDefaultLabel = "Session Total##stat" + renderIndexStr;
         if (ImGui::RadioButton(checkboxDefaultLabel.c_str(), &overlayState, STAT_DEFAULT)) {
             overlayStateCvar.setValue(STAT_DEFAULT);
         }
         ImGui::SameLine();
 
-        std::string checkboxAverageLabel = "Average##stat" + renderIndexStr;
+        std::string checkboxAverageLabel = "Session Average##stat" + renderIndexStr;
         if (ImGui::RadioButton(checkboxAverageLabel.c_str(), &overlayState, STAT_AVERAGE)) {
             overlayStateCvar.setValue(STAT_AVERAGE);
         }
         ImGui::SameLine();
 
 
-        std::string checkboxGameLabel = "Game##stat" + renderIndexStr;
+        std::string checkboxGameLabel = "Current Game##stat" + renderIndexStr;
         if (ImGui::RadioButton(checkboxGameLabel.c_str(), &overlayState, STAT_GAME)) {
             overlayStateCvar.setValue(STAT_GAME);
         }
@@ -302,6 +306,11 @@ void OBSCounter::statSettings(int renderIndex) {
         if (ImGui::RadioButton(checkboxCareerCasualLabel.c_str(), &overlayState, STAT_CAREER_CASUAL)) {
             overlayStateCvar.setValue(STAT_CAREER_CASUAL);
         }
+        ImGui::SameLine();
+        std::string checkboxCareerAverageLabel = "Career Average##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerAverageLabel.c_str(), &overlayState, STAT_CAREER_AVERAGE)) {
+            overlayStateCvar.setValue(STAT_CAREER_AVERAGE);
+        }
 
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
@@ -319,6 +328,7 @@ void OBSCounter::statSettings(int renderIndex) {
             case STAT_CAREER_PRIVATE:
             case STAT_CAREER_RANKED:
             case STAT_CAREER_CASUAL:
+            case STAT_CAREER_AVERAGE:
                 maxSize = NUMCAREERSTATS;
                 statStrings = indexStringMapCareerChar;
                 indexUsed = statIndexCareer;

@@ -95,10 +95,12 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
         STAT_AVERAGE,
         STAT_GAME,
         STAT_OTHER,
+        STAT_CAREER_START = STAT_OTHER,
         STAT_CAREER_TOTAL,
         STAT_CAREER_PRIVATE,
         STAT_CAREER_RANKED,
         STAT_CAREER_CASUAL,
+        STAT_CAREER_AVERAGE,
         STAT_END
     };
 
@@ -107,6 +109,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     int careerStatPrivate[NUMCAREERSTATS];
     int careerStatRanked[NUMCAREERSTATS];
     int careerStatCasual[NUMCAREERSTATS];
+    float careerStatAverage[NUMCAREERSTATS];
 
     std::filesystem::path fileLocation;
 

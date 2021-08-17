@@ -106,12 +106,6 @@ void OBSCounter::setCvars() {
         overlayBackgroundColor = cvar.getColorValue();
         });
 
-    // lists all the stats and their numbers to use in the in game counter
-    cvarManager->registerNotifier("counter_list_stats",
-        [this](std::vector<std::string> params) {
-            writeCareerStats();
-        }, "List all different stat types", PERMISSION_ALL);
-
     // adds 1 to games to fix any errors in game tracking
     cvarManager->registerNotifier("counter_add_game",
         [this](std::vector<std::string> params) {
@@ -225,6 +219,13 @@ void OBSCounter::setCvars() {
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
                 indexStringMapRenderCareerCasual[i] = cvar.getStringValue();
             });
+
+        std::string cvarNameAverage = "counter_set_render_string_average" + indexStringMapCareer[i];
+        std::string cvarTipAverage = "sets Average" + indexStringMapCareer[i] + " render string";
+        cvarManager->registerCvar(cvarNameAverage, indexStringMapRenderCareerAverage[i], cvarTipAverage)
+            .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            indexStringMapRenderCareerAverage[i] = cvar.getStringValue();
+                });
 
         // allows user to set an offset to count stats from other platforms
         std::string cvarNameOffset = "counter_career_offset_" + indexStringMapCareer[i];

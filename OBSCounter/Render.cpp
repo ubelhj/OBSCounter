@@ -45,7 +45,7 @@ void OBSCounter::render(CanvasWrapper canvas) {
 }
 
 std::string OBSCounter::statToRenderString(int index, int state) {
-    if (state >= STAT_END) {
+    if (state >= STAT_END || state < 0 || index < 0) {
         return "INVALID STATE";
     }
 
@@ -145,6 +145,14 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         strStream << careerStatCasual[index];
 
         return indexStringMapRenderCareerCasual[index] + strStream.str();
+    case STAT_CAREER_AVERAGE:
+        if (index >= NUMCAREERSTATS) {
+            return "INVALID STATE";
+        }
+        strStream << std::fixed << std::setprecision(decimalPlaces);
+        strStream << careerStatAverage[index];
+
+        return indexStringMapRenderCareerAverage[index] + strStream.str();
     default:
         return "INVALID STATE";
     }
@@ -152,7 +160,7 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 
 void OBSCounter::renderAllStrings() {
     for (int i = 0; i < overlayStrings.size(); i++) {
-        if (overlayStates[i] > STAT_OTHER) {
+        if (overlayStates[i] > STAT_CAREER_START) {
             overlayStrings[i] = statToRenderString(overlayStatsCareer[i], overlayStates[i]);
         } else {
             overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
