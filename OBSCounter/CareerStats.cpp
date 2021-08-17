@@ -43,7 +43,7 @@ void OBSCounter::writeCareerStatsWrapped() {
     careerStatPrivate[Game] = careerStatPrivate[Win] + careerStatPrivate[Loss];
     careerStatRanked[Game] = careerStatRanked[Win] + careerStatRanked[Loss];
     careerStatCasual[Game] = careerStatCasual[Win] + careerStatCasual[Loss];
-    careerStatTotal[Game] = careerStatTotal[Win] + careerStatTotal[Loss];
+    careerStatTotal[Game] = careerStatTotal[Win] + careerStatTotal[Loss] + careerStatTotalOffset[Game];
 
     // writes the private stat
     writeFile(fileLocation / "Career" / ("Private" + indexStringMapCareer[Game] + ".txt"), careerStatPrivate[Game]);
