@@ -374,9 +374,7 @@ void OBSCounter::statSettings(int renderIndex) {
             std::string offsetLabel = "Add offset to total##" + renderIndexStr;
 
             if (ImGui::InputInt(offsetLabel.c_str(), &offset)) {
-                gameWrapper->Execute([this, offset, offsetCvar](...) mutable {
-                    offsetCvar.setValue(offset);
-                    });
+                offsetCvar.setValue(offset);
             }
 
             if (ImGui::IsItemHovered()) {

@@ -1,7 +1,7 @@
 // enum for all stat indexes 
 // easier to refer back to stat names
 // total stats are from 0 to 30, game stats from 31 to end
-static enum stats {
+enum stats {
     wins,
     losses,
     mvps,
@@ -246,7 +246,7 @@ static const std::map<std::string, int> eventDictionary = {
     { "OwnGoal", ownGoals}
 };
 
-static enum otherStats {
+enum otherStats {
     shootingPercentage,
     gameShootingPercentage,
     kDRatio,
@@ -279,7 +279,7 @@ static const char* indexStringMapOtherChar[numOtherStats] = {
 
 extern std::string indexStringMapRenderOther[numOtherStats];
 
-static enum careerStats {
+enum careerStats {
     FirstTouch,
     Shot,
     Goal,
