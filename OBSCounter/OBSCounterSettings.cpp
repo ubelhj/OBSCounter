@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "OBSCounter.h"
-#include "Maps.h"
 
 std::string OBSCounter::GetPluginName() {
     return "OBS Counter Plugin";
@@ -209,26 +208,53 @@ void OBSCounter::statSettings(int renderIndex) {
     if (!statIndexCvar) { return; }
     int statIndex = statIndexCvar.getIntValue();
 
-    const char* statString = indexStringMapChar[statIndex];
+    CVarWrapper statIndexCareerCvar = cvarManager->getCvar("counter_ingame_stat_career_" + renderIndexStr);
+    if (!statIndexCareerCvar) { return; }
+    int statIndexCareer = statIndexCareerCvar.getIntValue();
 
     CVarWrapper overlayStateCvar = cvarManager->getCvar("counter_ingame_stat_render_state_" + renderIndexStr);
     if (!overlayStateCvar) { return; }
     int overlayState = overlayStateCvar.getIntValue();
 
     std::string statRenderName = "";
+    const char* statString;
 
     switch (overlayState) {
-    case RENDERSTATE_DEFAULT:
+    case STAT_DEFAULT:
         statRenderName = indexStringMap[statIndex];
+        statString = indexStringMapChar[statIndex];
         break;
-    case RENDERSTATE_AVERAGE:
+    case STAT_AVERAGE:
         statRenderName = averageStrings[statIndex];
+        statString = indexStringMapChar[statIndex];
         break;
-    case RENDERSTATE_GAME:
+    case STAT_GAME:
         statRenderName = indexStringMapGame[statIndex];
+        statString = indexStringMapChar[statIndex];
         break;
-    case RENDERSTATE_OTHER:
+    case STAT_OTHER:
         statRenderName = indexStringMapOther[statIndex];
+        statString = indexStringMapChar[statIndex];
+        break;
+    case STAT_CAREER_TOTAL:
+        statRenderName = "total" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
+    case STAT_CAREER_PRIVATE:
+        statRenderName = "private" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
+    case STAT_CAREER_RANKED:
+        statRenderName = "ranked" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
+    case STAT_CAREER_CASUAL:
+        statRenderName = "casual" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
+        break;
+    case STAT_CAREER_AVERAGE:
+        statRenderName = "average" + indexStringMapCareer[statIndexCareer];
+        statString = indexStringMapCareerChar[statIndexCareer];
         break;
     default:
         break;
@@ -237,39 +263,76 @@ void OBSCounter::statSettings(int renderIndex) {
     std::string headerName("Stat " + statRenderName + "###statheader" + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
-        std::string checkboxDefaultLabel = "Default##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxDefaultLabel.c_str(), &overlayState, RENDERSTATE_DEFAULT)) {
-            overlayStateCvar.setValue(RENDERSTATE_DEFAULT);
+        std::string checkboxDefaultLabel = "Session Total##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxDefaultLabel.c_str(), &overlayState, STAT_DEFAULT)) {
+            overlayStateCvar.setValue(STAT_DEFAULT);
         }
         ImGui::SameLine();
 
-        std::string checkboxAverageLabel = "Average##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxAverageLabel.c_str(), &overlayState, RENDERSTATE_AVERAGE)) {
-            overlayStateCvar.setValue(RENDERSTATE_AVERAGE);
+        std::string checkboxAverageLabel = "Session Average##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxAverageLabel.c_str(), &overlayState, STAT_AVERAGE)) {
+            overlayStateCvar.setValue(STAT_AVERAGE);
         }
         ImGui::SameLine();
 
 
-        std::string checkboxGameLabel = "Game##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxGameLabel.c_str(), &overlayState, RENDERSTATE_GAME)) {
-            overlayStateCvar.setValue(RENDERSTATE_GAME);
+        std::string checkboxGameLabel = "Current Game##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxGameLabel.c_str(), &overlayState, STAT_GAME)) {
+            overlayStateCvar.setValue(STAT_GAME);
         }
         ImGui::SameLine();
 
         std::string checkboxOtherLabel = "Other##stat" + renderIndexStr;
-        if (ImGui::RadioButton(checkboxOtherLabel.c_str(), &overlayState, RENDERSTATE_OTHER)) {
-            overlayStateCvar.setValue(RENDERSTATE_OTHER);
+        if (ImGui::RadioButton(checkboxOtherLabel.c_str(), &overlayState, STAT_OTHER)) {
+            overlayStateCvar.setValue(STAT_OTHER);
+        }
+
+        std::string checkboxCareerTotalLabel = "Career Total##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerTotalLabel.c_str(), &overlayState, STAT_CAREER_TOTAL)) {
+            overlayStateCvar.setValue(STAT_CAREER_TOTAL);
+        }
+        ImGui::SameLine();
+        std::string checkboxCareerPrivateLabel = "Career Private##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerPrivateLabel.c_str(), &overlayState, STAT_CAREER_PRIVATE)) {
+            overlayStateCvar.setValue(STAT_CAREER_PRIVATE);
+        }
+        ImGui::SameLine();
+        std::string checkboxCareerRankedLabel = "Career Ranked##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerRankedLabel.c_str(), &overlayState, STAT_CAREER_RANKED)) {
+            overlayStateCvar.setValue(STAT_CAREER_RANKED);
+        }
+        ImGui::SameLine();
+        std::string checkboxCareerCasualLabel = "Career Casual##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerCasualLabel.c_str(), &overlayState, STAT_CAREER_CASUAL)) {
+            overlayStateCvar.setValue(STAT_CAREER_CASUAL);
+        }
+        ImGui::SameLine();
+        std::string checkboxCareerAverageLabel = "Career Average##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerAverageLabel.c_str(), &overlayState, STAT_CAREER_AVERAGE)) {
+            overlayStateCvar.setValue(STAT_CAREER_AVERAGE);
         }
 
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
             int maxSize = 0;
             const char** statStrings = nullptr;
+            int indexUsed = statIndex;
+            CVarWrapper cvarIndexUsed = statIndexCvar;
 
             switch (overlayState) {
-            case RENDERSTATE_OTHER:
+            case STAT_OTHER:
                 maxSize = numOtherStats;
                 statStrings = indexStringMapOtherChar;
+                break;
+            case STAT_CAREER_TOTAL:
+            case STAT_CAREER_PRIVATE:
+            case STAT_CAREER_RANKED:
+            case STAT_CAREER_CASUAL:
+            case STAT_CAREER_AVERAGE:
+                maxSize = NUMCAREERSTATS;
+                statStrings = indexStringMapCareerChar;
+                indexUsed = statIndexCareer;
+                cvarIndexUsed = statIndexCareerCvar;
                 break;
             default:
                 maxSize = numStats;
@@ -278,10 +341,10 @@ void OBSCounter::statSettings(int renderIndex) {
             }
 
             for (int n = 0; n < maxSize; n++) {
-                const bool is_selected = (statIndex == n);
+                const bool is_selected = (indexUsed == n);
                 
                 if (ImGui::Selectable(statStrings[n], is_selected)) {
-                    statIndexCvar.setValue(n);
+                    cvarIndexUsed.setValue(n);
                 }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -298,8 +361,25 @@ void OBSCounter::statSettings(int renderIndex) {
 
         char buffer[255] = "";
 
-        if (ImGui::InputTextWithHint("Set New Render String", overlayStatString.c_str(), buffer, 255)) {
+        std::string renderStringLabel = "Set New Render String##" + renderIndexStr;
+        if (ImGui::InputTextWithHint(renderStringLabel.c_str(), overlayStatString.c_str(), buffer, 255)) {
             overlayStatStringCvar.setValue(buffer);
+        }
+
+        if (overlayState == STAT_CAREER_TOTAL) {
+            CVarWrapper offsetCvar = cvarManager->getCvar("counter_career_offset_" + indexStringMapCareer[statIndexCareer]);
+            if (!offsetCvar) { return; }
+            int offset = offsetCvar.getIntValue();
+
+            std::string offsetLabel = "Add offset to total##" + renderIndexStr;
+
+            if (ImGui::InputInt(offsetLabel.c_str(), &offset)) {
+                offsetCvar.setValue(offset);
+            }
+
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Use this to add career stats from other platforms if you want");
+            }
         }
     }
 }
@@ -322,4 +402,15 @@ void OBSCounter::addRemoveStatSettings() {
     ImGui::SameLine();
 
     ImGui::TextUnformatted("Maximum 10 Stats");
+
+    if (ImGui::Button("Copy Demolition leaderboard update message")) {
+        std::string clipboardText( "/update Demolitions: " + std::to_string(careerStatTotal[Demolish]) 
+            + " Exterminations: " + std::to_string(careerStatTotal[Demolition]));
+        ImGui::SetClipboardText(clipboardText.c_str());
+    }
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Easy copying of stats for the Demolition and Extermination Leaderboard! Join it at discord.gg/kNnDxuC");
+    }
 }

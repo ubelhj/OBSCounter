@@ -3,6 +3,7 @@
 
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/PluginSettingsWindow.h"
+#include "Maps.h"
 
 #include "version.h"
 #include <sstream>
@@ -46,16 +47,24 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void writeAll();
     // writes a specific stat
     void write(int statIndex);
-    // writes a game stat only
-    void writeGameStat(int statIndex);
+    // writes a specific type of stat
+    void writeSpecific(int statIndex, int statType);
     // writes time stats
     void writeTimeStat(int statIndex);
     // writes a game stat only but formats for time
     void writeGameTimeStat(int statIndex);
+    // writes career stats
+    void writeCareerStats();
+    // helper to above 
+    void writeCareerStatsWrapped();
+    // writes to a file
+    void writeFile(std::filesystem::path path, int value);
+    // writes an average to a file
+    void writeFileAverage(std::filesystem::path path, float value);
     // calculates an average of a stat
-    float average(int statValue);
+    float average(int statIndex);
     // divides two stats and prevents NaN
-    float divide(int firstStatIndex, int secondStatIndex);
+    float divide(int firstStat, int secondStat);
 
 
     // extra stats beyond basic ones
@@ -87,15 +96,62 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void statSettings(int renderIndex);
     void addRemoveStatSettings();
 
-    // prints all stat types
-    void listStats();
-
-    enum stringRenderStates {
-        RENDERSTATE_DEFAULT,
-        RENDERSTATE_AVERAGE,
-        RENDERSTATE_GAME,
-        RENDERSTATE_OTHER,
-        RENDERSTATE_END
+    enum statStates {
+        STAT_DEFAULT,
+        STAT_AVERAGE,
+        STAT_GAME,
+        STAT_OTHER,
+        STAT_CAREER_START = STAT_OTHER,
+        STAT_CAREER_TOTAL,
+        STAT_CAREER_PRIVATE,
+        STAT_CAREER_RANKED,
+        STAT_CAREER_CASUAL,
+        STAT_CAREER_AVERAGE,
+        STAT_END
     };
+
+    int careerStatTotal[NUMCAREERSTATS];
+    int careerStatTotalOffset[NUMCAREERSTATS];
+    int careerStatPrivate[NUMCAREERSTATS];
+    int careerStatRanked[NUMCAREERSTATS];
+    int careerStatCasual[NUMCAREERSTATS];
+    float careerStatAverage[NUMCAREERSTATS];
+
+    std::filesystem::path fileLocation;
+
+    // whether the last game ended
+    // I know it may seem redundant, 
+    //  but it allows game tracking to work with casual games
+    // in casual you can join games in progress which makes the programming 
+    //  to deal with it a bit complicated. 
+    // leaving a game before it ends can mess with this boolean and 
+    //  game tracking but I haven't found a good workaround yet.
+    bool endedGame = true;
+    int decimalPlaces;
+
+    // global vars to control overlay
+    // are initialized in onLoad()
+    bool enabledOverlay;
+    bool enabledOverlayBackground;
+    const int defaultMaxOverlayLines = 10;
+    int overlayLines;
+    std::vector<int> overlayStats;
+    std::vector<int> overlayStatsCareer;
+    std::vector<int> overlayStates;
+    std::vector<std::string> overlayStrings;
+    float xLocation;
+    float yLocation;
+    float scale;
+    LinearColor overlayColor;
+    LinearColor overlayBackgroundColor;
+
+    // holds all stats
+    int statArray[numStats];
+    int statArrayGame[numStats];
+    std::string statArrayOther[numOtherStats];
+
+    // holds all averages
+    // caching improves performance significantly
+    float averages[numStats];
 };
 
