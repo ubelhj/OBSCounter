@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "OBSCounter.h"
 
+bool inDragMode = false;
+
 std::string OBSCounter::GetPluginName() {
     return "OBS Counter Plugin";
 }
@@ -199,6 +201,27 @@ void OBSCounter::locationAndScaleSettings() {
     if (ImGui::SliderInt("Decimals for averages", &decimals, 1, 5)) {
         decimalsCvar.setValue(decimals);
     }
+
+    // location dragger
+    if (!enabledOverlay) return;
+    ImGui::Checkbox("Drag Mode", &inDragMode);
+
+    if (inDragMode) {
+        ImVec2 mousePos = ImGui::GetMousePos();
+
+        if (ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered()) {
+            return;
+        }
+        ImGui::SetMouseCursor(2);
+        if (ImGui::IsMouseDown(0)) {
+            float newX = mousePos.x / screenSize.X;
+            float newY = mousePos.y / screenSize.Y;
+
+            xLocCvar.setValue(newX);
+            yLocCvar.setValue(newY);
+        }
+    }
+   
 }
 
 void OBSCounter::statSettings(int renderIndex) {

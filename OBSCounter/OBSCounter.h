@@ -142,6 +142,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     float xLocation;
     float yLocation;
     float scale;
+    Vector2 screenSize;
     LinearColor overlayColor;
     LinearColor overlayBackgroundColor;
 

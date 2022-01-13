@@ -9,11 +9,11 @@ void OBSCounter::render(CanvasWrapper canvas) {
 
     renderAllStrings();
 
-    Vector2 screen = canvas.GetSize();
+    screenSize = canvas.GetSize();
 
     float fontSize = scale;
-    int xValue = int((float)screen.X * xLocation);
-    int yValue = int((float)screen.Y * yLocation);
+    int xValue = int((float)screenSize.X * xLocation);
+    int yValue = int((float)screenSize.Y * yLocation);
 
     Vector2F maxStringSize = { -1.0, -1.0 };
     for (int i = 0; i < overlayLines; i++) {
