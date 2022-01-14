@@ -129,14 +129,56 @@ void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
         return;
     }
 
-    // special case for demolitions to check for the player's death
-    if (eventType == demos && isPrimaryPlayer(victim)) {
-        cvarManager->log("player died");
-        statArray[deaths]++;
-        statArrayGame[deaths]++;
-        write(deaths);
-        writeKillPercentage();
+    // team stats
+    ServerWrapper sw = gameWrapper->GetOnlineGame();
+    if (!sw) {
+        cvarManager->log("null server");
         return;
+    }
+    PlayerControllerWrapper primary = sw.GetLocalPrimaryPlayer();
+    if (!primary) {
+        cvarManager->log("null primary player");
+        return;
+    }
+
+    unsigned char playerTeamNum = primary.GetTeamNum2();
+    if (playerTeamNum > 1) return;
+
+    unsigned char recieverTeamNum = receiver.GetTeamNum2();
+    bool sameTeam = playerTeamNum == recieverTeamNum;
+
+    if (sameTeam) {
+        statArrayTeam[eventType]++;
+        writeSpecific(eventType, STAT_TEAM);
+    } else {
+        statArrayOpponent[eventType]++;
+        writeSpecific(eventType, STAT_TEAM_OPPONENT);
+    }
+
+    switch (eventType) {
+    case saves:
+    case epicSaves:
+        sameTeam ?
+            statArrayTeam[totalSaves]++ :
+            statArrayOpponent[totalSaves]++;
+        write(totalSaves);
+        break;
+    case demos:
+        bool sameTeamDead = playerTeamNum == victim.GetTeamNum2();
+        sameTeamDead ?
+            statArrayTeam[deaths]++ :
+            statArrayOpponent[deaths]++;
+
+        if (isPrimaryPlayer(victim)) {
+            cvarManager->log("player died");
+            statArray[deaths]++;
+            statArrayGame[deaths]++;
+            writeKillPercentage();
+            return;
+        }
+
+        write(deaths);
+        break;
     }
 }
 
