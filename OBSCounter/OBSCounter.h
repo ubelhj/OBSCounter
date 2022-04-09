@@ -150,8 +150,8 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 
     // holds all stats
     int statArray[numStats];
-    int statArrayTeam[numStats];
-    int statArrayOpponent[numStats];
+    int statArrayTeam[endNormalStats - 1];
+    int statArrayOpponent[endNormalStats - 1];
     int statArrayGame[numStats];
     std::string statArrayOther[numOtherStats];
 

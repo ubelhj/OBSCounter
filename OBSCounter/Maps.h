@@ -476,3 +476,6 @@ extern std::string indexStringMapRenderCareerPrivate[NUMCAREERSTATS];
 extern std::string indexStringMapRenderCareerCasual[NUMCAREERSTATS];
 extern std::string indexStringMapRenderCareerRanked[NUMCAREERSTATS];
 extern std::string indexStringMapRenderCareerAverage[NUMCAREERSTATS];
+
+extern std::string indexStringMapRenderTeam[numStats];
+extern std::string indexStringMapRenderOpponent[numStats];

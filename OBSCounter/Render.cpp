@@ -30,7 +30,7 @@ void OBSCounter::render(CanvasWrapper canvas) {
 
     if (enabledOverlayBackground) {
         canvas.SetColor(overlayBackgroundColor);
-        canvas.SetPosition(Vector2({ xValue, yValue }));
+        canvas.SetPosition(Vector2 { xValue, yValue });
         canvas.FillBox(Vector2({ int(maxStringSize.X), int(maxStringSize.Y * overlayLines) }));
     }
 
@@ -153,6 +153,32 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         strStream << careerStatAverage[index];
 
         return indexStringMapRenderCareerAverage[index] + strStream.str();
+    case STAT_TEAM:
+        if (index >= numStats) {
+            return "INVALID STATE";
+        }
+
+        // writes time stats
+        if (index >= endNormalStats) {
+            // time stats don't exist for teams
+        } else {
+            strStream << statArrayTeam[index];
+        }
+
+        return indexStringMapRenderTeam[index] + strStream.str();
+    case STAT_TEAM_OPPONENT:
+        if (index >= numStats) {
+            return "INVALID STATE";
+        }
+
+        // writes time stats
+        if (index >= endNormalStats) {
+            // time stats don't exist for teams
+        } else {
+            strStream << statArrayOpponent[index];
+        }
+
+        return indexStringMapRenderOpponent[index] + strStream.str();
     default:
         return "INVALID STATE";
     }

@@ -95,21 +95,11 @@ void OBSCounter::colorSettings() {
         return;
     }
 
-    float textColors[4];
-
     LinearColor textColor = textColorVar.getColorValue();
 
-    ImVec4 colorVec;
-
-    textColors[0] = textColor.R / 255;
-    textColors[1] = textColor.G / 255;
-    textColors[2] = textColor.B / 255;
-    textColors[3] = textColor.A / 255;
-
-    colorVec.x = textColor.R / 255;
-    colorVec.y = textColor.G / 255;
-    colorVec.z = textColor.B / 255;
-    colorVec.w = textColor.A / 255;
+    float textColors[4] = { textColor.R / 255, textColor.G / 255, textColor.B / 255, textColor.A / 255 };
+    ImVec4 colorVec = { textColor.R / 255, textColor.G / 255, textColor.B / 255, textColor.A / 255 };
+    
     if (ImGui::ColorButton("Text Color##button", colorVec)) {
         ImGui::OpenPopup("Text Color selector");
     }
@@ -120,10 +110,7 @@ void OBSCounter::colorSettings() {
 
     if (ImGui::BeginPopup("Text Color selector")) {
         if (ImGui::ColorPicker4("Text Color##selector", textColors)) {
-            textColor.R = textColors[0] * 255;
-            textColor.G = textColors[1] * 255;
-            textColor.B = textColors[2] * 255;
-            textColor.A = textColors[3] * 255;
+            textColor = { textColors[0] * 255, textColors[1] * 255, textColors[2] * 255, textColors[3] * 255 };
             textColorVar.setValue(textColor);
         }
 
