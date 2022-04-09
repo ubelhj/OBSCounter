@@ -237,6 +237,23 @@ void OBSCounter::setCvars() {
                 });
     }
 
+    // setters for render strings for stats
+    for (int i = 0; i < endNormalStats; i++) {
+        std::string cvarNameTeam = "counter_set_render_string_team" + indexStringMap[i];
+        std::string cvarTipTeam = "sets team" + indexStringMap[i] + " render string";
+        cvarManager->registerCvar(cvarNameTeam, indexStringMapRenderTeam[i], cvarTipTeam);
+        auto cvarTeam = cvarManager->getCvar(cvarNameTeam);
+        cvarTeam.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            indexStringMapRenderTeam[i] = cvar.getStringValue(); });
+
+        std::string cvarNameOpponent = "counter_set_render_string_opponent" + indexStringMap[i];
+        std::string cvarTipOpponent = "sets opponent" + indexStringMap[i] + " render string";
+        cvarManager->registerCvar(cvarNameOpponent, indexStringMapRenderOpponent[i], cvarTipOpponent);
+        auto cvarOpponent = cvarManager->getCvar(cvarNameOpponent);
+        cvarOpponent.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
+            indexStringMapRenderOpponent[i] = cvar.getStringValue(); });
+    }
+
     // special case to make sure games update properly
     // needs to call startGame() to ensure averages and 
     //  game stats are written

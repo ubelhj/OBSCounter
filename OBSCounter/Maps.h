@@ -40,8 +40,8 @@ enum stats {
     totalSaves,
     ownGoals,
     // last stat with normal output type
-    endNormalStats = ownGoals,
-    timePlayed,
+    endNormalStats = ownGoals + 1,
+    timePlayed = endNormalStats,
     offenseTime,
     defenseTime,
     // total number of stats in the stat array
@@ -477,5 +477,5 @@ extern std::string indexStringMapRenderCareerCasual[NUMCAREERSTATS];
 extern std::string indexStringMapRenderCareerRanked[NUMCAREERSTATS];
 extern std::string indexStringMapRenderCareerAverage[NUMCAREERSTATS];
 
-extern std::string indexStringMapRenderTeam[numStats];
-extern std::string indexStringMapRenderOpponent[numStats];
+extern std::string indexStringMapRenderTeam[endNormalStats];
+extern std::string indexStringMapRenderOpponent[endNormalStats];

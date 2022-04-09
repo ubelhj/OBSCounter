@@ -371,7 +371,7 @@ std::string indexStringMapRenderCareerAverage[NUMCAREERSTATS] = {
     "Career Average Games: "
 };
 
-std::string indexStringMapRenderTeam[numStats] = {
+std::string indexStringMapRenderTeam[endNormalStats] = {
     "Team Wins: ",
     "Team Losses: ",
     "Team MVPs: ",
@@ -394,9 +394,9 @@ std::string indexStringMapRenderTeam[numStats] = {
     "Team Epic Saves: ",
     "Team Saviors: ",
     "Team Shots: ",
-    "Team Centers: ",
-    "Team Clears: ",
-    "Team First Touches: ",
+    "Team Centers (BROKEN): ",
+    "Team Clears (BROKEN): ",
+    "Team First Touches (BROKEN): ",
     "Team Damages: ",
     "Team Ultra Damages: ",
     "Team LowFives: ",
@@ -405,13 +405,10 @@ std::string indexStringMapRenderTeam[numStats] = {
     "Team Bicycle Hits: ",
     "Team Points: ",
     "Team Total Saves: ",
-    "Team Own Goals: ",
-    "Team Time Played: ",
-    "Team Offense Time: ",
-    "Team Defense Time: "
+    "Team Own Goals: "
 };
 
-std::string indexStringMapRenderOpponent[numStats] = {
+std::string indexStringMapRenderOpponent[endNormalStats] = {
     "Opponent Wins: ",
     "Opponent Losses: ",
     "Opponent MVPs: ",
@@ -434,9 +431,9 @@ std::string indexStringMapRenderOpponent[numStats] = {
     "Opponent Epic Saves: ",
     "Opponent Saviors: ",
     "Opponent Shots: ",
-    "Opponent Centers: ",
-    "Opponent Clears: ",
-    "Opponent First Touches: ",
+    "Opponent Centers (BROKEN): ",
+    "Opponent Clears (BROKEN): ",
+    "Opponent First Touches (BROKEN): ",
     "Opponent Damages: ",
     "Opponent Ultra Damages: ",
     "Opponent LowFives: ",
@@ -445,8 +442,5 @@ std::string indexStringMapRenderOpponent[numStats] = {
     "Opponent Bicycle Hits: ",
     "Opponent Points: ",
     "Opponent Total Saves: ",
-    "Opponent Own Goals: ",
-    "Opponent Time Played: ",
-    "Opponent Offense Time: ",
-    "Opponent Defense Time: "
+    "Opponent Own Goals: "
 };
