@@ -107,6 +107,7 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
         STAT_CAREER_RANKED,
         STAT_CAREER_CASUAL,
         STAT_CAREER_AVERAGE,
+        STAT_TEAM_START = STAT_CAREER_AVERAGE,
         STAT_TEAM,
         STAT_TEAM_OPPONENT,
         STAT_END

@@ -266,6 +266,14 @@ void OBSCounter::statSettings(int renderIndex) {
         statRenderName = "average" + indexStringMapCareer[statIndexCareer];
         statString = indexStringMapCareerChar[statIndexCareer];
         break;
+    case STAT_TEAM:
+        statRenderName = "team" + indexStringMap[statIndex];
+        statString = indexStringMapChar[statIndex];
+        break;
+    case STAT_TEAM_OPPONENT:
+        statRenderName = "opponent" + indexStringMap[statIndex];
+        statString = indexStringMapChar[statIndex];
+        break;
     default:
         break;
     }
@@ -321,6 +329,15 @@ void OBSCounter::statSettings(int renderIndex) {
         if (ImGui::RadioButton(checkboxCareerAverageLabel.c_str(), &overlayState, STAT_CAREER_AVERAGE)) {
             overlayStateCvar.setValue(STAT_CAREER_AVERAGE);
         }
+        std::string checkboxCareerTeamLabel = "Session My Team##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerTeamLabel.c_str(), &overlayState, STAT_TEAM)) {
+            overlayStateCvar.setValue(STAT_TEAM);
+        }
+        ImGui::SameLine();
+        std::string checkboxCareerOpponentLabel = "Session Opponent Team##stat" + renderIndexStr;
+        if (ImGui::RadioButton(checkboxCareerOpponentLabel.c_str(), &overlayState, STAT_TEAM_OPPONENT)) {
+            overlayStateCvar.setValue(STAT_TEAM_OPPONENT);
+        }
 
         std::string listBoxName("##Select stat" + renderIndexStr);
         if (ImGui::ListBoxHeader(listBoxName.c_str())) {
@@ -330,24 +347,29 @@ void OBSCounter::statSettings(int renderIndex) {
             CVarWrapper cvarIndexUsed = statIndexCvar;
 
             switch (overlayState) {
-            case STAT_OTHER:
-                maxSize = numOtherStats;
-                statStrings = indexStringMapOtherChar;
-                break;
-            case STAT_CAREER_TOTAL:
-            case STAT_CAREER_PRIVATE:
-            case STAT_CAREER_RANKED:
-            case STAT_CAREER_CASUAL:
-            case STAT_CAREER_AVERAGE:
-                maxSize = NUMCAREERSTATS;
-                statStrings = indexStringMapCareerChar;
-                indexUsed = statIndexCareer;
-                cvarIndexUsed = statIndexCareerCvar;
-                break;
-            default:
-                maxSize = numStats;
-                statStrings = indexStringMapChar;
-                break;
+                case STAT_OTHER:
+                    maxSize = numOtherStats;
+                    statStrings = indexStringMapOtherChar;
+                    break;
+                case STAT_CAREER_TOTAL:
+                case STAT_CAREER_PRIVATE:
+                case STAT_CAREER_RANKED:
+                case STAT_CAREER_CASUAL:
+                case STAT_CAREER_AVERAGE:
+                    maxSize = NUMCAREERSTATS;
+                    statStrings = indexStringMapCareerChar;
+                    indexUsed = statIndexCareer;
+                    cvarIndexUsed = statIndexCareerCvar;
+                    break;
+                case STAT_TEAM:
+                case STAT_TEAM_OPPONENT:
+                    maxSize = endNormalStats;
+                    statStrings = indexStringMapChar;
+                    break;
+                default:
+                    maxSize = numStats;
+                    statStrings = indexStringMapChar;
+                    break;
             }
 
             for (int n = 0; n < maxSize; n++) {

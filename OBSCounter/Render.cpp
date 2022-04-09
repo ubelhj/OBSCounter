@@ -186,10 +186,11 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 
 void OBSCounter::renderAllStrings() {
     for (int i = 0; i < overlayStrings.size(); i++) {
-        if (overlayStates[i] > STAT_CAREER_START) {
-            overlayStrings[i] = statToRenderString(overlayStatsCareer[i], overlayStates[i]);
+        auto state = overlayStates[i];
+        if (state > STAT_CAREER_START && state <= STAT_TEAM_START) {
+            overlayStrings[i] = statToRenderString(overlayStatsCareer[i], state);
         } else {
-            overlayStrings[i] = statToRenderString(overlayStats[i], overlayStates[i]);
+            overlayStrings[i] = statToRenderString(overlayStats[i], state);
         }
     }
 }
