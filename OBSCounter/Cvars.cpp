@@ -11,15 +11,6 @@ void OBSCounter::setCvars() {
         writeAll();
         });
 
-    // in-game overlay cvars
-    // enables or disables overlay
-    auto overlayEnableVar = cvarManager->registerCvar("counter_enable_ingame",
-        "0", "enables in game overlay");
-    enabledOverlay = overlayEnableVar.getBoolValue();
-    overlayEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        enabledOverlay = cvar.getBoolValue();
-        });
-
     // sets number of stats in in game overlay
     // 1-5 allowed
     auto overlayNumberVar = cvarManager->registerCvar(
@@ -59,24 +50,6 @@ void OBSCounter::setCvars() {
             overlayStates[i] = cvar.getIntValue();
             });
     }
-
-    // sets cvar to move counter's X location
-    auto xLocVar = cvarManager->registerCvar("counter_ingame_x_location",
-        "0.86", "set location of ingame counter X in % of screen",
-        true, true, 0.0, true, 1.0);
-    xLocation = xLocVar.getFloatValue();
-    xLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        xLocation = cvar.getFloatValue();
-        });
-
-    // sets cvar to move counter's Y location
-    auto yLocVar = cvarManager->registerCvar("counter_ingame_y_location",
-        "0", "set location of ingame counter Y in % of screen",
-        true, true, 0.0, true, 1.0);
-    yLocation = yLocVar.getFloatValue();
-    yLocVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
-        yLocation = cvar.getFloatValue();
-        });
 
     // sets cvar for counter's scale
     auto scaleVar = cvarManager->registerCvar("counter_ingame_scale",

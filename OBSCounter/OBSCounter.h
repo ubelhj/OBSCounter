@@ -4,12 +4,12 @@
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/PluginSettingsWindow.h"
 #include "bakkesmod/plugin/pluginwindow.h"
+#include "bakkesmod/wrappers/GuiManagerWrapper.h"
 #include "Maps.h"
 
 #include "version.h"
 #include <sstream>
 #include <fstream>
-#include "bakkesmod/wrappers/GameObject/Stats/StatEventWrapper.h"
 constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_MINOR) "." stringify(VERSION_PATCH) "." stringify(VERSION_BUILD);
 
 class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::Plugin::PluginSettingsWindow, public BakkesMod::Plugin::PluginWindow
@@ -110,6 +110,7 @@ private:
     bool isWindowOpen_ = false;
     std::string menuTitle_ = "OBSCounter";
     bool inDragMode = false;
+    ImFont* font;
 
     enum statStates {
         STAT_DEFAULT,

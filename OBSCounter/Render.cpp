@@ -36,9 +36,24 @@ void OBSCounter::Render() {
 
     ImGui::SetWindowFontScale(scale);
 
+    // First ensure the font is actually loaded
+    if (!font) {
+        auto gui = gameWrapper->GetGUIManager();
+        font = gui.GetFont("OBSCounter");
+    }
+
+    // Now use the font
+    if (font) {
+        ImGui::PushFont(font);
+    }
+
     for (int i = 0; i < overlayLines; i++) {
         // locates based on screen and font size
         ImGui::Text(overlayStrings[i].c_str());
+    }
+
+    if (font) {
+        ImGui::PopFont();
     }
 
     ImGui::PopStyleColor(3);
@@ -235,4 +250,18 @@ void OBSCounter::OnOpen()
 void OBSCounter::OnClose()
 {
     isWindowOpen_ = false;
+}
+
+void OBSCounter::SetImGuiContext(uintptr_t ctx) {
+    ImGui::SetCurrentContext(reinterpret_cast<ImGuiContext*>(ctx));
+
+    auto gui = gameWrapper->GetGUIManager();
+
+    // This syntax requires c++17
+    // Pick any name you want for the font here
+    auto [res, newFont] = gui.LoadFont("OBSCounter", "OBSCounter.ttf", 40);
+
+    if (res == 2 && newFont) {
+        font = newFont;
+    }
 }

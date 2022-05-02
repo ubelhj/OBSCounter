@@ -5,10 +5,6 @@ std::string OBSCounter::GetPluginName() {
     return "OBS Counter Plugin";
 }
 
-void OBSCounter::SetImGuiContext(uintptr_t ctx) {
-    ImGui::SetCurrentContext(reinterpret_cast<ImGuiContext*>(ctx));
-}
-
 void OBSCounter::RenderSettings() {
     enableSettings();
 
