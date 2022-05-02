@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "OBSCounter.h"
 
-bool inDragMode = false;
-
 std::string OBSCounter::GetPluginName() {
     return "OBS Counter Plugin";
 }
@@ -45,16 +43,10 @@ void OBSCounter::RenderSettings() {
 }
 
 void OBSCounter::enableSettings() {
-    CVarWrapper enableVar = cvarManager->getCvar("counter_enable_ingame");
-
-    if (!enableVar) {
-        return;
-    }
-
-    bool enabled = enableVar.getBoolValue();
-
-    if (ImGui::Checkbox("Enable overlay", &enabled)) {
-        enableVar.setValue(enabled);
+    if (ImGui::Button("Toggle overlay")) {
+        gameWrapper->Execute([this](...) {
+            cvarManager->executeCommand("togglemenu OBSCounter");
+            });
     }
 
     if (ImGui::Button("Add a Game")) {
@@ -164,18 +156,6 @@ void OBSCounter::colorSettings() {
 }
 
 void OBSCounter::locationAndScaleSettings() {
-    CVarWrapper xLocCvar = cvarManager->getCvar("counter_ingame_x_location");
-    if (!xLocCvar) { return; }
-    float xLoc = xLocCvar.getFloatValue();
-    if (ImGui::SliderFloat("X Location", &xLoc, 0.0, 1.0)) {
-        xLocCvar.setValue(xLoc);
-    }
-    CVarWrapper yLocCvar = cvarManager->getCvar("counter_ingame_y_location");
-    if (!yLocCvar) { return; }
-    float yLoc = yLocCvar.getFloatValue();
-    if (ImGui::SliderFloat("Y Location", &yLoc, 0.0, 1.0)) {
-        yLocCvar.setValue(yLoc);
-    }
     CVarWrapper textScaleCvar = cvarManager->getCvar("counter_ingame_scale");
     if (!textScaleCvar) { return; }
     float textScale = textScaleCvar.getFloatValue();
@@ -190,25 +170,7 @@ void OBSCounter::locationAndScaleSettings() {
     }
 
     // location dragger
-    if (!enabledOverlay) return;
     ImGui::Checkbox("Drag Mode", &inDragMode);
-
-    if (inDragMode) {
-        ImVec2 mousePos = ImGui::GetMousePos();
-
-        if (ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered()) {
-            return;
-        }
-        ImGui::SetMouseCursor(2);
-        if (ImGui::IsMouseDown(0)) {
-            float newX = mousePos.x / screenSize.X;
-            float newY = mousePos.y / screenSize.Y;
-
-            xLocCvar.setValue(newX);
-            yLocCvar.setValue(newY);
-        }
-    }
-   
 }
 
 void OBSCounter::statSettings(int renderIndex) {

@@ -2,45 +2,51 @@
 #include "OBSCounter.h"
 
 // Renders in game overlay
-void OBSCounter::render(CanvasWrapper canvas) {
-    if (!enabledOverlay) {
+void OBSCounter::Render() {
+    ImGuiWindowFlags WindowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize
+        | ImGuiWindowFlags_NoFocusOnAppearing;
+
+    if (!inDragMode) {
+        WindowFlags |= ImGuiWindowFlags_NoInputs;
+    }
+
+    if (!enabledOverlayBackground) {
+        WindowFlags |= ImGuiWindowFlags_NoBackground;
+    }
+
+    ImVec4 bgColorVec = { overlayBackgroundColor.R / 255, overlayBackgroundColor.G / 255,
+        overlayBackgroundColor.B / 255, overlayBackgroundColor.A / 255 };
+
+    ImVec4 textColorVec = { overlayColor.R / 255, overlayColor.G / 255, 
+        overlayColor.B / 255, overlayColor.A / 255 };
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, bgColorVec);
+    ImGui::PushStyleColor(ImGuiCol_Text, textColorVec);
+    ImGui::PushStyleColor(ImGuiCol_Border, textColorVec);
+
+    if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, WindowFlags))
+    {
+        // Early out if the window is collapsed, as an optimization.
+        ImGui::PopStyleColor(3);
+        ImGui::End();
         return;
     }
 
     renderAllStrings();
 
-    screenSize = canvas.GetSize();
-
-    float fontSize = scale;
-    int xValue = int((float)screenSize.X * xLocation);
-    int yValue = int((float)screenSize.Y * yLocation);
-
-    Vector2F maxStringSize = { -1.0, -1.0 };
-    for (int i = 0; i < overlayLines; i++) {
-        Vector2F newStringSize = canvas.GetStringSize(overlayStrings[i], fontSize, fontSize);
-
-        if (newStringSize.X > maxStringSize.X) {
-            maxStringSize.X = newStringSize.X;
-        }
-
-        if (newStringSize.Y > maxStringSize.Y) {
-            maxStringSize.Y = newStringSize.Y;
-        }
-    }
-
-    if (enabledOverlayBackground) {
-        canvas.SetColor(overlayBackgroundColor);
-        canvas.SetPosition(Vector2 { xValue, yValue });
-        canvas.FillBox(Vector2({ int(maxStringSize.X), int(maxStringSize.Y * overlayLines) }));
-    }
-
-    // sets to user-chosen color
-    canvas.SetColor(overlayColor);
+    ImGui::SetWindowFontScale(scale);
 
     for (int i = 0; i < overlayLines; i++) {
         // locates based on screen and font size
-        canvas.SetPosition(Vector2({ xValue, int((maxStringSize.Y * i) + yValue) }));
-        canvas.DrawString(overlayStrings[i], fontSize, fontSize, false);
+        ImGui::Text(overlayStrings[i].c_str());
+    }
+
+    ImGui::PopStyleColor(3);
+    ImGui::End();
+
+    if (!isWindowOpen_)
+    {
+        cvarManager->executeCommand("togglemenu " + GetMenuName());
     }
 }
 
@@ -193,4 +199,40 @@ void OBSCounter::renderAllStrings() {
             overlayStrings[i] = statToRenderString(overlayStats[i], state);
         }
     }
+}
+
+// Name of the menu that is used to toggle the window.
+std::string OBSCounter::GetMenuName()
+{
+    return "OBSCounter";
+}
+
+// Title to give the menu
+std::string OBSCounter::GetMenuTitle()
+{
+    return menuTitle_;
+}
+
+// Should events such as mouse clicks/key inputs be blocked so they won't reach the game
+bool OBSCounter::ShouldBlockInput()
+{
+    return ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard;
+}
+
+// Return true if window should be interactive
+bool OBSCounter::IsActiveOverlay()
+{
+    return true;
+}
+
+// Called when window is opened
+void OBSCounter::OnOpen()
+{
+    isWindowOpen_ = true;
+}
+
+// Called when window is closed
+void OBSCounter::OnClose()
+{
+    isWindowOpen_ = false;
 }

@@ -94,7 +94,7 @@ void OBSCounter::setCvars() {
         });
 
     auto overlayBackgroundEnableVar = cvarManager->registerCvar("counter_enable_background",
-        "0", "enables in game overlay background");
+        "1", "enables in game overlay background");
     enabledOverlayBackground = overlayBackgroundEnableVar.getBoolValue();
     overlayBackgroundEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         enabledOverlayBackground = cvar.getBoolValue();

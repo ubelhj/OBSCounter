@@ -11,9 +11,6 @@ void OBSCounter::onLoad()
     _globalCvarManager = cvarManager;
 
     fileLocation = gameWrapper->GetDataFolder() / "OBSCounter";
-    // tells the plugin to render the in game overlay
-    gameWrapper->RegisterDrawable(
-        std::bind(&OBSCounter::render, this, std::placeholders::_1));
 
     // creates cvars and sets global variable defaults to prevent any nulls
     setCvars();
@@ -23,7 +20,6 @@ void OBSCounter::onLoad()
 
     std::filesystem::create_directories(fileLocation);
     std::filesystem::create_directories(fileLocation / "Career");
-    //cvarManager->log(gameWrapper->GetDataFolder().generic_string() + fileLocation);
 
     writeAll();
 }
