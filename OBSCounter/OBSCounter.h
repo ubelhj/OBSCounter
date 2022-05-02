@@ -108,7 +108,6 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
 
 private:
     bool isWindowOpen_ = false;
-    bool overlayEnabled = false;
     std::string menuTitle_ = "OBSCounter";
     bool inDragMode = false;
     ImFont* font;

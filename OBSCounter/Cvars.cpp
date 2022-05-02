@@ -51,21 +51,13 @@ void OBSCounter::setCvars() {
             });
     }
 
-    auto overlayEnableVar = cvarManager->registerCvar("counter_enable_overlay", "0", "enables in game overlay", 
+    auto overlayEnableVar = cvarManager->registerCvar("counter_enable_overlay", "0", "whether in-game overlay should show by default", 
         true, true, 0, true, 1);
-    overlayEnabled = overlayEnableVar.getBoolValue();
     overlayEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
         if (cvar.getBoolValue()) {
-            overlayEnabled = true;
             if (!isWindowOpen_) {
-                gameWrapper->Execute([this](...) 
-                    { cvarManager->executeCommand("togglemenu " + GetMenuName()); });
-            }
-        } else {
-            overlayEnabled = false;
-            if (isWindowOpen_) {
                 gameWrapper->Execute([this](...)
-                    { cvarManager->executeCommand("togglemenu " + GetMenuName()); });
+                    { cvarManager->executeCommand("openmenu " + GetMenuName()); });
             }
         }
         });

@@ -38,11 +38,19 @@ void OBSCounter::RenderSettings() {
 }
 
 void OBSCounter::enableSettings() {
-    auto overlayEnableVar = cvarManager->getCvar("counter_enable_overlay");
-    if (!overlayEnableVar) { return; }
-    overlayEnabled = overlayEnableVar.getBoolValue();
-    if (ImGui::Checkbox("Enable Overlay", &overlayEnabled)) {
-        overlayEnableVar.setValue(std::to_string(overlayEnabled));
+    if (ImGui::Button("Toggle Overlay")) {
+        gameWrapper->Execute([this](...) 
+            { cvarManager->executeCommand("togglemenu " + GetMenuName()); });
+    }
+
+    ImGui::SameLine();
+
+    CVarWrapper enableVar = cvarManager->getCvar("counter_enable_overlay");
+    if (!enableVar) { return; }
+    bool enabled = enableVar.getBoolValue();
+
+    if (ImGui::Checkbox("Open Overlay by default", &enabled)) {
+        enableVar.setValue(enabled);
     }
 
     if (ImGui::Button("Add a Game")) {

@@ -244,7 +244,7 @@ bool OBSCounter::ShouldBlockInput()
 // Return true if window should be interactive
 bool OBSCounter::IsActiveOverlay()
 {
-    return true;
+    return false;
 }
 
 // Called when window is opened
@@ -255,12 +255,7 @@ void OBSCounter::OnOpen()
 
 // Called when window is closed
 void OBSCounter::OnClose() {
-    if (overlayEnabled) {
-        gameWrapper->Execute([this](...) 
-            {cvarManager->executeCommand("togglemenu " + GetMenuName()); });
-    } else {
-        isWindowOpen_ = false;
-    }
+    isWindowOpen_ = false;
 }
 
 void OBSCounter::SetImGuiContext(uintptr_t ctx) {
