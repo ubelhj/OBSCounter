@@ -83,71 +83,38 @@ void OBSCounter::colorSettings() {
         return;
     }
 
-    LinearColor textColor = textColorVar.getColorValue();
+    LinearColor textColor = textColorVar.getColorValue() / 255;
 
-    float textColors[4] = { textColor.R / 255, textColor.G / 255, textColor.B / 255, textColor.A / 255 };
-    ImVec4 colorVec = { textColor.R / 255, textColor.G / 255, textColor.B / 255, textColor.A / 255 };
-    
-    if (ImGui::ColorButton("Text Color##button", colorVec)) {
-        ImGui::OpenPopup("Text Color selector");
+    if (ImGui::ColorEdit4("Text Color##button", &textColor.R, ImGuiColorEditFlags_NoInputs)) {
+        textColorVar.setValue(textColor * 255);
     }
 
     ImGui::SameLine();
 
-    ImGui::Text("Text Color");
+    CVarWrapper bgColorVar = cvarManager->getCvar("counter_color_background");
 
-    if (ImGui::BeginPopup("Text Color selector")) {
-        if (ImGui::ColorPicker4("Text Color##selector", textColors)) {
-            textColor = { textColors[0] * 255, textColors[1] * 255, textColors[2] * 255, textColors[3] * 255 };
-            textColorVar.setValue(textColor);
-        }
-
-        ImGui::EndPopup();
+    if (!bgColorVar) {
+        return;
     }
 
-    if (enabledbg) {
-        ImGui::SameLine();
+    LinearColor bgColor = bgColorVar.getColorValue() / 255;
 
-        CVarWrapper bgColorVar = cvarManager->getCvar("counter_color_background");
+    if (ImGui::ColorEdit4("Background Color##button", &bgColor.R, ImGuiColorEditFlags_NoInputs)) {
+        bgColorVar.setValue(bgColor * 255);
+    }
 
-        if (!bgColorVar) {
-            return;
-        }
+    ImGui::SameLine();
 
-        float bgColors[4];
+    CVarWrapper outlineColorVar = cvarManager->getCvar("counter_color_outline");
 
-        LinearColor bgColor = bgColorVar.getColorValue();
+    if (!outlineColorVar) {
+        return;
+    }
 
-        ImVec4 bgColorVec;
+    LinearColor outlineColor = outlineColorVar.getColorValue() / 255;
 
-        bgColors[0] = bgColor.R / 255;
-        bgColors[1] = bgColor.G / 255;
-        bgColors[2] = bgColor.B / 255;
-        bgColors[3] = bgColor.A / 255;
-
-        bgColorVec.x = bgColor.R / 255;
-        bgColorVec.y = bgColor.G / 255;
-        bgColorVec.z = bgColor.B / 255;
-        bgColorVec.w = bgColor.A / 255;
-        if (ImGui::ColorButton("Background Color##button", bgColorVec)) {
-            ImGui::OpenPopup("Background Color selector");
-        }
-
-        ImGui::SameLine();
-
-        ImGui::Text("Background Color");
-
-        if (ImGui::BeginPopup("Background Color selector")) {
-            if (ImGui::ColorPicker4("Background Color##selector", bgColors)) {
-                bgColor.R = bgColors[0] * 255;
-                bgColor.G = bgColors[1] * 255;
-                bgColor.B = bgColors[2] * 255;
-                bgColor.A = bgColors[3] * 255;
-                bgColorVar.setValue(bgColor);
-            }
-
-            ImGui::EndPopup();
-        }
+    if (ImGui::ColorEdit4("Outline Color##button", &outlineColor.R, ImGuiColorEditFlags_NoInputs)) {
+        outlineColorVar.setValue(outlineColor * 255);
     }
 }
 

@@ -79,6 +79,12 @@ void OBSCounter::setCvars() {
         overlayBackgroundColor = cvar.getColorValue();
         });
 
+    auto outlineColorVar = cvarManager->registerCvar("counter_color_outline", "#FFFFFF", "color of overlay outline");
+    overlayOutlineColor = colorVar.getColorValue();
+    outlineColorVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        overlayOutlineColor = cvar.getColorValue();
+        });
+
     // adds 1 to games to fix any errors in game tracking
     cvarManager->registerNotifier("counter_add_game",
         [this](std::vector<std::string> params) {

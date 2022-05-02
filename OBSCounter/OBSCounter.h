@@ -164,6 +164,7 @@ private:
     Vector2 screenSize;
     LinearColor overlayColor;
     LinearColor overlayBackgroundColor;
+    LinearColor overlayOutlineColor;
 
     // holds all stats
     int statArray[numStats];
