@@ -254,9 +254,13 @@ void OBSCounter::OnOpen()
 }
 
 // Called when window is closed
-void OBSCounter::OnClose()
-{
-    isWindowOpen_ = false;
+void OBSCounter::OnClose() {
+    if (overlayEnabled) {
+        gameWrapper->Execute([this](...) 
+            {cvarManager->executeCommand("togglemenu " + GetMenuName()); });
+    } else {
+        isWindowOpen_ = false;
+    }
 }
 
 void OBSCounter::SetImGuiContext(uintptr_t ctx) {

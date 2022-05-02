@@ -38,10 +38,11 @@ void OBSCounter::RenderSettings() {
 }
 
 void OBSCounter::enableSettings() {
-    if (ImGui::Button("Toggle overlay")) {
-        gameWrapper->Execute([this](...) {
-            cvarManager->executeCommand("togglemenu OBSCounter");
-            });
+    auto overlayEnableVar = cvarManager->getCvar("counter_enable_overlay");
+    if (!overlayEnableVar) { return; }
+    overlayEnabled = overlayEnableVar.getBoolValue();
+    if (ImGui::Checkbox("Enable Overlay", &overlayEnabled)) {
+        overlayEnableVar.setValue(std::to_string(overlayEnabled));
     }
 
     if (ImGui::Button("Add a Game")) {

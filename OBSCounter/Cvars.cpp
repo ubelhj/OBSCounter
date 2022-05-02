@@ -51,6 +51,25 @@ void OBSCounter::setCvars() {
             });
     }
 
+    auto overlayEnableVar = cvarManager->registerCvar("counter_enable_overlay", "0", "enables in game overlay", 
+        true, true, 0, true, 1);
+    overlayEnabled = overlayEnableVar.getBoolValue();
+    overlayEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        if (cvar.getBoolValue()) {
+            overlayEnabled = true;
+            if (!isWindowOpen_) {
+                gameWrapper->Execute([this](...) 
+                    { cvarManager->executeCommand("togglemenu " + GetMenuName()); });
+            }
+        } else {
+            overlayEnabled = false;
+            if (isWindowOpen_) {
+                gameWrapper->Execute([this](...)
+                    { cvarManager->executeCommand("togglemenu " + GetMenuName()); });
+            }
+        }
+        });
+
     // sets cvar for counter's scale
     auto scaleVar = cvarManager->registerCvar("counter_ingame_scale",
         "2", "set counter scale",
