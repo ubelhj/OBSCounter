@@ -435,14 +435,9 @@ void OBSCounter::addRemoveStatSettings() {
 
     ImGui::TextUnformatted("Maximum 10 Stats");
 
-    if (ImGui::Button("Copy Demolition leaderboard update message")) {
-        std::string clipboardText( "/update Demolitions: " + std::to_string(careerStatTotal[Demolish]) 
-            + " Exterminations: " + std::to_string(careerStatTotal[Demolition]));
+    if (ImGui::Button("Copy Demolition leaderboard update message. Join at discord.gg/kNnDxuC")) {
+        std::string clipboardText( "/update demolitions: " + std::to_string(careerStatTotal[Demolish]) 
+            + " exterminations: " + std::to_string(careerStatTotal[Demolition]));
         ImGui::SetClipboardText(clipboardText.c_str());
-    }
-
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip(
-            "Easy copying of stats for the Demolition and Extermination Leaderboard! Join it at discord.gg/kNnDxuC");
     }
 }
