@@ -165,6 +165,8 @@ private:
     LinearColor overlayColor;
     LinearColor overlayBackgroundColor;
     LinearColor overlayOutlineColor;
+    float outlineRounding;
+    float outlineSize;
 
     // holds all stats
     int statArray[numStats];

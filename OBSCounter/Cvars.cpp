@@ -85,6 +85,21 @@ void OBSCounter::setCvars() {
         overlayOutlineColor = cvar.getColorValue();
         });
 
+    auto outlineRoundingVar = cvarManager->registerCvar("counter_outline_rounding", "5", "roundness of overlay outline",
+        true, true, 0.0, false);
+    outlineRounding = outlineRoundingVar.getFloatValue();
+    outlineRoundingVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        outlineRounding = cvar.getFloatValue();
+        });
+
+    // sets cvar for counter's scale
+    auto outlineSizeVar = cvarManager->registerCvar("counter_outline_size", "1.0", "size of overlay outline",
+        true, true, 0.0, false);
+    outlineSize = outlineSizeVar.getFloatValue();
+    outlineSizeVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        outlineSize = cvar.getFloatValue();
+        });
+
     // adds 1 to games to fix any errors in game tracking
     cvarManager->registerNotifier("counter_add_game",
         [this](std::vector<std::string> params) {

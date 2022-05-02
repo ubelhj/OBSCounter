@@ -8,8 +8,7 @@ std::string OBSCounter::GetPluginName() {
 void OBSCounter::RenderSettings() {
     enableSettings();
 
-    if (ImGui::CollapsingHeader("Color And Style", ImGuiTreeNodeFlags_None))
-    {
+    if (ImGui::CollapsingHeader("Color And Style", ImGuiTreeNodeFlags_None)) {
         colorSettings();
         locationAndScaleSettings();
     }
@@ -119,21 +118,36 @@ void OBSCounter::colorSettings() {
 }
 
 void OBSCounter::locationAndScaleSettings() {
+    // location dragger
+    ImGui::Checkbox("Enable moving the overlay", &inDragMode);
+
     CVarWrapper textScaleCvar = cvarManager->getCvar("counter_ingame_scale");
     if (!textScaleCvar) { return; }
     float textScale = textScaleCvar.getFloatValue();
     if (ImGui::SliderFloat("Text Scale", &textScale, 0.0, 10.0)) {
         textScaleCvar.setValue(textScale);
     }
+
+    CVarWrapper outlineRoundingCvar = cvarManager->getCvar("counter_outline_rounding");
+    if (!outlineRoundingCvar) { return; }
+    float outlineRounding = outlineRoundingCvar.getFloatValue();
+    if (ImGui::SliderFloat("Outline Roundness", &outlineRounding, 0.0, 15.0)) {
+        outlineRoundingCvar.setValue(outlineRounding);
+    }
+
+    CVarWrapper outlineSizeCvar = cvarManager->getCvar("counter_outline_size");
+    if (!outlineSizeCvar) { return; }
+    float outlineSize = outlineSizeCvar.getFloatValue();
+    if (ImGui::SliderFloat("Outline Size", &outlineSize, 0.0, 10.0)) {
+        outlineSizeCvar.setValue(outlineSize);
+    }
+
     CVarWrapper decimalsCvar = cvarManager->getCvar("counter_decimals");
     if (!decimalsCvar) { return; }
     int decimals = decimalsCvar.getIntValue();
     if (ImGui::SliderInt("Decimals for averages", &decimals, 1, 5)) {
         decimalsCvar.setValue(decimals);
     }
-
-    // location dragger
-    ImGui::Checkbox("Drag Mode", &inDragMode);
 }
 
 void OBSCounter::statSettings(int renderIndex) {

@@ -24,14 +24,15 @@ void OBSCounter::Render() {
     ImGui::PushStyleColor(ImGuiCol_WindowBg, bgColorVec);
     ImGui::PushStyleColor(ImGuiCol_Text, textColorVec);
     ImGui::PushStyleColor(ImGuiCol_Border, outlineColorVec);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 12.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, outlineSize);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, outlineRounding);
 
     ImGui::SetNextWindowBgAlpha(bgColorVec.w);
 
     if (!ImGui::Begin(menuTitle_.c_str(), &isWindowOpen_, WindowFlags))
     {
         // Early out if the window is collapsed, as an optimization.
-        ImGui::PopStyleVar(1);
+        ImGui::PopStyleVar(2);
         ImGui::PopStyleColor(3);
         ImGui::End();
         return;
@@ -61,7 +62,7 @@ void OBSCounter::Render() {
         ImGui::PopFont();
     }
 
-    ImGui::PopStyleVar(1);
+    ImGui::PopStyleVar(2);
     ImGui::PopStyleColor(3);
     ImGui::End();
 
