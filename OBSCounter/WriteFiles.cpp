@@ -4,6 +4,7 @@
 // writes a stat to its files
 // also writes its game and average stats
 void OBSCounter::write(int statIndex) {
+    if (!writeFiles) { return; }
     // writes the total stat
     writeFile(fileLocation / (statStringsStandard[statIndex] + ".txt"), statArray[statIndex]);
 
@@ -23,6 +24,7 @@ void OBSCounter::write(int statIndex) {
 
 // writes a single stat
 void OBSCounter::writeSpecific(int statIndex, int statType) {
+    if (!writeFiles) { return; }
     std::string statLocation = "ERR";
     int statValue = 0;
 
@@ -35,6 +37,14 @@ void OBSCounter::writeSpecific(int statIndex, int statType) {
         statLocation = statStringsGame[statIndex];
         statValue = statArrayGame[statIndex];
         break;
+    case STAT_TEAM:
+        statLocation = cvarBases[STAT_TEAM][statIndex];
+        statValue = statArrayTeam[statIndex];
+        break;
+    case STAT_TEAM_OPPONENT:
+        statLocation = cvarBases[STAT_TEAM_OPPONENT][statIndex];
+        statValue = statArrayOpponent[statIndex];
+        break;
     default:
         break;
     }
@@ -42,8 +52,24 @@ void OBSCounter::writeSpecific(int statIndex, int statType) {
     writeFile(fileLocation / (statLocation + ".txt"), statValue);
 }
 
+void OBSCounter::writeTeams() {
+    if (!writeFiles) { return; }
+    for (int i = 0; i < ENDNORMALSTATS; i++) {
+        std::string statLocationTeam = cvarBases[STAT_TEAM][i];
+        int statValueTeam = statArrayTeam[i];
+
+        writeFile(fileLocation / (statLocationTeam + ".txt"), statValueTeam);
+
+        std::string statLocationOpponent = cvarBases[STAT_TEAM_OPPONENT][i];
+        int statValueOpponent = statArrayOpponent[i];
+
+        writeFile(fileLocation / (statLocationOpponent + ".txt"), statValueOpponent);
+    }
+}
+
 // writes a time stat with special formatting minutes:seconds
 void OBSCounter::writeTimeStat(int statIndex) {
+    if (!writeFiles) { return; }
     int totalSeconds = statArray[statIndex];
     // writes the total stat
     std::ofstream totalFile(fileLocation / (statStringsStandard[statIndex] + ".txt"));
@@ -86,6 +112,7 @@ void OBSCounter::writeTimeStat(int statIndex) {
 
 // writes only the game time stat
 void OBSCounter::writeGameTimeStat(int statIndex) {
+    if (!writeFiles) { return; }
     int totalSeconds = statArrayGame[statIndex];
     // writes the stat
     std::ofstream file(fileLocation / (statStringsGame[statIndex] + ".txt"));
@@ -101,6 +128,7 @@ void OBSCounter::writeGameTimeStat(int statIndex) {
 
 // calls all write functions at once
 void OBSCounter::writeAll() {
+    if (!writeFiles) { return; }
     for (int i = 0; i <= ENDNORMALSTATS; i++) {
         write(i);
     }
@@ -114,11 +142,13 @@ void OBSCounter::writeAll() {
     writeMissedExterms();
     writeWinPercentage();
     writeCareerStats();
+    writeTeams();
 }
 
 // special cases for extra complicated stats
 // calculates shooting percentage (shots/goals)
 void OBSCounter::writeShootingPercentage() {
+    if (!writeFiles) { return; }
     // calculates current game shooting %
     // divides and checks for NaN
     int gameShooting = getPercentage(statArrayGame[goals], statArrayGame[shots]);
@@ -143,6 +173,7 @@ void OBSCounter::writeShootingPercentage() {
 
 // writes K/D ratio
 void OBSCounter::writeKillPercentage() {
+    if (!writeFiles) { return; }
     float gameKD = divide(statArrayGame[demos], statArrayGame[deaths]);
     std::stringstream gameStream;
     gameStream << std::fixed << std::setprecision(decimalPlaces) << gameKD;
@@ -165,6 +196,7 @@ void OBSCounter::writeKillPercentage() {
 // writes missed exterm % for the session
 // total exterms / possible exterms (demos / 7) 
 void OBSCounter::writeMissedExterms() {
+    if (!writeFiles) { return; }
     // calculates possible exterms (demos / 7) 
     int possibleExterms = statArray[demos] / 7;
     std::stringstream totalStream;
@@ -186,6 +218,7 @@ void OBSCounter::writeMissedExterms() {
 }
 
 void OBSCounter::writeWinPercentage() {
+    if (!writeFiles) { return; }
     int winPercent = getPercentage(statArray[wins], statArray[wins] + statArray[losses]);
     std::stringstream percentStream;
     percentStream << winPercent << "%";
@@ -197,12 +230,14 @@ void OBSCounter::writeWinPercentage() {
 }
 
 void OBSCounter::writeFile(std::filesystem::path path, int value) {
+    if (!writeFiles) { return; }
     std::ofstream file(path);
     file << value;
     file.close();
 }
 
 void OBSCounter::writeFileAverage(std::filesystem::path path, float value) {
+    if (!writeFiles) { return; }
     std::ofstream file(path);
     file << std::fixed << std::setprecision(decimalPlaces);
     file << value;

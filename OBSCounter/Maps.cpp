@@ -143,7 +143,10 @@ void Maps::generateStatStrings() {
         labelStrings[STAT_TEAM][i] = "Team " + baseLabel;
         labelStrings[STAT_TEAM_OPPONENT][i] = "Opponent " + baseLabel;
 
-        cvarBases[STAT_TEAM][i] = "team" + statStringsStandard[i];
-        cvarBases[STAT_TEAM_OPPONENT][i] = "opponent" + statStringsStandard[i];
+        std::string cvarBase = statStringsStandard[i];
+        cvarBase[0] = std::toupper(cvarBase[0]);
+
+        cvarBases[STAT_TEAM][i] = "team" + cvarBase;
+        cvarBases[STAT_TEAM_OPPONENT][i] = "opponent" + cvarBase;
     }
 }

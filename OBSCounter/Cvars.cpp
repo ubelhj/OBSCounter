@@ -11,6 +11,17 @@ void OBSCounter::setCvars() {
         writeAll();
         });
 
+    auto writeEnableVar = cvarManager->registerCvar("counter_write", "0", "Whether files should be written",
+        true, true, 0, true, 1);
+    writeEnableVar.addOnValueChanged([this](std::string, CVarWrapper cvar) {
+        if (cvar.getBoolValue()) {
+            writeFiles = true;
+            writeAll();
+        } else {
+            writeFiles = false;
+        }
+        });
+
     // sets number of stats in in game overlay
     // 1-5 allowed
     auto overlayNumberVar = cvarManager->registerCvar(
@@ -244,14 +255,14 @@ void OBSCounter::setCvars() {
 
     // setters for render strings for stats
     for (int i = 0; i < ENDNORMALSTATS; i++) {
-        std::string cvarNameTeam = "counter_set_render_string_team" + statStringsStandard[i];
+        std::string cvarNameTeam = "counter_set_render_string_" + cvarBases[STAT_TEAM][i];
         std::string cvarTipTeam = "sets team" + statStringsStandard[i] + " render string";
         cvarManager->registerCvar(cvarNameTeam, renderStringsTeam[i], cvarTipTeam);
         auto cvarTeam = cvarManager->getCvar(cvarNameTeam);
         cvarTeam.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
             renderStringsTeam[i] = cvar.getStringValue(); });
 
-        std::string cvarNameOpponent = "counter_set_render_string_opponent" + statStringsStandard[i];
+        std::string cvarNameOpponent = "counter_set_render_string_" + cvarBases[STAT_TEAM_OPPONENT][i];
         std::string cvarTipOpponent = "sets opponent" + statStringsStandard[i] + " render string";
         cvarManager->registerCvar(cvarNameOpponent, renderStringsOpponent[i], cvarTipOpponent);
         auto cvarOpponent = cvarManager->getCvar(cvarNameOpponent);

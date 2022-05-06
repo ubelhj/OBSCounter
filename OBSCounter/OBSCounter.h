@@ -58,6 +58,8 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void writeCareerStats();
     // helper to above 
     void writeCareerStatsWrapped();
+    // writes all team stats
+    void writeTeams();
     // writes to a file
     void writeFile(std::filesystem::path path, int value);
     // writes an average to a file
@@ -79,9 +81,6 @@ class OBSCounter: public BakkesMod::Plugin::BakkesModPlugin, public BakkesMod::P
     void writeWinPercentage();
 
     int getPercentage(int numerator, int denominator);
-
-    // renders overlay
-    //void render(CanvasWrapper canvas);
 
     void renderAllStrings();
     std::string statToRenderString(int statIndex, int state);
@@ -120,6 +119,7 @@ private:
     float careerStatAverage[NUMCAREERSTATS];
 
     std::filesystem::path fileLocation;
+    bool writeFiles = false;
 
     // whether the last game ended
     // I know it may seem redundant, 
@@ -153,8 +153,8 @@ private:
 
     // holds all stats
     int statArray[NUMSTATS];
-    int statArrayTeam[ENDNORMALSTATS - 1];
-    int statArrayOpponent[ENDNORMALSTATS - 1];
+    int statArrayTeam[ENDNORMALSTATS];
+    int statArrayOpponent[ENDNORMALSTATS];
     int statArrayGame[NUMSTATS];
     std::string statArrayOther[NUMOTHERSTATS];
 
