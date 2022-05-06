@@ -5,18 +5,18 @@
 // also writes its game and average stats
 void OBSCounter::write(int statIndex) {
     // writes the total stat
-    writeFile(fileLocation / (indexStringMap[statIndex] + ".txt"), statArray[statIndex]);
+    writeFile(fileLocation / (statStringsStandard[statIndex] + ".txt"), statArray[statIndex]);
 
     // doesn't write averageGames, 
     //  as that would just be games/games and always 1
     if (statIndex != games) {
         // writes average of stat per game
-        writeFileAverage(fileLocation / (averageStrings[statIndex] + ".txt"), average(statIndex));
+        writeFileAverage(fileLocation / (statStringsAverage[statIndex] + ".txt"), average(statIndex));
     }
 
     // writes the game version of stat
     // only writes if stat has a game version
-    if (statIndex > statsWithoutGame) {
+    if (statIndex > STATSWITHOUTGAME) {
         writeSpecific(statIndex, STAT_GAME);
     }
 }
@@ -28,11 +28,11 @@ void OBSCounter::writeSpecific(int statIndex, int statType) {
 
     switch (statType) {
     case STAT_DEFAULT:
-        statLocation = indexStringMap[statIndex];
+        statLocation = statStringsStandard[statIndex];
         statValue = statArray[statIndex];
         break;
     case STAT_GAME:
-        statLocation = indexStringMapGame[statIndex];
+        statLocation = statStringsGame[statIndex];
         statValue = statArrayGame[statIndex];
         break;
     default:
@@ -46,7 +46,7 @@ void OBSCounter::writeSpecific(int statIndex, int statType) {
 void OBSCounter::writeTimeStat(int statIndex) {
     int totalSeconds = statArray[statIndex];
     // writes the total stat
-    std::ofstream totalFile(fileLocation / (indexStringMap[statIndex] + ".txt"));
+    std::ofstream totalFile(fileLocation / (statStringsStandard[statIndex] + ".txt"));
     totalFile << totalSeconds / 60;
     totalFile << ":";
     int remSeconds = totalSeconds % 60;
@@ -57,7 +57,7 @@ void OBSCounter::writeTimeStat(int statIndex) {
     totalFile.close();
 
     // writes average of stat per game
-    std::ofstream averageFile(fileLocation / (averageStrings[statIndex] + ".txt"));
+    std::ofstream averageFile(fileLocation / (statStringsAverage[statIndex] + ".txt"));
 
     // average time is total / games
     int avgSeconds;
@@ -79,7 +79,7 @@ void OBSCounter::writeTimeStat(int statIndex) {
 
     // writes the game version of stat
     // only writes if stat has a game version
-    if (statIndex > statsWithoutGame) {
+    if (statIndex > STATSWITHOUTGAME) {
         writeGameTimeStat(statIndex);
     }
 }
@@ -88,7 +88,7 @@ void OBSCounter::writeTimeStat(int statIndex) {
 void OBSCounter::writeGameTimeStat(int statIndex) {
     int totalSeconds = statArrayGame[statIndex];
     // writes the stat
-    std::ofstream file(fileLocation / (indexStringMapGame[statIndex] + ".txt"));
+    std::ofstream file(fileLocation / (statStringsGame[statIndex] + ".txt"));
     file << totalSeconds / 60;
     file << ":";
     int remSeconds = totalSeconds % 60;
@@ -101,11 +101,11 @@ void OBSCounter::writeGameTimeStat(int statIndex) {
 
 // calls all write functions at once
 void OBSCounter::writeAll() {
-    for (int i = 0; i <= endNormalStats; i++) {
+    for (int i = 0; i <= ENDNORMALSTATS; i++) {
         write(i);
     }
 
-    for (int i = endNormalStats + 1; i < numStats; i++) {
+    for (int i = ENDNORMALSTATS + 1; i < NUMSTATS; i++) {
         writeTimeStat(i);
     }
 

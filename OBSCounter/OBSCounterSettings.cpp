@@ -4,7 +4,6 @@
 std::string OBSCounter::GetPluginName() {
     return "OBS Counter Plugin";
 }
-
 void OBSCounter::RenderSettings() {
     enableSettings();
 
@@ -179,48 +178,48 @@ void OBSCounter::statSettings(int renderIndex) {
 
     switch (overlayState) {
     case STAT_DEFAULT:
-        statRenderName = indexStringMap[statIndex];
-        statString = indexStringMapChar[statIndex];
+        statRenderName = statStringsStandard[statIndex];
+        statString = statCharStandard[statIndex];
         break;
     case STAT_AVERAGE:
-        statRenderName = averageStrings[statIndex];
-        statString = indexStringMapChar[statIndex];
+        statRenderName = statStringsAverage[statIndex];
+        statString = statCharStandard[statIndex];
         break;
     case STAT_GAME:
-        statRenderName = indexStringMapGame[statIndex];
-        statString = indexStringMapChar[statIndex];
+        statRenderName = statStringsGame[statIndex];
+        statString = statCharStandard[statIndex];
         break;
     case STAT_OTHER:
-        statRenderName = indexStringMapOther[statIndex];
-        statString = indexStringMapChar[statIndex];
+        statRenderName = statStringsOther[statIndex];
+        statString = statCharStandard[statIndex];
         break;
     case STAT_CAREER_TOTAL:
-        statRenderName = "total" + indexStringMapCareer[statIndexCareer];
-        statString = indexStringMapCareerChar[statIndexCareer];
+        statRenderName = "total" + statStringsCareer[statIndexCareer];
+        statString = statCharsCareer[statIndexCareer];
         break;
     case STAT_CAREER_PRIVATE:
-        statRenderName = "private" + indexStringMapCareer[statIndexCareer];
-        statString = indexStringMapCareerChar[statIndexCareer];
+        statRenderName = "private" + statStringsCareer[statIndexCareer];
+        statString = statCharsCareer[statIndexCareer];
         break;
     case STAT_CAREER_RANKED:
-        statRenderName = "ranked" + indexStringMapCareer[statIndexCareer];
-        statString = indexStringMapCareerChar[statIndexCareer];
+        statRenderName = "ranked" + statStringsCareer[statIndexCareer];
+        statString = statCharsCareer[statIndexCareer];
         break;
     case STAT_CAREER_CASUAL:
-        statRenderName = "casual" + indexStringMapCareer[statIndexCareer];
-        statString = indexStringMapCareerChar[statIndexCareer];
+        statRenderName = "casual" + statStringsCareer[statIndexCareer];
+        statString = statCharsCareer[statIndexCareer];
         break;
     case STAT_CAREER_AVERAGE:
-        statRenderName = "average" + indexStringMapCareer[statIndexCareer];
-        statString = indexStringMapCareerChar[statIndexCareer];
+        statRenderName = "average" + statStringsCareer[statIndexCareer];
+        statString = statCharsCareer[statIndexCareer];
         break;
     case STAT_TEAM:
-        statRenderName = "team" + indexStringMap[statIndex];
-        statString = indexStringMapChar[statIndex];
+        statRenderName = "team" + statStringsStandard[statIndex];
+        statString = statCharStandard[statIndex];
         break;
     case STAT_TEAM_OPPONENT:
-        statRenderName = "opponent" + indexStringMap[statIndex];
-        statString = indexStringMapChar[statIndex];
+        statRenderName = "opponent" + statStringsStandard[statIndex];
+        statString = statCharStandard[statIndex];
         break;
     default:
         break;
@@ -296,8 +295,8 @@ void OBSCounter::statSettings(int renderIndex) {
 
             switch (overlayState) {
                 case STAT_OTHER:
-                    maxSize = numOtherStats;
-                    statStrings = indexStringMapOtherChar;
+                    maxSize = NUMOTHERSTATS;
+                    statStrings = statCharOther;
                     break;
                 case STAT_CAREER_TOTAL:
                 case STAT_CAREER_PRIVATE:
@@ -305,18 +304,18 @@ void OBSCounter::statSettings(int renderIndex) {
                 case STAT_CAREER_CASUAL:
                 case STAT_CAREER_AVERAGE:
                     maxSize = NUMCAREERSTATS;
-                    statStrings = indexStringMapCareerChar;
+                    statStrings = statCharsCareer;
                     indexUsed = statIndexCareer;
                     cvarIndexUsed = statIndexCareerCvar;
                     break;
                 case STAT_TEAM:
                 case STAT_TEAM_OPPONENT:
-                    maxSize = endNormalStats;
-                    statStrings = indexStringMapChar;
+                    maxSize = ENDNORMALSTATS;
+                    statStrings = statCharStandard;
                     break;
                 default:
-                    maxSize = numStats;
-                    statStrings = indexStringMapChar;
+                    maxSize = NUMSTATS;
+                    statStrings = statCharStandard;
                     break;
             }
 
@@ -347,7 +346,7 @@ void OBSCounter::statSettings(int renderIndex) {
         }
 
         if (overlayState == STAT_CAREER_TOTAL) {
-            CVarWrapper offsetCvar = cvarManager->getCvar("counter_career_offset_" + indexStringMapCareer[statIndexCareer]);
+            CVarWrapper offsetCvar = cvarManager->getCvar("counter_career_offset_" + statStringsCareer[statIndexCareer]);
             if (!offsetCvar) { return; }
             int offset = offsetCvar.getIntValue();
 

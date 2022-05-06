@@ -29,13 +29,13 @@ void OBSCounter::writeCareerStatsWrapped() {
         careerStatTotal[i] = careerValue.private_ + careerValue.ranked + careerValue.unranked + careerStatTotalOffset[i];
 
         // writes the private stat
-        writeFile(fileLocation / "Career" / ("Private" + indexStringMapCareer[i] + ".txt"), careerStatPrivate[i]);
+        writeFile(fileLocation / "Career" / ("Private" + statStringsCareer[i] + ".txt"), careerStatPrivate[i]);
         // writes the ranked stat
-        writeFile(fileLocation / "Career" / ("Ranked" + indexStringMapCareer[i] + ".txt"), careerStatRanked[i]);
+        writeFile(fileLocation / "Career" / ("Ranked" + statStringsCareer[i] + ".txt"), careerStatRanked[i]);
         // writes the casual stat
-        writeFile(fileLocation / "Career" / ("Casual" + indexStringMapCareer[i] + ".txt"), careerStatCasual[i]);
+        writeFile(fileLocation / "Career" / ("Casual" + statStringsCareer[i] + ".txt"), careerStatCasual[i]);
         // writes the total stat
-        writeFile(fileLocation / "Career" / ("Total" + indexStringMapCareer[i] + ".txt"), careerStatTotal[i]);
+        writeFile(fileLocation / "Career" / ("Total" + statStringsCareer[i] + ".txt"), careerStatTotal[i]);
 
     }
 
@@ -46,10 +46,10 @@ void OBSCounter::writeCareerStatsWrapped() {
     careerStatTotal[Game] = careerStatTotal[Win] + careerStatTotal[Loss] + careerStatTotalOffset[Game];
 
     // writes the private stat
-    writeFile(fileLocation / "Career" / ("Private" + indexStringMapCareer[Game] + ".txt"), careerStatPrivate[Game]);
-    writeFile(fileLocation / "Career" / ("Ranked" + indexStringMapCareer[Game] + ".txt"), careerStatRanked[Game]);
-    writeFile(fileLocation / "Career" / ("Casual" + indexStringMapCareer[Game] + ".txt"), careerStatCasual[Game]);
-    writeFile(fileLocation / "Career" / ("Total" + indexStringMapCareer[Game] + ".txt"), careerStatTotal[Game]);
+    writeFile(fileLocation / "Career" / ("Private" + statStringsCareer[Game] + ".txt"), careerStatPrivate[Game]);
+    writeFile(fileLocation / "Career" / ("Ranked" + statStringsCareer[Game] + ".txt"), careerStatRanked[Game]);
+    writeFile(fileLocation / "Career" / ("Casual" + statStringsCareer[Game] + ".txt"), careerStatCasual[Game]);
+    writeFile(fileLocation / "Career" / ("Total" + statStringsCareer[Game] + ".txt"), careerStatTotal[Game]);
 
     // second loop for averages to ensure wins and losses were correct
     for (CareerStatsWrapper::StatValue careerValue : careerStats) {
@@ -67,6 +67,6 @@ void OBSCounter::writeCareerStatsWrapped() {
 
         careerStatAverage[i] = divide(careerStatTotal[i], careerStatTotal[Game]);
 
-        writeFileAverage(fileLocation / "Career" / ("Average" + indexStringMapCareer[i] + ".txt"), careerStatAverage[i]);
+        writeFileAverage(fileLocation / "Career" / ("Average" + statStringsCareer[i] + ".txt"), careerStatAverage[i]);
     }
 }

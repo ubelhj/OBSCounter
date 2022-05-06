@@ -12,6 +12,8 @@ void OBSCounter::onLoad()
 
     fileLocation = gameWrapper->GetDataFolder() / "OBSCounter";
 
+    Maps::generateStatStrings();
+
     // creates cvars and sets global variable defaults to prevent any nulls
     setCvars();
 

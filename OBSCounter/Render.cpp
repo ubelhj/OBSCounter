@@ -81,11 +81,11 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 
     switch (state) {
     case STAT_DEFAULT:
-        if (index >= numStats) {
+        if (index >= NUMSTATS) {
             return "INVALID STATE";
         }
         // writes time stats
-        if (index > endNormalStats) {
+        if (index > ENDNORMALSTATS) {
             int totalSeconds = statArray[index];
             // writes the stat
             strStream << totalSeconds / 60;
@@ -99,12 +99,12 @@ std::string OBSCounter::statToRenderString(int index, int state) {
             strStream << statArray[index];
         }
 
-        return indexStringMapRender[index] + strStream.str();
+        return renderStringsStandard[index] + strStream.str();
     case STAT_AVERAGE:
-        if (index >= numStats) {
+        if (index >= NUMSTATS) {
             return "INVALID STATE";
         }
-        if (index > endNormalStats) {
+        if (index > ENDNORMALSTATS) {
             int totalSeconds = averages[index];
             // writes the stat
             strStream << totalSeconds / 60;
@@ -118,13 +118,13 @@ std::string OBSCounter::statToRenderString(int index, int state) {
             strStream << std::fixed << std::setprecision(decimalPlaces);
             strStream << averages[index];
         }
-        return averageStringsRender[index] + strStream.str();
+        return renderStringsAverage[index] + strStream.str();
     case STAT_GAME:
-        if (index >= numStats) {
+        if (index >= NUMSTATS) {
             return "INVALID STATE";
         }
         // writes time stats
-        if (index > endNormalStats) {
+        if (index > ENDNORMALSTATS) {
             int totalSeconds = statArrayGame[index];
             // writes the stat
             strStream << totalSeconds / 60;
@@ -138,12 +138,12 @@ std::string OBSCounter::statToRenderString(int index, int state) {
             strStream << statArrayGame[index];
         }
 
-        return indexStringMapRenderGame[index] + strStream.str();
+        return renderStringsGame[index] + strStream.str();
     case STAT_OTHER:
-        if (index >= numOtherStats) {
-            return indexStringMapRenderOther[0] + statArrayOther[0];
+        if (index >= NUMOTHERSTATS) {
+            return renderStringsOther[0] + statArrayOther[0];
         } else {
-            return indexStringMapRenderOther[index] + statArrayOther[index];
+            return renderStringsOther[index] + statArrayOther[index];
         }
     case STAT_CAREER_TOTAL:
         if (index >= NUMCAREERSTATS) {
@@ -151,28 +151,28 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         }
         strStream << careerStatTotal[index];
 
-        return indexStringMapRenderCareerTotal[index] + strStream.str();
+        return renderStringsCareerTotal[index] + strStream.str();
     case STAT_CAREER_PRIVATE:
         if (index >= NUMCAREERSTATS) {
             return "INVALID STATE";
         }
         strStream << careerStatPrivate[index];
 
-        return indexStringMapRenderCareerPrivate[index] + strStream.str();
+        return renderStringsCareerPrivate[index] + strStream.str();
     case STAT_CAREER_RANKED:
         if (index >= NUMCAREERSTATS) {
             return "INVALID STATE";
         }
         strStream << careerStatRanked[index];
 
-        return indexStringMapRenderCareerRanked[index] + strStream.str();
+        return renderStringsCareerRanked[index] + strStream.str();
     case STAT_CAREER_CASUAL:
         if (index >= NUMCAREERSTATS) {
             return "INVALID STATE";
         }
         strStream << careerStatCasual[index];
 
-        return indexStringMapRenderCareerCasual[index] + strStream.str();
+        return renderStringsCareerCasual[index] + strStream.str();
     case STAT_CAREER_AVERAGE:
         if (index >= NUMCAREERSTATS) {
             return "INVALID STATE";
@@ -180,33 +180,33 @@ std::string OBSCounter::statToRenderString(int index, int state) {
         strStream << std::fixed << std::setprecision(decimalPlaces);
         strStream << careerStatAverage[index];
 
-        return indexStringMapRenderCareerAverage[index] + strStream.str();
+        return renderStringsCareerAverage[index] + strStream.str();
     case STAT_TEAM:
-        if (index >= numStats) {
+        if (index >= NUMSTATS) {
             return "INVALID STATE";
         }
 
         // writes time stats
-        if (index >= endNormalStats) {
+        if (index >= ENDNORMALSTATS) {
             // time stats don't exist for teams
         } else {
             strStream << statArrayTeam[index];
         }
 
-        return indexStringMapRenderTeam[index] + strStream.str();
+        return renderStringsTeam[index] + strStream.str();
     case STAT_TEAM_OPPONENT:
-        if (index >= numStats) {
+        if (index >= NUMSTATS) {
             return "INVALID STATE";
         }
 
         // writes time stats
-        if (index >= endNormalStats) {
+        if (index >= ENDNORMALSTATS) {
             // time stats don't exist for teams
         } else {
             strStream << statArrayOpponent[index];
         }
 
-        return indexStringMapRenderOpponent[index] + strStream.str();
+        return renderStringsOpponent[index] + strStream.str();
     default:
         return "INVALID STATE";
     }

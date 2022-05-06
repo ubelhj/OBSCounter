@@ -61,7 +61,7 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
     }
     statArray[eventType]++;
     // adds 1 to the game stat equivalent if applicable
-    if (eventType > statsWithoutGame) {
+    if (eventType > STATSWITHOUTGAME) {
         statArrayGame[eventType]++;
     }
 
@@ -236,7 +236,7 @@ void OBSCounter::startGame() {
     statArray[games]++;
 
     // resets all game stats to 0 
-    for (int i = 0; i < numStats; i++) {
+    for (int i = 0; i < NUMSTATS; i++) {
         statArrayGame[i] = 0;
     }
 

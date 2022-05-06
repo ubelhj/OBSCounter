@@ -1,3 +1,7 @@
+namespace Maps {
+    void generateStatStrings();
+}
+
 // enum for all stat indexes 
 // easier to refer back to stat names
 // total stats are from 0 to 30, game stats from 31 to end
@@ -7,8 +11,7 @@ enum stats {
     mvps,
     games,
     // end of stats without game counterpart
-    statsWithoutGame = games,
-    // stat + 27 = gameStat
+    STATSWITHOUTGAME = games,
     goals,
     demos,
     deaths,
@@ -40,15 +43,15 @@ enum stats {
     totalSaves,
     ownGoals,
     // last stat with normal output type
-    endNormalStats = ownGoals + 1,
-    timePlayed = endNormalStats,
+    ENDNORMALSTATS = ownGoals + 1,
+    timePlayed = ENDNORMALSTATS,
     offenseTime,
     defenseTime,
     // total number of stats in the stat array
-    numStats
+    NUMSTATS
 };
 
-static std::string indexStringMap[numStats] = {
+static std::string statStringsStandard[NUMSTATS] = {
     "wins",
     "losses",
     "mvps",
@@ -88,10 +91,10 @@ static std::string indexStringMap[numStats] = {
     "defenseTime"
 };
 
-static const char* indexStringMapChar[numStats] = {
+static const char* statCharStandard[NUMSTATS] = {
     "Wins",
     "Losses",
-    "Mvps",
+    "MVPs",
     "Games",
     "Goals",
     "Demolitions",
@@ -118,7 +121,7 @@ static const char* indexStringMapChar[numStats] = {
     "Ultra Damages",
     "Low Fives",
     "High Fives",
-    "Swishs",
+    "Swishes",
     "Bicycle Hits",
     "Points",
     "Total Saves",
@@ -128,91 +131,13 @@ static const char* indexStringMapChar[numStats] = {
     "Defense Time"
 };
 
-static std::string indexStringMapGame[numStats] = {
-    "gameWins",
-    "gameLosses",
-    "gameMvps",
-    "gameGames",
-    "gameGoals",
-    "gameDemolitions",
-    "gameDeaths",
-    "gameExterminations",
-    "gameAerialGoals",
-    "gameBackwardsGoals",
-    "gameBicycleGoals",
-    "gameLongGoals",
-    "gameTurtleGoals",
-    "gamePoolShots",
-    "gameOvertimeGoals",
-    "gameHatTricks",
-    "gameAssists",
-    "gamePlaymakers",
-    "gameSaves",
-    "gameEpicSaves",
-    "gameSaviors",
-    "gameShots",
-    "gameCenters",
-    "gameClears",
-    "gameFirstTouchs",
-    "gameDamages",
-    "gameUltraDamages",
-    "gameLowFives",
-    "gameHighFives",
-    "gameSwishs",
-    "gameBicycleHits",
-    "gamePoints",
-    "gameTotalSaves",
-    "gameOwnGoals",
-    "gameTimePlayed",
-    "gameOffenseTime",
-    "gameDefenseTime"
-};
+extern std::string renderStringsStandard[NUMSTATS];
 
-extern std::string indexStringMapRender[numStats];
+extern std::string statStringsGame[NUMSTATS];
+extern std::string renderStringsGame[NUMSTATS];
 
-extern std::string indexStringMapRenderGame[numStats];
-
-static std::string averageStrings[numStats] = {
-    "averageWins",
-    "averageLosses",
-    "averageMvps",
-    "averageGames",
-    "averageGoals",
-    "averageDemolitions",
-    "averageDeaths",
-    "averageExterminations",
-    "averageAerialGoals",
-    "averageBackwardsGoals",
-    "averageBicycleGoals",
-    "averageLongGoals",
-    "averageTurtleGoals",
-    "averagePoolShots",
-    "averageOvertimeGoals",
-    "averageHatTricks",
-    "averageAssists",
-    "averagePlaymakers",
-    "averageSaves",
-    "averageEpicSaves",
-    "averageSaviors",
-    "averageShots",
-    "averageCenters",
-    "averageClears",
-    "averageFirstTouchs",
-    "averageDamages",
-    "averageUltraDamages",
-    "averageLowFives",
-    "averageHighFives",
-    "averageSwishs",
-    "averageBicycleHits",
-    "averagePoints",
-    "averageTotalSaves",
-    "averageOwnGoals",
-    "averageTimePlayed",
-    "averageOffenseTime",
-    "averageDefenseTime"
-};
-
-extern std::string averageStringsRender[numStats];
+extern std::string statStringsAverage[NUMSTATS];
+extern std::string renderStringsAverage[NUMSTATS];
 
 static const std::map<std::string, int> eventDictionary = {
     { "Demolish", demos},
@@ -254,10 +179,10 @@ enum otherStats {
     possibleExterminations,
     missedExterminationPercent,
     winPercentage,
-    numOtherStats
+    NUMOTHERSTATS
 };
 
-static std::string indexStringMapOther[numOtherStats] = {
+static std::string statStringsOther[NUMOTHERSTATS] = {
     "shootingPercentage",
     "gameShootingPercentage",
     "kDRatio",
@@ -267,7 +192,7 @@ static std::string indexStringMapOther[numOtherStats] = {
     "winPercentage"
 };
 
-static const char* indexStringMapOtherChar[numOtherStats] = {
+static const char* statCharOther[NUMOTHERSTATS] = {
     "Shooting Percentage",
     "Game Shooting Percentage",
     "KD Ratio",
@@ -277,7 +202,7 @@ static const char* indexStringMapOtherChar[numOtherStats] = {
     "Win Percentage"
 };
 
-extern std::string indexStringMapRenderOther[numOtherStats];
+extern std::string renderStringsOther[NUMOTHERSTATS];
 
 enum careerStats {
     FirstTouch,
@@ -375,7 +300,7 @@ static const std::map<std::string, int> eventDictionaryCareer = {
     { "BoostPickups", BoostPickups }
 };
 
-static std::string indexStringMapCareer[NUMCAREERSTATS] = {
+static std::string statStringsCareer[NUMCAREERSTATS] = {
     "CareerFirstTouches",
     "CareerShots",
     "CareerGoals",
@@ -423,7 +348,7 @@ static std::string indexStringMapCareer[NUMCAREERSTATS] = {
     "CareerGames"
 };
 
-static const char * indexStringMapCareerChar[NUMCAREERSTATS] = {
+static const char * statCharsCareer[NUMCAREERSTATS] = {
     "First Touches",
     "Shots",
     "Goals",
@@ -471,11 +396,11 @@ static const char * indexStringMapCareerChar[NUMCAREERSTATS] = {
     "Games"
 };
 
-extern std::string indexStringMapRenderCareerTotal[NUMCAREERSTATS];
-extern std::string indexStringMapRenderCareerPrivate[NUMCAREERSTATS];
-extern std::string indexStringMapRenderCareerCasual[NUMCAREERSTATS];
-extern std::string indexStringMapRenderCareerRanked[NUMCAREERSTATS];
-extern std::string indexStringMapRenderCareerAverage[NUMCAREERSTATS];
+extern std::string renderStringsCareerTotal[NUMCAREERSTATS];
+extern std::string renderStringsCareerPrivate[NUMCAREERSTATS];
+extern std::string renderStringsCareerCasual[NUMCAREERSTATS];
+extern std::string renderStringsCareerRanked[NUMCAREERSTATS];
+extern std::string renderStringsCareerAverage[NUMCAREERSTATS];
 
-extern std::string indexStringMapRenderTeam[endNormalStats];
-extern std::string indexStringMapRenderOpponent[endNormalStats];
+extern std::string renderStringsTeam[ENDNORMALSTATS];
+extern std::string renderStringsOpponent[ENDNORMALSTATS];

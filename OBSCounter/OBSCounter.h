@@ -169,14 +169,14 @@ private:
     float outlineSize;
 
     // holds all stats
-    int statArray[numStats];
-    int statArrayTeam[endNormalStats - 1];
-    int statArrayOpponent[endNormalStats - 1];
-    int statArrayGame[numStats];
-    std::string statArrayOther[numOtherStats];
+    int statArray[NUMSTATS];
+    int statArrayTeam[ENDNORMALSTATS - 1];
+    int statArrayOpponent[ENDNORMALSTATS - 1];
+    int statArrayGame[NUMSTATS];
+    std::string statArrayOther[NUMOTHERSTATS];
 
     // holds all averages
     // caching improves performance significantly
-    float averages[numStats];
+    float averages[NUMSTATS];
 };
 

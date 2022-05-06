@@ -122,7 +122,7 @@ void OBSCounter::setCvars() {
     // resets all stats
     cvarManager->registerNotifier("counter_reset",
         [this](std::vector<std::string> params) {
-            for (int i = 0; i < numStats; i++) {
+            for (int i = 0; i < NUMSTATS; i++) {
                 statArray[i] = 0;
                 statArrayGame[i] = 0;
             }
@@ -132,9 +132,9 @@ void OBSCounter::setCvars() {
 
     // creates setters for the default start value for each stat
     // also writes these new values to files
-    for (int i = 0; i <= endNormalStats; i++) {
-        std::string cvarName = "counter_set_" + indexStringMap[i];
-        std::string cvarTip = "sets " + indexStringMap[i] + " value";
+    for (int i = 0; i <= ENDNORMALSTATS; i++) {
+        std::string cvarName = "counter_set_" + statStringsStandard[i];
+        std::string cvarTip = "sets " + statStringsStandard[i] + " value";
         cvarManager->registerCvar(cvarName, "0", cvarTip, true, false, 0, false, 0, false);
         auto cvar = cvarManager->getCvar(cvarName);
         statArray[i] = cvar.getIntValue();
@@ -147,9 +147,9 @@ void OBSCounter::setCvars() {
 
     // creates setters for the default start value for time stats
     // also writes these new values to files
-    for (int i = endNormalStats + 1; i < numStats; i++) {
-        std::string cvarName = "counter_set_" + indexStringMap[i];
-        std::string cvarTip = "sets " + indexStringMap[i] + " value";
+    for (int i = ENDNORMALSTATS + 1; i < NUMSTATS; i++) {
+        std::string cvarName = "counter_set_" + statStringsStandard[i];
+        std::string cvarTip = "sets " + statStringsStandard[i] + " value";
         cvarManager->registerCvar(cvarName, "0", cvarTip, true, false, 0, false, 0, false);
         auto cvar = cvarManager->getCvar(cvarName);
         statArray[i] = cvar.getIntValue();
@@ -159,82 +159,82 @@ void OBSCounter::setCvars() {
     }
 
     // setters for render strings for stats
-    for (int i = 0; i < numStats; i++) {
-        std::string cvarName = "counter_set_render_string_" + indexStringMap[i];
-        std::string cvarTip = "sets " + indexStringMap[i] + " render string";
-        cvarManager->registerCvar(cvarName, indexStringMapRender[i], cvarTip);
+    for (int i = 0; i < NUMSTATS; i++) {
+        std::string cvarName = "counter_set_render_string_" + statStringsStandard[i];
+        std::string cvarTip = "sets " + statStringsStandard[i] + " render string";
+        cvarManager->registerCvar(cvarName, renderStringsStandard[i], cvarTip);
         auto cvar = cvarManager->getCvar(cvarName);
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            indexStringMapRender[i] = cvar.getStringValue(); });
+            renderStringsStandard[i] = cvar.getStringValue(); });
 
         // setters for render strings for average stats
-        cvarName = "counter_set_render_string_" + averageStrings[i];
-        cvarTip = "sets " + averageStrings[i] + " render string";
-        cvarManager->registerCvar(cvarName, averageStringsRender[i], cvarTip);
+        cvarName = "counter_set_render_string_" + statStringsAverage[i];
+        cvarTip = "sets " + statStringsAverage[i] + " render string";
+        cvarManager->registerCvar(cvarName, renderStringsAverage[i], cvarTip);
         cvar = cvarManager->getCvar(cvarName);
         statArray[i] = cvar.getIntValue();
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            averageStringsRender[i] = cvar.getStringValue(); });
+            renderStringsAverage[i] = cvar.getStringValue(); });
 
         // setters for render strings for game stats
-        cvarName = "counter_set_render_string_" + indexStringMapGame[i];
-        cvarTip = "sets " + indexStringMapGame[i] + " render string";
-        cvarManager->registerCvar(cvarName, indexStringMapRenderGame[i], cvarTip);
+        cvarName = "counter_set_render_string_" + statStringsGame[i];
+        cvarTip = "sets " + statStringsGame[i] + " render string";
+        cvarManager->registerCvar(cvarName, renderStringsGame[i], cvarTip);
         cvar = cvarManager->getCvar(cvarName);
         cvar.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            indexStringMapRenderGame[i] = cvar.getStringValue(); });
+            renderStringsGame[i] = cvar.getStringValue(); });
     }
 
-    for (int i = 0; i < numOtherStats; i++) {
+    for (int i = 0; i < NUMOTHERSTATS; i++) {
         // setters for render strings for other stats
-        std::string cvarName = "counter_set_render_string_" + indexStringMapOther[i];
-        std::string cvarTip = "sets " + indexStringMapOther[i] + " render string";
-        cvarManager->registerCvar(cvarName, indexStringMapRenderOther[i], cvarTip)
+        std::string cvarName = "counter_set_render_string_" + statStringsOther[i];
+        std::string cvarTip = "sets " + statStringsOther[i] + " render string";
+        cvarManager->registerCvar(cvarName, renderStringsOther[i], cvarTip)
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-                indexStringMapRenderOther[i] = cvar.getStringValue();
+                renderStringsOther[i] = cvar.getStringValue();
             });
     }
 
     for (int i = 0; i < NUMCAREERSTATS; i++) {
         // setters for render strings for career stats
-        std::string cvarNameTotal = "counter_set_render_string_total" + indexStringMapCareer[i];
-        std::string cvarTipTotal = "sets Total" + indexStringMapCareer[i] + " render string";
-        cvarManager->registerCvar(cvarNameTotal, indexStringMapRenderCareerTotal[i], cvarTipTotal)
+        std::string cvarNameTotal = "counter_set_render_string_total" + statStringsCareer[i];
+        std::string cvarTipTotal = "sets Total" + statStringsCareer[i] + " render string";
+        cvarManager->registerCvar(cvarNameTotal, renderStringsCareerTotal[i], cvarTipTotal)
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-                indexStringMapRenderCareerTotal[i] = cvar.getStringValue();
+                renderStringsCareerTotal[i] = cvar.getStringValue();
             });
 
-        std::string cvarNamePrivate = "counter_set_render_string_private" + indexStringMapCareer[i];
-        std::string cvarTipPrivate = "sets Private" + indexStringMapCareer[i] + " render string";
-        cvarManager->registerCvar(cvarNamePrivate, indexStringMapRenderCareerPrivate[i], cvarTipPrivate)
+        std::string cvarNamePrivate = "counter_set_render_string_private" + statStringsCareer[i];
+        std::string cvarTipPrivate = "sets Private" + statStringsCareer[i] + " render string";
+        cvarManager->registerCvar(cvarNamePrivate, renderStringsCareerPrivate[i], cvarTipPrivate)
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-                indexStringMapRenderCareerPrivate[i] = cvar.getStringValue();
+                renderStringsCareerPrivate[i] = cvar.getStringValue();
             });
 
-        std::string cvarNameRanked = "counter_set_render_string_ranked" + indexStringMapCareer[i];
-        std::string cvarTipRanked = "sets Ranked" + indexStringMapCareer[i] + " render string";
-        cvarManager->registerCvar(cvarNameRanked, indexStringMapRenderCareerRanked[i], cvarTipRanked)
+        std::string cvarNameRanked = "counter_set_render_string_ranked" + statStringsCareer[i];
+        std::string cvarTipRanked = "sets Ranked" + statStringsCareer[i] + " render string";
+        cvarManager->registerCvar(cvarNameRanked, renderStringsCareerRanked[i], cvarTipRanked)
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-                indexStringMapRenderCareerRanked[i] = cvar.getStringValue();
+                renderStringsCareerRanked[i] = cvar.getStringValue();
             });
 
-        std::string cvarNameCasual = "counter_set_render_string_casual" + indexStringMapCareer[i];
-        std::string cvarTipCasual = "sets Casual" + indexStringMapCareer[i] + " render string";
-        cvarManager->registerCvar(cvarNameCasual, indexStringMapRenderCareerCasual[i], cvarTipCasual)
+        std::string cvarNameCasual = "counter_set_render_string_casual" + statStringsCareer[i];
+        std::string cvarTipCasual = "sets Casual" + statStringsCareer[i] + " render string";
+        cvarManager->registerCvar(cvarNameCasual, renderStringsCareerCasual[i], cvarTipCasual)
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-                indexStringMapRenderCareerCasual[i] = cvar.getStringValue();
+                renderStringsCareerCasual[i] = cvar.getStringValue();
             });
 
-        std::string cvarNameAverage = "counter_set_render_string_average" + indexStringMapCareer[i];
-        std::string cvarTipAverage = "sets Average" + indexStringMapCareer[i] + " render string";
-        cvarManager->registerCvar(cvarNameAverage, indexStringMapRenderCareerAverage[i], cvarTipAverage)
+        std::string cvarNameAverage = "counter_set_render_string_average" + statStringsCareer[i];
+        std::string cvarTipAverage = "sets Average" + statStringsCareer[i] + " render string";
+        cvarManager->registerCvar(cvarNameAverage, renderStringsCareerAverage[i], cvarTipAverage)
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            indexStringMapRenderCareerAverage[i] = cvar.getStringValue();
+            renderStringsCareerAverage[i] = cvar.getStringValue();
                 });
 
         // allows user to set an offset to count stats from other platforms
-        std::string cvarNameOffset = "counter_career_offset_" + indexStringMapCareer[i];
-        std::string cvarTipOffset = "sets career total offset for" + indexStringMapCareer[i];
+        std::string cvarNameOffset = "counter_career_offset_" + statStringsCareer[i];
+        std::string cvarTipOffset = "sets career total offset for" + statStringsCareer[i];
         cvarManager->registerCvar(cvarNameOffset, "0", cvarTipOffset)
             .addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
                 careerStatTotalOffset[i] = cvar.getIntValue();
@@ -243,20 +243,20 @@ void OBSCounter::setCvars() {
     }
 
     // setters for render strings for stats
-    for (int i = 0; i < endNormalStats; i++) {
-        std::string cvarNameTeam = "counter_set_render_string_team" + indexStringMap[i];
-        std::string cvarTipTeam = "sets team" + indexStringMap[i] + " render string";
-        cvarManager->registerCvar(cvarNameTeam, indexStringMapRenderTeam[i], cvarTipTeam);
+    for (int i = 0; i < ENDNORMALSTATS; i++) {
+        std::string cvarNameTeam = "counter_set_render_string_team" + statStringsStandard[i];
+        std::string cvarTipTeam = "sets team" + statStringsStandard[i] + " render string";
+        cvarManager->registerCvar(cvarNameTeam, renderStringsTeam[i], cvarTipTeam);
         auto cvarTeam = cvarManager->getCvar(cvarNameTeam);
         cvarTeam.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            indexStringMapRenderTeam[i] = cvar.getStringValue(); });
+            renderStringsTeam[i] = cvar.getStringValue(); });
 
-        std::string cvarNameOpponent = "counter_set_render_string_opponent" + indexStringMap[i];
-        std::string cvarTipOpponent = "sets opponent" + indexStringMap[i] + " render string";
-        cvarManager->registerCvar(cvarNameOpponent, indexStringMapRenderOpponent[i], cvarTipOpponent);
+        std::string cvarNameOpponent = "counter_set_render_string_opponent" + statStringsStandard[i];
+        std::string cvarTipOpponent = "sets opponent" + statStringsStandard[i] + " render string";
+        cvarManager->registerCvar(cvarNameOpponent, renderStringsOpponent[i], cvarTipOpponent);
         auto cvarOpponent = cvarManager->getCvar(cvarNameOpponent);
         cvarOpponent.addOnValueChanged([this, i](std::string, CVarWrapper cvar) {
-            indexStringMapRenderOpponent[i] = cvar.getStringValue(); });
+            renderStringsOpponent[i] = cvar.getStringValue(); });
     }
 
     // special case to make sure games update properly
