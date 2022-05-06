@@ -540,3 +540,48 @@ extern std::string renderStringsCareerAverage[NUMCAREERSTATS];
 
 extern std::string renderStringsTeam[ENDNORMALSTATS];
 extern std::string renderStringsOpponent[ENDNORMALSTATS];
+
+enum statStates {
+    STAT_DEFAULT,
+    STAT_AVERAGE,
+    STAT_GAME,
+    STAT_OTHER,
+    STAT_CAREER_START = STAT_OTHER,
+    STAT_CAREER_TOTAL,
+    STAT_CAREER_PRIVATE,
+    STAT_CAREER_RANKED,
+    STAT_CAREER_CASUAL,
+    STAT_CAREER_AVERAGE,
+    STAT_TEAM_START = STAT_CAREER_AVERAGE,
+    STAT_TEAM,
+    STAT_TEAM_OPPONENT,
+    STAT_END
+};
+
+extern std::string labelStringsStandard[NUMSTATS];
+extern std::string labelStringsGame[NUMSTATS];
+extern std::string labelStringsAverage[NUMSTATS];
+
+extern std::string labelStringsOther[NUMOTHERSTATS];
+
+extern std::string labelStringsCareerTotal[NUMCAREERSTATS];
+extern std::string labelStringsCareerPrivate[NUMCAREERSTATS];
+extern std::string labelStringsCareerCasual[NUMCAREERSTATS];
+extern std::string labelStringsCareerRanked[NUMCAREERSTATS];
+extern std::string labelStringsCareerAverage[NUMCAREERSTATS];
+
+extern std::string labelStringsTeam[ENDNORMALSTATS];
+extern std::string labelStringsOpponent[ENDNORMALSTATS];
+
+// used for cvar names
+extern std::string statStringsCareerTotal[NUMCAREERSTATS];
+extern std::string statStringsCareerPrivate[NUMCAREERSTATS];
+extern std::string statStringsCareerCasual[NUMCAREERSTATS];
+extern std::string statStringsCareerRanked[NUMCAREERSTATS];
+extern std::string statStringsCareerAverage[NUMCAREERSTATS];
+extern std::string statStringsTeam[ENDNORMALSTATS];
+extern std::string statStringsOpponent[ENDNORMALSTATS];
+
+extern std::vector<std::string*> labelStrings;
+extern std::vector<std::string*> renderStrings;
+extern std::vector<std::string*> cvarBases;

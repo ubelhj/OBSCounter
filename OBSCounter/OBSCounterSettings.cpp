@@ -173,59 +173,18 @@ void OBSCounter::statSettings(int renderIndex) {
     if (!overlayStateCvar) { return; }
     int overlayState = overlayStateCvar.getIntValue();
 
-    std::string statRenderName = "";
-    const char* statString;
+    std::string statCvarName;
+    std::string statLabel;
 
-    switch (overlayState) {
-    case STAT_DEFAULT:
-        statRenderName = statStringsStandard[statIndex];
-        statString = statCharStandard[statIndex];
-        break;
-    case STAT_AVERAGE:
-        statRenderName = statStringsAverage[statIndex];
-        statString = statCharStandard[statIndex];
-        break;
-    case STAT_GAME:
-        statRenderName = statStringsGame[statIndex];
-        statString = statCharStandard[statIndex];
-        break;
-    case STAT_OTHER:
-        statRenderName = statStringsOther[statIndex];
-        statString = statCharStandard[statIndex];
-        break;
-    case STAT_CAREER_TOTAL:
-        statRenderName = "total" + statStringsCareer[statIndexCareer];
-        statString = statCharsCareer[statIndexCareer];
-        break;
-    case STAT_CAREER_PRIVATE:
-        statRenderName = "private" + statStringsCareer[statIndexCareer];
-        statString = statCharsCareer[statIndexCareer];
-        break;
-    case STAT_CAREER_RANKED:
-        statRenderName = "ranked" + statStringsCareer[statIndexCareer];
-        statString = statCharsCareer[statIndexCareer];
-        break;
-    case STAT_CAREER_CASUAL:
-        statRenderName = "casual" + statStringsCareer[statIndexCareer];
-        statString = statCharsCareer[statIndexCareer];
-        break;
-    case STAT_CAREER_AVERAGE:
-        statRenderName = "average" + statStringsCareer[statIndexCareer];
-        statString = statCharsCareer[statIndexCareer];
-        break;
-    case STAT_TEAM:
-        statRenderName = "team" + statStringsStandard[statIndex];
-        statString = statCharStandard[statIndex];
-        break;
-    case STAT_TEAM_OPPONENT:
-        statRenderName = "opponent" + statStringsStandard[statIndex];
-        statString = statCharStandard[statIndex];
-        break;
-    default:
-        break;
+    if (overlayState > STAT_CAREER_START && overlayState <= STAT_TEAM_START) {
+        statLabel = labelStrings[overlayState][statIndexCareer];
+        statCvarName = cvarBases[overlayState][statIndexCareer];
+    } else {
+        statLabel = labelStrings[overlayState][statIndex];
+        statCvarName = cvarBases[overlayState][statIndex];
     }
 
-    std::string headerName("Stat " + statRenderName + "###statheader" + renderIndexStr);
+    std::string headerName(statLabel + "###statheader" + renderIndexStr);
 
     if (ImGui::CollapsingHeader(headerName.c_str())) {
         std::string checkboxDefaultLabel = "Session Total##stat" + renderIndexStr;
@@ -334,7 +293,7 @@ void OBSCounter::statSettings(int renderIndex) {
             ImGui::ListBoxFooter();
         }
         
-        CVarWrapper overlayStatStringCvar = cvarManager->getCvar("counter_set_render_string_" + statRenderName);
+        CVarWrapper overlayStatStringCvar = cvarManager->getCvar("counter_set_render_string_" + statCvarName);
         if (!overlayStatStringCvar) { return; }
         std::string overlayStatString = overlayStatStringCvar.getStringValue();
 

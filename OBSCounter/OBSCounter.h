@@ -112,23 +112,6 @@ private:
     bool inDragMode = false;
     ImFont* font;
 
-    enum statStates {
-        STAT_DEFAULT,
-        STAT_AVERAGE,
-        STAT_GAME,
-        STAT_OTHER,
-        STAT_CAREER_START = STAT_OTHER,
-        STAT_CAREER_TOTAL,
-        STAT_CAREER_PRIVATE,
-        STAT_CAREER_RANKED,
-        STAT_CAREER_CASUAL,
-        STAT_CAREER_AVERAGE,
-        STAT_TEAM_START = STAT_CAREER_AVERAGE,
-        STAT_TEAM,
-        STAT_TEAM_OPPONENT,
-        STAT_END
-    };
-
     int careerStatTotal[NUMCAREERSTATS];
     int careerStatTotalOffset[NUMCAREERSTATS];
     int careerStatPrivate[NUMCAREERSTATS];
