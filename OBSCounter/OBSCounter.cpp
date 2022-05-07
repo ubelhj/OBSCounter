@@ -22,6 +22,7 @@ void OBSCounter::onLoad()
 
     std::filesystem::create_directories(fileLocation);
     std::filesystem::create_directories(fileLocation / "Career");
+    std::filesystem::create_directories(fileLocation / "Team");
 
     writeAll();
 }

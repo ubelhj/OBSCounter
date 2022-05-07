@@ -22,3 +22,12 @@ void LOG(const S& format_str, Args&&... args)
 {
     _globalCvarManager->log(fmt::format(format_str, args...));
 }
+
+const bool debugLog = true;
+template<typename S, typename... Args>
+void DEBUGLOG(const S& format_str, Args&&... args)
+{
+    if (debugLog) {
+        _globalCvarManager->log(fmt::format(format_str, args...));
+    }
+}

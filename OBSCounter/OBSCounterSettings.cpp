@@ -2,7 +2,7 @@
 #include "OBSCounter.h"
 
 std::string OBSCounter::GetPluginName() {
-    return "OBS Counter Plugin";
+    return "Stat Counter";
 }
 void OBSCounter::RenderSettings() {
     enableSettings();

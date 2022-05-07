@@ -38,11 +38,11 @@ void OBSCounter::writeSpecific(int statIndex, int statType) {
         statValue = statArrayGame[statIndex];
         break;
     case STAT_TEAM:
-        statLocation = cvarBases[STAT_TEAM][statIndex];
+        statLocation = "Team/" + cvarBases[STAT_TEAM][statIndex];
         statValue = statArrayTeam[statIndex];
         break;
     case STAT_TEAM_OPPONENT:
-        statLocation = cvarBases[STAT_TEAM_OPPONENT][statIndex];
+        statLocation = "Team/" + cvarBases[STAT_TEAM_OPPONENT][statIndex];
         statValue = statArrayOpponent[statIndex];
         break;
     default:
@@ -55,12 +55,12 @@ void OBSCounter::writeSpecific(int statIndex, int statType) {
 void OBSCounter::writeTeams() {
     if (!writeFiles) { return; }
     for (int i = 0; i < ENDNORMALSTATS; i++) {
-        std::string statLocationTeam = cvarBases[STAT_TEAM][i];
+        std::string statLocationTeam = "Team/" + cvarBases[STAT_TEAM][i];
         int statValueTeam = statArrayTeam[i];
 
         writeFile(fileLocation / (statLocationTeam + ".txt"), statValueTeam);
 
-        std::string statLocationOpponent = cvarBases[STAT_TEAM_OPPONENT][i];
+        std::string statLocationOpponent = "Team/" + cvarBases[STAT_TEAM_OPPONENT][i];
         int statValueOpponent = statArrayOpponent[i];
 
         writeFile(fileLocation / (statLocationOpponent + ".txt"), statValueOpponent);

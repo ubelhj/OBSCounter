@@ -20,9 +20,9 @@ struct StatEventStruct {
 };
 
 void OBSCounter::statEvent(ServerWrapper caller, void* args) {
-    //cvarManager->log("stat event!");
+    //DEBUGLOG("stat event!");
     if (!gameWrapper->IsInOnlineGame()) {
-        //cvarManager->log("not in online game");
+        //DEBUGLOG("not in online game");
         return;
     }
     auto tArgs = (StatEventStruct*)args;
@@ -32,11 +32,11 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
 
     // PRI is always main player for this event
     /*auto pri = PriWrapper(tArgs->PRI);
-    cvarManager->log("is primary: " + std::to_string(pri.IsLocalPlayerPRI()));*/
+    DEBUGLOG("is primary: " + std::to_string(pri.IsLocalPlayerPRI()));*/
 
     // Count always is int_max. No idea why
     /*auto count = tArgs->Count;
-    cvarManager->log("count: " + std::to_string(count));*/
+    DEBUGLOG("count: " + std::to_string(count));*/
 
     auto eventTypePtr = eventDictionary.find(eventString);
 
@@ -44,16 +44,16 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
 
     if (eventTypePtr != eventDictionary.end()) {
         eventType = eventTypePtr->second;
-        cvarManager->log("event type: " + eventString);
-        cvarManager->log("event num: " + std::to_string(eventType));
+        DEBUGLOG("event type: " + eventString);
+        DEBUGLOG("event num: {}", eventType);
     } else {
-        cvarManager->log("missing stat: " + eventString);
-        cvarManager->log("missing stat points: " + std::to_string(statEvent.GetPoints()));
+        LOG("missing stat: " + eventString);
+        DEBUGLOG("missing stat points: " + std::to_string(statEvent.GetPoints()));
         return;
     }
 
     int statPoints = statEvent.GetPoints();
-    cvarManager->log("points: " + std::to_string(statPoints));
+    DEBUGLOG("points: " + std::to_string(statPoints));
     if (statPoints > 0) {
         statArray[points] += statPoints;
         statArrayGame[points] += statPoints;
@@ -77,6 +77,7 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
         break;
     case demos:
         writeKillPercentage();
+        __fallthrough;
     case exterms:
         writeMissedExterms();
         break;
@@ -100,9 +101,9 @@ void OBSCounter::statEvent(ServerWrapper caller, void* args) {
 
 void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
     auto tArgs = (TickerStruct*)args;
-    //cvarManager->log("stat ticker event!");
+    //LOG("stat ticker event!");
     if (!gameWrapper->IsInOnlineGame()) {
-        //cvarManager->log("not in online game");
+        //LOG("not in online game");
         return;
     }
 
@@ -120,24 +121,24 @@ void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
 
     if (eventTypePtr != eventDictionary.end()) {
         eventType = eventTypePtr->second;
-        cvarManager->log("event type: " + eventString);
-        cvarManager->log("event num: " + std::to_string(eventType));
+        DEBUGLOG("event type: " + eventString);
+        DEBUGLOG("event num: {}", eventType);
     }
     else {
-        cvarManager->log("missing stat: " + eventString);
-        cvarManager->log("missing stat points: " + statEvent.GetPoints());
+        LOG("missing stat: " + eventString);
+        DEBUGLOG("missing stat points: {}",  statEvent.GetPoints());
         return;
     }
 
     // team stats
     ServerWrapper sw = gameWrapper->GetOnlineGame();
     if (!sw) {
-        cvarManager->log("null server");
+        DEBUGLOG("null server");
         return;
     }
     PlayerControllerWrapper primary = sw.GetLocalPrimaryPlayer();
     if (!primary) {
-        cvarManager->log("null primary player");
+        DEBUGLOG("null primary player");
         return;
     }
 
@@ -170,7 +171,7 @@ void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
             statArrayOpponent[deaths]++;
 
         if (isPrimaryPlayer(victim)) {
-            cvarManager->log("player died");
+            DEBUGLOG("player died");
             statArray[deaths]++;
             statArrayGame[deaths]++;
             writeKillPercentage();
@@ -186,33 +187,33 @@ void OBSCounter::statTickerEvent(ServerWrapper caller, void* args) {
 bool OBSCounter::isPrimaryPlayer(PriWrapper receiver) {
     // anything down this conversion line can be null, so always checks
     if (!gameWrapper->IsInOnlineGame()) {
-        cvarManager->log("not in online game");
+        DEBUGLOG("not in online game");
         return false;
     }
 
     ServerWrapper sw = gameWrapper->GetOnlineGame();
 
     if (sw.IsNull()) {
-        cvarManager->log("null server");
+        DEBUGLOG("null server");
         return false;
     }
 
     auto primary = sw.GetLocalPrimaryPlayer();
 
     if (primary.IsNull()) {
-        cvarManager->log("null primary player");
+        DEBUGLOG("null primary player");
         return false;
     }
 
     auto primaryPri = primary.GetPRI();
 
     if (primaryPri.IsNull()) {
-        cvarManager->log("null primary pri");
+        DEBUGLOG("null primary pri");
         return false;
     }
 
     if (receiver.IsNull()) {
-        cvarManager->log("null receiver");
+        DEBUGLOG("null receiver");
         return false;
     }
 
@@ -224,11 +225,11 @@ bool OBSCounter::isPrimaryPlayer(PriWrapper receiver) {
 
 // called whenever a new game begins, and resets all game stats to 0
 void OBSCounter::startGame() {
-    cvarManager->log("started game");
+    DEBUGLOG("started game");
     // if the last game didnt end, doesn't start game
     // can lead to issues if the user ragequits. No good workaround yet
     if (!endedGame) {
-        cvarManager->log("last game didn't end");
+        DEBUGLOG("last game didn't end");
         return;
     }
     endedGame = false;
@@ -245,21 +246,21 @@ void OBSCounter::startGame() {
 
 void OBSCounter::endGame() {
     if (!gameWrapper->IsInOnlineGame()) {
-        cvarManager->log("not in online game");
+        DEBUGLOG("not in online game");
         return;
     }
 
     ServerWrapper sw = gameWrapper->GetOnlineGame();
 
     if (sw.IsNull()) {
-        cvarManager->log("null server");
+        DEBUGLOG("null server");
         return;
     }
 
     auto primary = sw.GetLocalPrimaryPlayer();
 
     if (primary.IsNull()) {
-        cvarManager->log("null primary player");
+        DEBUGLOG("null primary player");
         return;
     }
 
@@ -268,7 +269,7 @@ void OBSCounter::endGame() {
     auto winner = sw.GetWinningTeam();
 
     if (winner.IsNull()) {
-        cvarManager->log("null winner");
+        DEBUGLOG("null winner");
         return;
     }
 
@@ -282,7 +283,7 @@ void OBSCounter::endGame() {
     PriWrapper pri = primary.GetPRI();
 
     if (!pri) {
-        cvarManager->log("null player pri");
+        DEBUGLOG("null player pri");
         return;
     }
 
@@ -303,23 +304,23 @@ void OBSCounter::endGame() {
 // called every second to log car location on offense or defense
 // also makes sure points are synced
 void OBSCounter::checkCarLocation() {
-    //cvarManager->log("updated time");
+    //DEBUGLOG("updated time");
     if (!gameWrapper->IsInOnlineGame()) {
-        // cvarManager->log("not in online game");
+        // DEBUGLOG("not in online game");
         return;
     }
 
     ServerWrapper sw = gameWrapper->GetOnlineGame();
 
     if (sw.IsNull()) {
-        //cvarManager->log("null server");
+        //DEBUGLOG("null server");
         return;
     }
 
     auto car = gameWrapper->GetLocalCar();
 
     if (car.IsNull()) {
-        //cvarManager->log("null car");
+        //DEBUGLOG("null car");
         return;
     }
 

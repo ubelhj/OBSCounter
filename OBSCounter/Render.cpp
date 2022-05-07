@@ -182,26 +182,20 @@ std::string OBSCounter::statToRenderString(int index, int state) {
 
         return renderStringsCareerAverage[index] + strStream.str();
     case STAT_TEAM:
-        if (index >= NUMSTATS) {
-            return "INVALID STATE";
-        }
-
         // writes time stats
         if (index >= ENDNORMALSTATS) {
             // time stats don't exist for teams
+            return "INVALID STATE";
         } else {
             strStream << statArrayTeam[index];
         }
 
         return renderStringsTeam[index] + strStream.str();
     case STAT_TEAM_OPPONENT:
-        if (index >= NUMSTATS) {
-            return "INVALID STATE";
-        }
-
         // writes time stats
         if (index >= ENDNORMALSTATS) {
             // time stats don't exist for teams
+            return "INVALID STATE";
         } else {
             strStream << statArrayOpponent[index];
         }

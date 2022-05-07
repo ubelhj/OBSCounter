@@ -46,8 +46,8 @@ std::string statStringsOpponent[ENDNORMALSTATS] = { "ERR" };
 
 std::vector<std::string*> labelStrings  = {
    labelStringsStandard,
-   labelStringsGame,
    labelStringsAverage,
+   labelStringsGame,
    labelStringsOther,
    labelStringsCareerTotal,
    labelStringsCareerPrivate,
@@ -60,8 +60,8 @@ std::vector<std::string*> labelStrings  = {
 
 std::vector<std::string*> renderStrings = {
    renderStringsStandard,
-   renderStringsGame,
    renderStringsAverage,
+   renderStringsGame,
    renderStringsOther,
    renderStringsCareerTotal,
    renderStringsCareerPrivate,
@@ -74,8 +74,8 @@ std::vector<std::string*> renderStrings = {
 
 std::vector<std::string*> cvarBases = {
    statStringsStandard,
-   statStringsGame,
    statStringsAverage,
+   statStringsGame,
    statStringsOther,
    statStringsCareerTotal,
    statStringsCareerPrivate,
