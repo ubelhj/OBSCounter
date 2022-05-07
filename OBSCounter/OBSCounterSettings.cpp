@@ -69,6 +69,16 @@ void OBSCounter::enableSettings() {
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Resets all stats, including games to 0");
     }
+
+    ImGui::SameLine();
+
+    CVarWrapper writeVar = cvarManager->getCvar("counter_write");
+    if (!writeVar) { return; }
+    bool writeb = writeVar.getBoolValue();
+
+    if (ImGui::Checkbox("Write stats to bakkesmod/data/OBSCounter for OBS text source", &writeb)) {
+        writeVar.setValue(writeb);
+    }
 }
 
 void OBSCounter::colorSettings() {
