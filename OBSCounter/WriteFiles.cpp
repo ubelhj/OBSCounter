@@ -4,7 +4,6 @@
 // writes a stat to its files
 // also writes its game and average stats
 void OBSCounter::write(int statIndex) {
-    if (!writeFiles) { return; }
     // writes the total stat
     writeFile(fileLocation / (statStringsStandard[statIndex] + ".txt"), statArray[statIndex]);
 
@@ -69,8 +68,17 @@ void OBSCounter::writeTeams() {
 
 // writes a time stat with special formatting minutes:seconds
 void OBSCounter::writeTimeStat(int statIndex) {
-    if (!writeFiles) { return; }
     int totalSeconds = statArray[statIndex];
+    // average time is total / games
+    int avgSeconds;
+    if (statArray[games] == 0) {
+        avgSeconds = 0;
+    } else {
+        avgSeconds = totalSeconds / statArray[games];
+    }
+    averages[statIndex] = avgSeconds;
+
+    if (!writeFiles) { return; }
     // writes the total stat
     std::ofstream totalFile(fileLocation / (statStringsStandard[statIndex] + ".txt"));
     totalFile << totalSeconds / 60;
@@ -84,16 +92,7 @@ void OBSCounter::writeTimeStat(int statIndex) {
 
     // writes average of stat per game
     std::ofstream averageFile(fileLocation / (statStringsAverage[statIndex] + ".txt"));
-
-    // average time is total / games
-    int avgSeconds;
-    if (statArray[games] == 0) {
-        avgSeconds = 0;
-    }
-    else {
-        avgSeconds = totalSeconds / statArray[games];
-    }
-    averages[statIndex] = avgSeconds;
+    
     averageFile << avgSeconds / 60;
     averageFile << ":";
     remSeconds = avgSeconds % 60;
@@ -128,7 +127,6 @@ void OBSCounter::writeGameTimeStat(int statIndex) {
 
 // calls all write functions at once
 void OBSCounter::writeAll() {
-    if (!writeFiles) { return; }
     for (int i = 0; i <= ENDNORMALSTATS; i++) {
         write(i);
     }
@@ -148,16 +146,12 @@ void OBSCounter::writeAll() {
 // special cases for extra complicated stats
 // calculates shooting percentage (shots/goals)
 void OBSCounter::writeShootingPercentage() {
-    if (!writeFiles) { return; }
     // calculates current game shooting %
     // divides and checks for NaN
     int gameShooting = getPercentage(statArrayGame[goals], statArrayGame[shots]);
     std::stringstream gameShootingStream;
     gameShootingStream << gameShooting << "%";
     std::string gameShootingStr = gameShootingStream.str();
-    std::ofstream gameFile(fileLocation / "gameShootingPercentage.txt");
-    gameFile << gameShootingStr;
-    gameFile.close();
     statArrayOther[gameShootingPercentage] = gameShootingStr;
 
     // writes total session shooting
@@ -165,68 +159,82 @@ void OBSCounter::writeShootingPercentage() {
     std::stringstream totalShootingStream;
     totalShootingStream << totalShooting << "%";
     std::string totalShootingStr = totalShootingStream.str();
+    statArrayOther[shootingPercentage] = totalShootingStr;
+
+    if (!writeFiles) { return; }
+
+    std::ofstream gameFile(fileLocation / "gameShootingPercentage.txt");
+    gameFile << gameShootingStr;
+    gameFile.close();
+
     std::ofstream file(fileLocation / "shootingPercentage.txt");
     file << totalShootingStr;
     file.close();
-    statArrayOther[shootingPercentage] = totalShootingStr;
 }
 
 // writes K/D ratio
 void OBSCounter::writeKillPercentage() {
-    if (!writeFiles) { return; }
     float gameKD = divide(statArrayGame[demos], statArrayGame[deaths]);
     std::stringstream gameStream;
     gameStream << std::fixed << std::setprecision(decimalPlaces) << gameKD;
     std::string gameStr = gameStream.str();
-    std::ofstream gameFile(fileLocation / "gameKDRatio.txt");
-    gameFile << gameStr;
-    gameFile.close();
     statArrayOther[gameKDRatio] = gameStr;
 
     float totalKDRatio = divide(statArray[demos], statArray[deaths]);
     std::stringstream totalStream;
     totalStream << std::fixed << std::setprecision(decimalPlaces) << totalKDRatio;
     std::string totalStr = totalStream.str();
+    statArrayOther[kDRatio] = totalStr;
+
+    if (!writeFiles) { return; }
+    std::ofstream gameFile(fileLocation / "gameKDRatio.txt");
+    gameFile << gameStr;
+    gameFile.close();
+
     std::ofstream file(fileLocation / "KDRatio.txt");
     file << totalStr;
     file.close();
-    statArrayOther[kDRatio] = totalStr;
 }
 
 // writes missed exterm % for the session
 // total exterms / possible exterms (demos / 7) 
 void OBSCounter::writeMissedExterms() {
-    if (!writeFiles) { return; }
     // calculates possible exterms (demos / 7) 
     int possibleExterms = statArray[demos] / 7;
     std::stringstream totalStream;
     totalStream << possibleExterms;
     std::string totalStr = totalStream.str();
-    std::ofstream totalFile(fileLocation / "possibleExterminations.txt");
-    totalFile << totalStr;
-    totalFile.close();
     statArrayOther[possibleExterminations] = totalStr;
 
     int missedExtermPercent = getPercentage(statArray[exterms], possibleExterms);
     std::stringstream percentStream;
     percentStream << missedExtermPercent << "%";
     std::string percentStr = percentStream.str();
+    statArrayOther[missedExterminationPercent] = percentStr;
+
+    if (!writeFiles) { return; }
+    std::ofstream totalFile(fileLocation / "possibleExterminations.txt");
+    totalFile << totalStr;
+    totalFile.close();
+
     std::ofstream file(fileLocation / "missedExterminationPercent.txt");
     file << percentStr;
     file.close();
-    statArrayOther[missedExterminationPercent] = percentStr;
+    
 }
 
 void OBSCounter::writeWinPercentage() {
-    if (!writeFiles) { return; }
     int winPercent = getPercentage(statArray[wins], statArray[wins] + statArray[losses]);
     std::stringstream percentStream;
     percentStream << winPercent << "%";
     std::string percentStr = percentStream.str();
+    statArrayOther[winPercentage] = percentStr;
+
+    if (!writeFiles) { return; }
     std::ofstream file(fileLocation / "winPercent.txt");
     file << percentStr;
     file.close();
-    statArrayOther[winPercentage] = percentStr;
+    
 }
 
 void OBSCounter::writeFile(std::filesystem::path path, int value) {
